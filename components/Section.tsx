@@ -1,0 +1,25 @@
+import React from 'react';
+
+interface SectionProps {
+  id?: string;
+  className?: string;
+  children: React.ReactNode;
+  label?: string;
+}
+
+export const Section: React.FC<SectionProps> = ({ id, className = '', children, label }) => {
+  return (
+    <section id={id} className={`py-24 md:py-32 relative ${className}`}>
+      <div className="max-w-7xl mx-auto px-6">
+        {label && (
+          <div className="flex justify-center mb-16">
+             <span className="font-mono text-xs font-bold text-electric-teal uppercase tracking-[0.2em] border-b border-electric-teal/30 pb-2">
+              {label}
+             </span>
+          </div>
+        )}
+        {children}
+      </div>
+    </section>
+  );
+};
