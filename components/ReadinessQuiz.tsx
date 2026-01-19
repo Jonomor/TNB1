@@ -31,6 +31,11 @@ export const ReadinessQuiz: React.FC = () => {
     setCompleted(false);
   };
 
+  const scrollToPricing = () => {
+    const el = document.getElementById('pricing');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="bg-charcoal border border-white/5 p-8 md:p-12 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-electric-teal/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -85,7 +90,7 @@ export const ReadinessQuiz: React.FC = () => {
             </p>
 
             <div className="flex justify-center gap-4">
-              <Button variant="primary">Secure Institutional Edition</Button>
+              <Button variant="primary" onClick={scrollToPricing}>Secure Institutional Edition</Button>
               <Button variant="ghost" onClick={reset}>Restart Diagnostic</Button>
             </div>
           </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
 import { Button } from './components/Button';
-import { VoiceAssistant } from './components/VoiceAssistant';
 import { ComparisonRow } from './components/ComparisonRow';
 import { ResetCountdown } from './components/ResetCountdown';
 import { BridgeCalculator } from './components/BridgeCalculator';
@@ -21,6 +20,9 @@ import { StrategicDialogue } from './components/StrategicDialogue';
 import { IntelligenceVault } from './components/IntelligenceVault';
 import { TechnicalDefense } from './components/TechnicalDefense';
 import { PreOrderBridge } from './components/PreOrderBridge';
+import { DigitalAvatar } from './components/DigitalAvatar';
+import { FAQ } from './components/FAQ';
+import { LegalModal, LegalTab } from './components/LegalModal';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check } from 'lucide-react';
 
@@ -28,12 +30,27 @@ const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePreview, setActivePreview] = useState<'retail' | 'institutional' | null>(null);
   const [isVaultOpen, setIsVaultOpen] = useState(false);
+  
+  // Legal Modal State
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [activeLegalTab, setActiveLegalTab] = useState<LegalTab>('privacy');
 
-  const scrollToPricing = () => {
-    const el = document.getElementById('pricing');
+  const openLegal = (tab: LegalTab) => {
+    setActiveLegalTab(tab);
+    setLegalModalOpen(true);
+  };
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
+    setMobileMenuOpen(false);
+  };
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    scrollToSection(id);
   };
 
   const pricingTiers: PricingTier[] = [
@@ -128,7 +145,7 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen font-sans bg-matte-black text-off-white selection:bg-electric-teal selection:text-black pt-8">
+    <div className="min-h-screen font-sans bg-matte-black text-off-white selection:bg-electric-teal selection:text-black pt-12">
       
       {/* GLOBAL OVERLAYS */}
       <div className="fixed top-0 left-0 right-0 z-[60]">
@@ -140,31 +157,36 @@ const App: React.FC = () => {
         onClose={() => setActivePreview(null)}
         onOrder={() => {
           setActivePreview(null);
-          scrollToPricing();
+          scrollToSection('pricing');
         }}
       />
       <IntelligenceVault 
         isOpen={isVaultOpen}
         onClose={() => setIsVaultOpen(false)}
       />
+      <LegalModal 
+        isOpen={legalModalOpen}
+        initialTab={activeLegalTab}
+        onClose={() => setLegalModalOpen(false)}
+      />
       <SocialProof />
 
-      {/* Navigation */}
+      {/* Navigation - Adjusted top spacing to clear DayZeroBar */}
       <nav className="fixed top-8 w-full z-50 bg-matte-black/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth'})}>
+          <a href="#" className="flex items-center gap-3 cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth'}); }}>
              <div className="w-8 h-8 bg-electric-teal flex items-center justify-center rounded-sm">
                <Terminal size={18} className="text-black" />
              </div>
              <span className="font-serif font-bold text-lg tracking-tight">The Neutral Bridge</span>
-          </div>
+          </a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#about" className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
-            <a href="#editions" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
-            <a href="#pricing" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
-            <Button variant="primary" className="h-10 px-6 text-xs" onClick={scrollToPricing}>Order Now</Button>
+            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
+            <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
+            <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
+            <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -176,54 +198,69 @@ const App: React.FC = () => {
         {/* Mobile Nav */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-matte-black border-b border-white/10 px-6 py-8 flex flex-col gap-6">
-            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-lg font-serif">The Architect</a>
-            <a href="#editions" onClick={() => setMobileMenuOpen(false)} className="text-lg font-serif">Analysis</a>
-            <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-lg font-serif">Pricing</a>
-            <Button variant="primary" className="w-full" onClick={() => { scrollToPricing(); setMobileMenuOpen(false); }}>Order Now</Button>
+            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-lg font-serif text-left">The Architect</a>
+            <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-lg font-serif text-left">Analysis</a>
+            <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-lg font-serif text-left">Pricing</a>
+            <Button variant="primary" className="w-full" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
         )}
       </nav>
 
       {/* Hero Section */}
-      <header className="relative pt-32 pb-20 md:pt-48 md:pb-24 overflow-hidden bg-circuit">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-grey/10 skew-x-12 transform origin-top-right"></div>
+      <header className="relative pt-32 pb-20 md:pt-48 md:pb-24 overflow-hidden bg-circuit min-h-[90vh] flex flex-col justify-center">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-grey/10 skew-x-12 transform origin-top-right pointer-events-none"></div>
         
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-crimson/10 border border-crimson/20 rounded-full mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-crimson animate-pulse"></span>
-              <span className="text-[10px] font-mono font-bold text-crimson uppercase tracking-widest">
-                Priority Status: Critical
-              </span>
+        <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            
+            {/* Left: Copy */}
+            <div className="flex-1 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-crimson/10 border border-crimson/20 rounded-full mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-crimson animate-pulse"></span>
+                <span className="text-[10px] font-mono font-bold text-crimson uppercase tracking-widest">
+                  Priority Status: Critical
+                </span>
+              </div>
+
+              <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
+                The Architecture of the <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
+                  Next Monetary Era
+                </span>
+              </h1>
+
+              <p className="font-sans text-lg md:text-xl text-white/60 leading-relaxed mb-12">
+                An engineering-grade analysis of the "Neutral Bridge" theory—explaining how XRP and Ripple are positioned to facilitate the 2027 global liquidity reset.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Button variant="primary" className="min-w-[200px]" onClick={() => scrollToSection('pricing')}>Order Your Copy Now</Button>
+                <Button 
+                  variant="outline" 
+                  className="min-w-[200px] flex gap-2 items-center"
+                  onClick={() => setActivePreview('retail')}
+                >
+                  <BookOpen size={16} /> Read Preview
+                </Button>
+              </div>
             </div>
 
-            <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
-              The Architecture of the <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
-                Next Monetary Era
-              </span>
-            </h1>
-
-            <p className="font-sans text-lg md:text-xl text-white/60 leading-relaxed max-w-2xl mb-12">
-              An engineering-grade analysis of the "Neutral Bridge" theory—explaining how XRP and Ripple are positioned to facilitate the 2027 global liquidity reset.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-16">
-              <Button variant="primary" className="min-w-[200px]" onClick={scrollToPricing}>Order Your Copy Now</Button>
-              <Button 
-                variant="outline" 
-                className="min-w-[200px] flex gap-2 items-center"
-                onClick={() => setActivePreview('retail')}
-              >
-                <BookOpen size={16} /> Read Preview
-              </Button>
-              <VoiceAssistant className="min-w-[200px]" />
+            {/* Right: The Hologram Intelligence Agent */}
+            <div className="flex-1 w-full max-w-md lg:max-w-lg">
+               <div className="aspect-[3/4] w-full">
+                  <DigitalAvatar />
+               </div>
+               <div className="mt-4 flex items-center justify-center gap-2 text-white/30 font-mono text-[10px] uppercase tracking-widest">
+                  <Terminal size={10} />
+                  <span>Interactive Intelligence Feed Active</span>
+               </div>
             </div>
+
           </div>
         </div>
       </header>
       
-      {/* NEW: Pre-Order Bridge */}
+      {/* Pre-Order Bridge */}
       <PreOrderBridge />
 
       {/* Value Bar */}
@@ -246,27 +283,26 @@ const App: React.FC = () => {
       {/* Reset Countdown & Roadmap */}
       <ResetCountdown />
 
-      {/* NEW: Engineering Rigor (Validation) */}
+      {/* Engineering Rigor (Validation) */}
       <EngineeringRigor />
 
-      {/* NEW: Chapter 4 Technical Defense */}
+      {/* Chapter 4 Technical Defense */}
       <TechnicalDefense />
 
-      {/* About The Author */}
+      {/* About The Author - Simplified to remove duplicate Hologram */}
       <Section id="about" className="bg-charcoal border-b border-white/5">
         <div className="flex flex-col md:flex-row items-center gap-16">
-          <div className="flex-1">
-             <div className="aspect-[3/4] max-w-sm bg-slate-grey relative overflow-hidden group rounded-sm shadow-2xl">
-                {/* Image Slot for K. Morgan */}
-                <img 
-                  src="./k-morgan.png" 
-                  alt="K. Morgan - Systems Analyst" 
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-                  <div className="font-serif text-2xl text-white">K. Morgan</div>
-                  <div className="font-mono text-xs text-electric-teal uppercase tracking-widest">Systems Analyst</div>
-                </div>
+          <div className="flex-1 w-full flex justify-center">
+             <div className="relative w-full max-w-sm aspect-[3/4] bg-matte-black border border-white/10 p-2 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+               <img 
+                 src="https://image.pollinations.ai/prompt/professional%20headshot%20of%20a%20serious%20african%20american%20financial%20systems%20engineer%20wearing%20a%20black%20blazer%20and%20t-shirt,%20cyan%20and%20dark%20grey%20studio%20lighting,%20high%20tech%20background?width=800&height=800&nologo=true"
+                 alt="K. Morgan Portrait" 
+                 className="w-full h-full object-cover grayscale contrast-125"
+               />
+               <div className="absolute bottom-4 left-4 right-4 bg-white/10 backdrop-blur border border-white/20 p-4">
+                 <h3 className="font-serif text-xl text-white">K. Morgan</h3>
+                 <p className="font-mono text-xs text-electric-teal uppercase tracking-widest">Systems Engineer</p>
+               </div>
              </div>
           </div>
           <div className="flex-1">
@@ -286,10 +322,10 @@ const App: React.FC = () => {
         </div>
       </Section>
 
-      {/* NEW: Strategic Dialogue */}
+      {/* Strategic Dialogue */}
       <StrategicDialogue />
 
-      {/* NEW: System Architecture Comparison */}
+      {/* System Architecture Comparison */}
       <SystemArchitecture />
 
       {/* Sovereign Map */}
@@ -368,10 +404,10 @@ const App: React.FC = () => {
         </div>
       </Section>
 
-      {/* NEW: Intelligence Tiers */}
+      {/* Intelligence Tiers */}
       <IntelligenceTiers />
 
-      {/* Reset Readiness Quiz */}
+      {/* Readiness Quiz */}
       <Section id="readiness-check" className="bg-matte-black border-y border-white/5 pb-0 pt-0">
         <ReadinessQuiz />
       </Section>
@@ -411,12 +447,15 @@ const App: React.FC = () => {
           ))}
         </div>
         
-        {/* Institutional Value Bundle Table (Updated) */}
+        {/* Institutional Value Bundle Table */}
         <InstitutionalBundle onOpenVault={() => setIsVaultOpen(true)} />
 
         {/* Price Justification Table */}
         <PriceJustification />
       </Section>
+
+      {/* FAQ Section - Added for Legal/Launch Compliance */}
+      <FAQ />
 
       {/* Testimonials */}
       <Section id="testimonials" className="bg-circuit">
@@ -461,7 +500,7 @@ const App: React.FC = () => {
         <p className="text-white/50 max-w-2xl mx-auto mb-12">
           History shows that those who understand the infrastructure of the new system before it goes live are the ones who thrive.
         </p>
-        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={scrollToPricing}>Order Your Copy Now</Button>
+        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')}>Order Your Copy Now</Button>
       </section>
 
       {/* Disclaimer */}
@@ -479,7 +518,6 @@ const App: React.FC = () => {
             </div>
             <p className="text-xs text-white/40 font-mono uppercase tracking-wider mb-6">Engineering the Future of Finance</p>
             
-            {/* Contact Info Added for Consistency with AI */}
             <div className="flex flex-col gap-2 mb-8 text-sm text-white/50 font-sans">
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-electric-teal/60" />
@@ -507,20 +545,21 @@ const App: React.FC = () => {
           <div className="flex gap-16 text-sm text-white/60">
             <div className="flex flex-col gap-3">
               <span className="font-bold text-white mb-2">Resources</span>
-              <a href="#pricing" className="hover:text-white">Shop</a>
-              <a href="#newsletter" className="hover:text-white">Newsletter</a>
-              <a href="#editions" className="hover:text-white">Analysis</a>
+              <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
+              <button onClick={() => scrollToSection('newsletter')} className="hover:text-white text-left">Newsletter</button>
+              <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
             </div>
             <div className="flex flex-col gap-3">
               <span className="font-bold text-white mb-2">Legal</span>
-              <a href="#legal" className="hover:text-white">Privacy Policy</a>
-              <a href="#legal" className="hover:text-white">Terms of Service</a>
+              <button onClick={() => openLegal('privacy')} className="hover:text-white text-left">Privacy Policy</button>
+              <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
+              <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
             </div>
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 text-center md:text-left font-sans leading-relaxed">
           <p>The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.</p>
-          <p className="mt-2">© 2025 K. Morgan. All Rights Reserved.</p>
+          <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
         </div>
       </footer>
     </div>

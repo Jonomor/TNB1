@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Shield, Book, Clock, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { ShoppingCart, Shield, Book, Clock, Lock, Loader2 } from 'lucide-react';
 
 export const PreOrderBridge: React.FC = () => {
   // 1. Independent Launch Timer Logic (Target: Feb 18, 2026 09:00:00 EST)
@@ -9,7 +9,7 @@ export const PreOrderBridge: React.FC = () => {
 
   useEffect(() => {
     // Target: February 18, 2026 09:00:00 EST (UTC-5)
-    // Adjusting ISO string to specific time
+    // 09:00 EST is 14:00 UTC
     const targetDate = new Date("2026-02-18T14:00:00Z").getTime(); 
 
     const launchTimer = setInterval(() => {
@@ -36,7 +36,7 @@ export const PreOrderBridge: React.FC = () => {
   // 2. Secure Redirect Logic
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  // Placeholder Attribution Link (Replace with real tag when live)
+  // Placeholder Attribution Link
   const AMAZON_KDP_URL = "https://www.amazon.com/dp/B0D1234567?tag=neutralbridge-site-20";
 
   const handleRedirect = () => {

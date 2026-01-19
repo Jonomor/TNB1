@@ -9,7 +9,7 @@ interface SectionProps {
 
 export const Section: React.FC<SectionProps> = ({ id, className = '', children, label }) => {
   return (
-    <section id={id} className={`py-24 md:py-32 relative ${className}`}>
+    <section id={id} className={`py-24 md:py-32 relative scroll-mt-32 ${className}`}>
       <div className="max-w-7xl mx-auto px-6">
         {label && (
           <div className="flex justify-center mb-16">
