@@ -13,6 +13,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({ tier }) => {
   const isSuite = tier.type === 'suite';
 
   const handlePurchase = () => {
+    if (tier.externalUrl) {
+      window.open(tier.externalUrl, '_blank');
+      return;
+    }
     alert(`Initiating secure checkout for: ${tier.title}\n\nPrice: ${tier.price}\n\nThis is a simulation.`);
   };
 

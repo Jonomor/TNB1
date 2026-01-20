@@ -6,6 +6,16 @@
     <title>The Neutral Bridge | K. Morgan</title>
     <meta name="description" content="Ripple, XRP, and the Engineered Reset of Global Finance. A forensic analysis of the 2027 Global Financial Reset." />
     
+    <!-- Polyfill for process.env to prevent ReferenceError crash on GitHub Pages -->
+    <script>
+      window.process = {
+        env: {
+          NODE_ENV: 'production',
+          API_KEY: '' // API Key must be set in your build environment or hosting settings
+        }
+      };
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -110,5 +120,6 @@
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>

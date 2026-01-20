@@ -36,8 +36,8 @@ export const PreOrderBridge: React.FC = () => {
   // 2. Secure Redirect Logic
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  // Placeholder Attribution Link
-  const AMAZON_KDP_URL = "https://www.amazon.com/dp/B0D1234567?tag=neutralbridge-site-20";
+  // Updated Amazon KDP URL
+  const AMAZON_KDP_URL = "https://www.amazon.com/dp/B0GHP8PGCL";
 
   const handleRedirect = () => {
     setIsRedirecting(true);
@@ -95,7 +95,7 @@ export const PreOrderBridge: React.FC = () => {
                    <div className="text-left space-y-2 group cursor-default">
                       <div className="flex items-center gap-2">
                         <Book className="text-[#00E5FF] group-hover:scale-110 transition-transform" size={18} />
-                        <h4 className="font-serif text-white text-lg">Retail Edition</h4>
+                        <h4 className="font-serif text-white text-lg">Retail Edition (E-Book)</h4>
                       </div>
                       <p className="text-xs text-white/50 leading-relaxed pl-7 border-l border-[#00E5FF]/30">
                         Secure your copy for wealth preservation analysis.
@@ -133,7 +133,7 @@ export const PreOrderBridge: React.FC = () => {
                       ) : (
                         <>
                           <ShoppingCart size={16} />
-                          SECURE PRE-ORDER ON AMAZON
+                          ORDER ON AMAZON
                         </>
                       )}
                     </div>

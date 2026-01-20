@@ -68,12 +68,12 @@ export const TechnicalDefense: React.FC = () => {
            </div>
         </div>
 
-        {/* Right: The Image/Visual - UPDATED - Added public/ prefix */}
+        {/* Right: The Image/Visual - UPDATED - Fixed Path */}
         <div className="flex-1 w-full relative group">
            <div className="absolute -inset-1 bg-gradient-to-tr from-crimson/20 to-electric-teal/20 opacity-50 blur-xl group-hover:opacity-75 transition-opacity"></div>
            <div className="relative bg-charcoal border border-white/10 p-2 shadow-2xl">
               <img 
-                src="public/thedecoupling.png"
+                src="./thedecoupling.png"
                 alt="The Decoupling: Price vs Utility Infographic" 
                 className="w-full h-auto"
               />

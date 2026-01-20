@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './Button';
 import { Mic, X, Loader2, Volume2, CheckCircle2, Edit2, AlertTriangle, Terminal, BookOpen } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type, LiveSession } from "@google/genai";
+import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData, arrayBufferToBase64, floatTo16BitPCM } from '../utils/audio';
 
 interface VoiceAssistantProps {
@@ -161,7 +161,8 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ className }) => 
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
-  const sessionRef = useRef<Promise<LiveSession> | null>(null);
+  // Use any for session promise type as LiveSession is not exported
+  const sessionRef = useRef<Promise<any> | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const audioSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
 

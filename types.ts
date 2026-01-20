@@ -8,6 +8,7 @@ export interface PricingTier {
   isRecommended?: boolean;
   type: 'digital' | 'physical' | 'suite';
   requiresAcknowledgement?: boolean;
+  externalUrl?: string;
 }
 
 export interface ComparisonPoint {

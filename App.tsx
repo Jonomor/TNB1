@@ -56,18 +56,19 @@ const App: React.FC = () => {
   const pricingTiers: PricingTier[] = [
     {
       id: 'retail',
-      title: 'Physical Retail',
-      subtitle: 'High-quality print of the "Cyan Bridge" edition.',
-      price: '$29.99',
+      title: 'Retail Edition (E-Book)',
+      subtitle: 'Digital Kindle Edition for immediate strategic deployment.',
+      price: '$9.99',
       type: 'physical',
       features: [
-        'Hardcover Retail Edition',
-        'Signed Bookplate',
+        'Kindle / E-Book Format',
+        'Instant Digital Delivery',
         'Asset Preservation Logic',
-        'Standard Shipping'
+        'Compatible with all Devices'
       ],
-      ctaText: 'Order Physical',
-      isRecommended: false
+      ctaText: 'Order on Amazon',
+      isRecommended: false,
+      externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
     },
     {
       id: 'bundle',
@@ -108,24 +109,34 @@ const App: React.FC = () => {
 
   const comparisonPoints: ComparisonPoint[] = [
     {
-      feature: 'Primary Audience',
-      retail: 'Individual investors & tech enthusiasts',
-      institutional: 'Policymakers, analysts & fund managers'
+      feature: 'Primary Goal',
+      retail: 'General Strategic Awareness',
+      institutional: 'Forensic Systems Analysis'
     },
     {
-      feature: 'Core Focus',
-      retail: 'Asset solvency & market dynamics',
-      institutional: 'Infrastructure, regulation & system architecture'
+      feature: 'Target Audience',
+      retail: 'Individual Investors',
+      institutional: 'Risk Committees / Sovereign Funds'
     },
     {
-      feature: 'Tone & Style',
-      retail: 'Accessible & Actionable',
-      institutional: 'Technical, Data-Driven, & Forensic'
+      feature: 'Key Frameworks',
+      retail: '2027 Timeline & Macro Logic',
+      institutional: 'The Math of Necessity & Vertical Stack'
     },
     {
-      feature: 'Key Insight',
-      retail: 'The "Hidden Accumulation" Phase',
-      institutional: 'The "Value Density" Mathematics'
+      feature: 'Privacy Deep Dive',
+      retail: 'Intro to Protocol 22',
+      institutional: 'ZKP Technical Specifications'
+    },
+    {
+      feature: 'Verification Kit',
+      retail: 'Summary proof points',
+      institutional: 'Full Technical Appendix (15+ pages)'
+    },
+    {
+      feature: 'Acquisition Data',
+      retail: 'High-level overview',
+      institutional: 'Forensic M&A Deconstruction'
     }
   ];
 
@@ -328,9 +339,9 @@ const App: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1 w-full flex justify-center">
              <div className="relative w-full max-w-sm aspect-[3/4] bg-matte-black border border-white/10 p-2 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
-               {/* AUTHOR PORTRAIT UPDATED - Added public/ prefix */}
+               {/* AUTHOR PORTRAIT UPDATED - Fixed Path */}
                <img 
-                 src="public/kmorgan.png"
+                 src="./kmorgan.png"
                  alt="K. Morgan Portrait" 
                  className="w-full h-full object-cover grayscale contrast-125"
                />
@@ -385,11 +396,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Retail UPDATED - Added public/ prefix */}
+            {/* Book Cover Image Slot - Retail UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="public/retailedition.png" 
+                   src="./retailedition.png" 
                    alt="The Neutral Bridge Retail Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20" 
                  />
@@ -414,11 +425,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Institutional UPDATED - Added public/ prefix */}
+            {/* Book Cover Image Slot - Institutional UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="public/institutionaledition.png"
+                   src="/TNB1/public/institutionaledition.png"
                    alt="The Neutral Bridge Institutional Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
                  />
