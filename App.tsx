@@ -328,7 +328,7 @@ const App: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1 w-full flex justify-center">
              <div className="relative w-full max-w-sm aspect-[3/4] bg-matte-black border border-white/10 p-2 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
-               {/* AUTHOR PORTRAIT UPDATED - String Path */}
+               {/* AUTHOR PORTRAIT */}
                <img 
                  src="assets/kmorgan.png"
                  alt="K. Morgan Portrait" 
@@ -385,11 +385,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Retail - UPDATED - String Path */}
+            {/* Book Cover Image Slot - Retail */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="assets/retailedition.png"
+                   src="assets/retailedition.png" 
                    alt="The Neutral Bridge Retail Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20" 
                  />
@@ -414,7 +414,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Institutional - UPDATED - String Path */}
+            {/* Book Cover Image Slot - Institutional */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
