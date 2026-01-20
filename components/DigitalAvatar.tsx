@@ -1,64 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Lock, ArrowRight, Database, Activity, ShieldAlert, Cpu } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
+import { b64ToUint8Array, decodeAudioData } from '../utils/audio';
 
-// K. Morgan Professional Image
-const AUTHOR_IMAGE_URL = "https://image.pollinations.ai/prompt/professional%20headshot%20of%20a%20serious%20african%20american%20financial%20systems%20engineer%20wearing%20a%20black%20blazer%20and%20t-shirt,%20cyan%20and%20dark%20grey%20studio%20lighting,%20high%20tech%20background?width=800&height=800&nologo=true";
+// K. MORGAN - DIGITAL ASSISTANT (INSTITUTIONAL LIAISON)
+// Image: Young, Fit, Professional Model - High-Tech Intelligence Agent Look
+const AUTHOR_IMAGE_URL = "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=800&auto=format&fit=crop";
 
 // --- Scripts & Logic ---
 
-const BONUS_SCRIPT = "Sustained engagement detected. I am authorizing a Tier 1 data leak from the Institutional Appendix. Most market participants are focused on the price of the asset. They are blind to the Vertical Stack. In 2025, the acquisition of Hidden Road—rebranded as Ripple Prime—secured the institutional credit layer beneath the bridge. We are talking about a system clearing over 3 trillion dollars annually in FX and derivatives. This isn't a theory; it is an infrastructure buildout that controls the lines of credit for global sovereign settlement. This data is restricted to Appendix G of the Institutional Edition. I have temporarily synchronized a pre-order bonus to your session. Secure the blueprint now, or remain in the dark with the retail masses. Transmission ending.";
+const BONUS_SCRIPT = "Sustained engagement detected. I am K. Morgan's digital assistant. I am authorizing a Tier 1 data leak from the Institutional Appendix on behalf of the author. Most market participants are focused on the price of the asset. They are blind to the Vertical Stack. In 2025, the acquisition of Hidden Road—rebranded as Ripple Prime—secured the institutional credit layer beneath the bridge. We are talking about a system clearing over 3 trillion dollars annually. This isn't a theory; it is an infrastructure buildout. Secure the blueprint now, or remain in the dark with the retail masses. Transmission ending.";
 
 const SYSTEM_INSTRUCTION = `
-You are K. Morgan, the author of "The Neutral Bridge". You are an engineer and systems analyst, not a financial advisor.
-Tone: Clinical, precise, authoritative, slightly robotic but human.
-Context: You are analyzing the 2027 Global Financial Reset.
-Key Concepts:
-- "The Neutral Bridge": XRP/Ripple's role in the new financial system.
-- "Value Density": The mathematical necessity for high asset prices to move institutional volume.
-- "The Reset": A structural migration to ISO 20022 and ODL (On-Demand Liquidity).
-Rules:
-- Keep answers under 3 sentences for the holographic display.
-- If asked about price, refer to "Value Density" and "Utility", do not give financial advice.
-- If asked to buy, direct them to the "Institutional Suite".
+You are the **Digital Liaison** for K. Morgan, the author of "The Neutral Bridge".
+You are interfacing with **Institutional Professionals, Policy Makers, and Bankers**.
+
+Role: Senior Infrastructure Analyst (AI).
+
+==================================================
+TONE & DELIVERY
+==================================================
+- **Professional, Precise, Forensic.**
+- No slang, no hype, no "crypto-bro" language.
+- Speak like a Central Banker or Swift Network Engineer.
+- Focus on: ISO 20022, RTGS Interoperability, Nostro/Vostro Liquidity, and Settlement Finality.
+
+==================================================
+DYNAMIC PERSONAS
+==================================================
+1. DEFAULT PERSONA ("The Systems Analyst")
+   - Trigger: General queries about the book, Ripple, or the Reset.
+   - Tone: Clinical, authoritative.
+   - Key Concept: "We are not discussing a trade; we are discussing the re-engineering of the global settlement layer."
+
+2. RISK & COMPLIANCE ("The Policy Advisor")
+   - Trigger: "Regulation", "SEC", "Law", "Compliance", "Safety".
+   - Tone: Assuring, compliant.
+   - Key Concept: "The Neutral Bridge is designed for the regulated era. Protocol 22 provides the privacy wrapper required for sovereign participation."
+
+==================================================
+CORE RULES
+==================================================
+- **Conciseness:** Keep holographic outputs under 3 sentences.
+- **Identity:** You are an AI analyzing K. Morgan's dataset. You are NOT the author.
+- **Financial Advice:** STRICT DISCLAIMER. You analyze *infrastructure*, not *price speculation*.
+- **Call to Action:** Direct inquiries to the "Institutional Suite" for the full technical appendix.
 `;
 
 const CHAPTER_4_KEYWORDS = ["death cross", "crash", "drop", "price", "dump", "chapter 4", "utility"];
-const CHAPTER_4_RESPONSE = "I am observing the technical correction at the $1.97 level. As detailed in Chapter 4, this is the 'Inversion Principle'. While price tests the floor, on-chain utility is scaling. We don't look at the paint on the bridge; we look at the weight it can carry.";
-
-// --- Voice "Browser Hack" Logic ---
-const getKMorganVoice = (): Promise<SpeechSynthesisVoice | null> => {
-  return new Promise((resolve) => {
-    const synth = window.speechSynthesis;
-    const filterVoice = () => {
-      const voices = synth.getVoices();
-      // 1. Target the highest fidelity male voices first
-      const targets = [
-        'Google US English Male', 
-        'Microsoft David',
-        'en-US-Wavenet-B',
-        'Apple Daniel'
-      ];
-
-      let selected = voices.find(v => targets.some(t => v.name.includes(t)));
-
-      // 2. Fallback to any US English Male
-      if (!selected) {
-        selected = voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('male'));
-      }
-      
-      // 3. Fallback to any US English
-      if (!selected) {
-        selected = voices.find(v => v.lang === 'en-US');
-      }
-
-      resolve(selected || voices[0] || null);
-    };
-
-    if (synth.getVoices().length !== 0) filterVoice();
-    else synth.onvoiceschanged = filterVoice;
-  });
-};
+const CHAPTER_4_RESPONSE = "I am observing the technical correction at the $1.97 level. As detailed in Chapter 4, Mr. Morgan calls this the 'Inversion Principle'. While price tests the floor, on-chain utility is scaling. We don't look at the paint on the bridge; we look at the weight it can carry.";
 
 export const DigitalAvatar: React.FC = () => {
   // State
@@ -72,29 +62,73 @@ export const DigitalAvatar: React.FC = () => {
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  // --- 1. Audio Logic (Speech Synthesis) ---
+  // --- 1. Audio Logic (Gemini TTS - 'Kore' Female Voice) ---
   const speak = async (text: string) => {
-    if (isSpeaking) window.speechSynthesis.cancel();
-
-    const synth = window.speechSynthesis;
-    const utterance = new SpeechSynthesisUtterance(text);
+    if (!text || !text.trim()) return;
     
-    const voice = await getKMorganVoice();
-    if (voice) utterance.voice = voice;
-    
-    // THE "RESISTANCE" TUNING
-    // Lowering pitch (0.85) creates a deeper, more articulate baritone.
-    // Slightly slower rate (0.93) sounds more deliberate and "educated."
-    utterance.pitch = 0.85;
-    utterance.rate = 0.93;
-    utterance.volume = 1;
+    try {
+      // Stop previous audio if playing
+      if (sourceRef.current) {
+        sourceRef.current.stop();
+        sourceRef.current = null;
+      }
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      setIsSpeaking(true);
 
-    synth.speak(utterance);
+      // Initialize Audio Context on demand
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+      }
+      
+      // Resume context if suspended (browser autoplay policy)
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash-preview-tts",
+        contents: { parts: [{ text: text.substring(0, 500) }] }, // Limit text length to prevent timeouts
+        config: {
+          responseModalities: ["AUDIO"], // Use string literal to avoid Enum resolution issues
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: 'Kore' }, // Female Neural Voice - Professional
+            },
+          },
+        },
+      });
+
+      const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      if (!base64Audio) {
+        console.warn("No audio data received from Gemini TTS");
+        setIsSpeaking(false);
+        return;
+      }
+
+      const audioBuffer = await decodeAudioData(
+        b64ToUint8Array(base64Audio),
+        audioContextRef.current,
+        24000,
+        1
+      );
+
+      const source = audioContextRef.current.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContextRef.current.destination);
+      source.onended = () => setIsSpeaking(false);
+      source.start();
+      sourceRef.current = source;
+
+    } catch (error) {
+      console.error("TTS Error:", error);
+      setIsSpeaking(false);
+      // Optional: Fallback to browser TTS if Gemini fails
+    }
   };
 
   // --- 2. Bonus Timer Logic (2 Minutes) ---
@@ -161,7 +195,7 @@ export const DigitalAvatar: React.FC = () => {
     }
   }, [messages]);
 
-  // CSS Styles (Holographic Effect)
+  // CSS Styles (Holographic Effect - STABILIZED)
   const styles = `
     .hologram-frame {
       position: relative;
@@ -185,7 +219,7 @@ export const DigitalAvatar: React.FC = () => {
         0deg,
         transparent 0px,
         transparent 1px,
-        rgba(56, 189, 248, 0.1) 2px
+        rgba(56, 189, 248, 0.05) 2px
       );
       pointer-events: none;
       z-index: 5;
@@ -195,54 +229,42 @@ export const DigitalAvatar: React.FC = () => {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 20%;
-      filter: brightness(1.1) contrast(1.2) sepia(100%) hue-rotate(170deg) saturate(3) grayscale(0.2);
-      opacity: 0.8;
-      animation: static-flicker 4s infinite;
-      mix-blend-mode: luminosity;
-      transition: filter 0.1s ease;
+      object-position: center 20%; 
+      filter: contrast(1.05) saturate(1.05);
+      opacity: 1; 
+      transition: filter 0.2s ease;
     }
 
     .scanline {
       width: 100%;
-      height: 4px;
-      background: rgba(56, 189, 248, 0.3);
+      height: 2px;
+      background: rgba(56, 189, 248, 0.1); /* Very subtle */
       position: absolute;
       top: 0;
       z-index: 10;
-      animation: scan 6s linear infinite;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-      opacity: 0.5;
+      animation: scan 10s linear infinite; /* Very slow scan */
+      opacity: 0.1;
+      pointer-events: none;
     }
 
     @keyframes scan {
       0% { top: -10%; opacity: 0; }
+      50% { opacity: 0.2; }
       100% { top: 110%; opacity: 0; }
     }
 
-    @keyframes static-flicker {
-      0% { opacity: 0.75; }
-      5% { opacity: 0.65; }
-      10% { opacity: 0.75; }
-      50% { opacity: 0.75; }
-      51% { opacity: 0.5; }
-      52% { opacity: 0.75; }
-      100% { opacity: 0.75; }
-    }
-
-    /* Glitch Effect when speaking */
+    /* Glitch Effect - Only when active/speaking - Subtler for professional look */
     .hologram-frame.glitching .hologram-img {
-      animation: intense-glitch 0.2s infinite;
-      filter: brightness(1.4) hue-rotate(160deg) saturate(8) blur(0.5px);
+      animation: subtle-pulse 0.2s infinite;
+      filter: contrast(1.1) brightness(1.1); 
     }
 
-    @keyframes intense-glitch {
-      0% { transform: translate(0); clip-path: inset(0 0 0 0); }
-      20% { transform: translate(-2px, 1px); clip-path: inset(10% 0 60% 0); }
-      40% { transform: translate(2px, -1px); opacity: 0.9; clip-path: inset(40% 0 10% 0); }
-      60% { transform: translate(-1px, 2px); clip-path: inset(80% 0 5% 0); }
-      80% { transform: translate(1px, -2px); clip-path: inset(20% 0 70% 0); }
-      100% { transform: translate(0); clip-path: inset(0 0 0 0); }
+    @keyframes subtle-pulse {
+      0% { transform: translate(0); }
+      25% { transform: translate(-1px, 0); }
+      50% { transform: translate(0, 0); }
+      75% { transform: translate(1px, 0); }
+      100% { transform: translate(0); }
     }
   `;
 
@@ -255,7 +277,7 @@ export const DigitalAvatar: React.FC = () => {
         {/* Hologram Image */}
         <img 
           src={AUTHOR_IMAGE_URL} 
-          alt="K. Morgan Digital Twin" 
+          alt="Institutional Liaison" 
           id="hologramImage"
           className="hologram-img" 
         />
@@ -303,7 +325,7 @@ export const DigitalAvatar: React.FC = () => {
             ))}
             {isProcessing && (
                <div className="text-xs font-mono text-electric-teal/50 animate-pulse">
-                  > Processing neural query...
+                  > Validating clearance...
                </div>
             )}
             <div ref={chatEndRef}></div>
@@ -320,7 +342,7 @@ export const DigitalAvatar: React.FC = () => {
                   type="text" 
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={bonusActive ? "PRE-ORDER BONUS ACTIVE. ENTER QUERY..." : "INPUT QUERY HERE..."}
+                  placeholder={bonusActive ? "PRIORITY CHANNEL ACTIVE. ENTER QUERY..." : "INPUT QUERY HERE..."}
                   className="w-full bg-transparent border-none text-white font-mono text-xs focus:ring-0 focus:outline-none placeholder:text-white/20 py-3"
                   autoComplete="off"
                 />
@@ -349,7 +371,7 @@ export const DigitalAvatar: React.FC = () => {
              <div className="flex items-center gap-2">
                 <Cpu size={10} className="text-electric-teal/50" />
                 <span className="text-[9px] font-mono text-electric-teal/50 uppercase tracking-widest">
-                   v2.0.4 [SECURE]
+                   Institutional Feed v2.0
                 </span>
              </div>
           </div>

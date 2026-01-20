@@ -20,11 +20,11 @@ import { StrategicDialogue } from './components/StrategicDialogue';
 import { IntelligenceVault } from './components/IntelligenceVault';
 import { TechnicalDefense } from './components/TechnicalDefense';
 import { PreOrderBridge } from './components/PreOrderBridge';
-import { DigitalAvatar } from './components/DigitalAvatar';
+import { VoiceAssistant } from './components/VoiceAssistant';
 import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
-import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -245,15 +245,49 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Right: The Hologram Intelligence Agent */}
-            <div className="flex-1 w-full max-w-md lg:max-w-lg">
-               <div className="aspect-[3/4] w-full">
-                  <DigitalAvatar />
-               </div>
-               <div className="mt-4 flex items-center justify-center gap-2 text-white/30 font-mono text-[10px] uppercase tracking-widest">
-                  <Terminal size={10} />
-                  <span>Interactive Intelligence Feed Active</span>
-               </div>
+            {/* Right: AI Voice Interface */}
+            <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
+                {/* Decorative Tech Background */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
+                
+                <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
+                    <div className="flex flex-col items-center text-center space-y-6">
+                        {/* Audio Visualization Ring */}
+                        <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative">
+                             <div className="absolute inset-0 border border-electric-teal/30 rounded-full animate-ping opacity-20"></div>
+                             <div className="absolute inset-2 border border-white/5 rounded-full"></div>
+                             <Mic size={32} className="text-electric-teal" />
+                        </div>
+                        
+                        <div>
+                            <h3 className="text-white font-serif text-2xl mb-2">Secure Voice Uplink</h3>
+                            <p className="text-white/60 text-sm leading-relaxed max-w-xs mx-auto">
+                                Direct neural link to the K. Morgan digital twin. Analyze the $1.97 Death Cross and 2027 Reset data in real-time.
+                            </p>
+                        </div>
+
+                        <VoiceAssistant className="w-full py-4 text-sm uppercase tracking-widest bg-electric-teal/10 hover:bg-electric-teal/20 border-electric-teal/50 hover:border-electric-teal text-white shadow-[0_0_15px_rgba(56,189,248,0.2)]" />
+                        
+                        <div className="grid grid-cols-2 gap-4 w-full pt-6 border-t border-white/5">
+                             <div className="text-center">
+                                 <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">System Status</div>
+                                 <div className="text-electric-teal text-xs font-mono font-bold flex items-center justify-center gap-1">
+                                    <div className="w-1.5 h-1.5 bg-electric-teal rounded-full animate-pulse"></div> Online
+                                 </div>
+                             </div>
+                             <div className="text-center">
+                                 <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Latency</div>
+                                 <div className="text-white text-xs font-mono">12ms</div>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    {/* Tech Corners */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-electric-teal"></div>
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-electric-teal"></div>
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-electric-teal"></div>
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-electric-teal"></div>
+                </div>
             </div>
 
           </div>
@@ -289,13 +323,14 @@ const App: React.FC = () => {
       {/* Chapter 4 Technical Defense */}
       <TechnicalDefense />
 
-      {/* About The Author - Simplified to remove duplicate Hologram */}
+      {/* About The Author - Simplified */}
       <Section id="about" className="bg-charcoal border-b border-white/5">
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1 w-full flex justify-center">
              <div className="relative w-full max-w-sm aspect-[3/4] bg-matte-black border border-white/10 p-2 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+               {/* AUTHOR PORTRAIT UPDATED - String Path */}
                <img 
-                 src="kmorgan.png"
+                 src="assets/kmorgan.png"
                  alt="K. Morgan Portrait" 
                  className="w-full h-full object-cover grayscale contrast-125"
                />
@@ -350,11 +385,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Retail */}
+            {/* Book Cover Image Slot - Retail - UPDATED - String Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="retailedition.png" 
+                   src="assets/retailedition.png"
                    alt="The Neutral Bridge Retail Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20" 
                  />
@@ -379,11 +414,11 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Cover Image Slot - Institutional */}
+            {/* Book Cover Image Slot - Institutional - UPDATED - String Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="institutionaledition.png" 
+                   src="assets/institutionaledition.png"
                    alt="The Neutral Bridge Institutional Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
                  />
