@@ -1,20 +1,29 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Backend Proxy (Optional)
 
-# Run and deploy your AI Studio app
+This minimal backend keeps your Gemini API key off the frontend by proxying requests.
 
-This contains everything you need to run your app locally.
+## Setup
 
-View your app in AI Studio: https://ai.studio/apps/drive/1ikPyB-IrSeqS2VZ2Q0bfDAYPPvc_-YBk
+```bash
+cd backend
+npm install
+export GEMINI_API_KEY="your_gemini_key"
+npm start
+```
 
-## Run Locally
+## Endpoints
 
-**Prerequisites:**  Node.js
+### Health check
+`GET /healthz`
 
+### Generate content (text prompt)
+`POST /api/generate`
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Example:
+```bash
+curl -X POST http://localhost:8080/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Hello world"}'
+```
+
+> Note: You will need to update the frontend to call this backend endpoint instead of using the Gemini SDK directly.
