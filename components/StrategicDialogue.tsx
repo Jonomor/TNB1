@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Section } from './Section';
 import { DialogueItem } from './DialogueItem';
 import { DialogueEntry } from '../types';
-import { Loader2, ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Info, Search } from 'lucide-react';
 
 export const StrategicDialogue: React.FC = () => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
   const dialogue: DialogueEntry[] = [
     {
       speaker: "INFRASTRUCTURE ARCHITECT",
@@ -43,16 +41,30 @@ export const StrategicDialogue: React.FC = () => {
   ];
 
   return (
-    <Section id="dialogue" className="bg-matte-black border-b border-white/5" label="The Strategic Dialogue // Exhibit A">
+    <Section id="dialogue" className="bg-matte-black border-b border-white/5" label="Strategic Dialogue // Forensic Exhibit">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
+        <div className="mb-10 p-4 bg-electric-teal/5 border border-electric-teal/20 flex gap-4 items-center rounded-sm">
+           <Search size={20} className="text-electric-teal" />
+           <p className="text-xs font-mono text-white/60">Hover over Morgan's responses to intercept the forensic reasoning behind each system pillar.</p>
+        </div>
+
         {dialogue.map((entry, idx) => (
-           <DialogueItem key={idx} entry={entry} />
+           <div key={idx} className="group relative">
+              <DialogueItem entry={entry} />
+              {entry.speaker === "Morgan" && (
+                <div className="absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="p-2 bg-matte-black border border-electric-teal/30 rounded-full cursor-help shadow-[0_0_15px_#38bdf822]">
+                    <Info size={14} className="text-electric-teal" />
+                  </div>
+                </div>
+              )}
+           </div>
         ))}
         
-        <div className="mt-12 flex justify-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-white/5 rounded-sm text-[10px] font-mono uppercase tracking-widest text-white/40">
-            <ShieldCheck size={14} className="text-electric-teal" />
-            Verified Forensic Transcript // Source: The Neutral Bridge MS
+        <div className="mt-16 flex justify-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 border border-white/10 bg-white/5 rounded-sm text-[10px] font-mono uppercase tracking-[0.2em] text-white/50">
+            <ShieldCheck size={16} className="text-electric-teal" />
+            Verified Infrastructure Intelligence // Ref: NB-MS-2027
           </div>
         </div>
       </div>
