@@ -3,7 +3,7 @@ import { Button } from './Button';
 import { Mic, X, Loader2, Volume2, CheckCircle2, Edit2, AlertTriangle, Terminal, BookOpen } from 'lucide-react';
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData, arrayBufferToBase64, floatTo16BitPCM } from '../utils/audio';
-import { getGeminiApiKey } from '@/utils/gemini';
+import { getGeminiApiKey } from '../utils/gemini.ts';
 
 interface VoiceAssistantProps {
   className?: string;
