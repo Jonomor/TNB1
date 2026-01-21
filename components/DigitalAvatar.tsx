@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Lock, ArrowRight, Database, Activity, ShieldAlert, Cpu } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData } from '../utils/audio';
-
+import { getGeminiApiKey } from '../utils/gemini';
 // K. MORGAN - DIGITAL ASSISTANT (INSTITUTIONAL LIAISON)
 // Image: Young, Fit, Professional Model - High-Tech Intelligence Agent Look
 const AUTHOR_IMAGE_URL = "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=800&auto=format&fit=crop";
@@ -88,7 +88,13 @@ export const DigitalAvatar: React.FC = () => {
         await audioContextRef.current.resume();
       }
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+       const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        console.warn("Missing API key for Gemini TTS.");
+        setIsSpeaking(false);
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
