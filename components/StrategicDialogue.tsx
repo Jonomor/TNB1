@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Section } from './Section';
 import { DialogueItem } from './DialogueItem';
 import { DialogueEntry } from '../types';
+import { Loader2, ShieldCheck } from 'lucide-react';
 
 export const StrategicDialogue: React.FC = () => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const dialogue: DialogueEntry[] = [
     {
       speaker: "INFRASTRUCTURE ARCHITECT",
@@ -45,6 +48,13 @@ export const StrategicDialogue: React.FC = () => {
         {dialogue.map((entry, idx) => (
            <DialogueItem key={idx} entry={entry} />
         ))}
+        
+        <div className="mt-12 flex justify-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 border border-white/10 bg-white/5 rounded-sm text-[10px] font-mono uppercase tracking-widest text-white/40">
+            <ShieldCheck size={14} className="text-electric-teal" />
+            Verified Forensic Transcript // Source: The Neutral Bridge MS
+          </div>
+        </div>
       </div>
     </Section>
   );
