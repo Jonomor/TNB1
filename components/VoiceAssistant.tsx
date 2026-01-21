@@ -3,6 +3,7 @@ import { Button } from './Button';
 import { Mic, X, Loader2, Volume2, CheckCircle2, Edit2, AlertTriangle, Terminal, BookOpen } from 'lucide-react';
 import { GoogleGenAI, LiveServerMessage, Modality, FunctionDeclaration, Type } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData, arrayBufferToBase64, floatTo16BitPCM } from '../utils/audio';
+import { getGeminiApiKey } from '../utils/gemini';
 
 interface VoiceAssistantProps {
   className?: string;
@@ -190,11 +191,18 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ className }) => 
     setError(null);
     setConnectionStep('connecting');
     try {
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        setError("Missing API key. Add VITE_GEMINI_API_KEY to your build or set window.process.env.API_KEY.");
+        setConnectionStep('idle');
+        return;
+      }
+      
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       audioContextRef.current = audioCtx;
       nextStartTimeRef.current = audioCtx.currentTime;
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey });
       
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-12-2025',
