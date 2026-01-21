@@ -24,12 +24,14 @@ import { VoiceAssistant } from './components/VoiceAssistant';
 import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
+import { getAssetBase } from './utils/assets';
 import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePreview, setActivePreview] = useState<'retail' | 'institutional' | null>(null);
   const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const assetBase = getAssetBase();
   
   // Legal Modal State
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -341,7 +343,7 @@ const App: React.FC = () => {
              <div className="relative w-full max-w-sm aspect-[3/4] bg-matte-black border border-white/10 p-2 shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
                {/* AUTHOR PORTRAIT UPDATED - Fixed Path */}
                <img 
-                 src="./kmorgan.png"
+                 src={`${assetBase}kmorgan.png`}
                  alt="K. Morgan Portrait" 
                  className="w-full h-full object-cover grayscale contrast-125"
                />
@@ -400,7 +402,7 @@ const App: React.FC = () => {
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="./retailedition.png" 
+                   src={`${assetBase}retailedition.png`} 
                    alt="The Neutral Bridge Retail Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20" 
                  />
@@ -429,7 +431,7 @@ const App: React.FC = () => {
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
                  <img 
-                   src="/TNB1/public/institutionaledition.png"
+                   src={`${assetBase}institutionedition.png`}
                    alt="The Neutral Bridge Institutional Edition Cover" 
                    className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
                  />
