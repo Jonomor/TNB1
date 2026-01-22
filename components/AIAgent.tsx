@@ -29,9 +29,17 @@ export const AIAgent: React.FC<AIAgentProps> = ({ isOpen, onClose }) => {
         ? NEUTRAL_BRIDGE_SYSTEM_PROMPT 
         : STANDARD_MARKETING_PROMPT;
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Access API Key safely from the window polyfill if strict process.env fails in browser
+      const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
+
+      if (!apiKey) {
+        throw new Error("API Key not found. Please check index.html polyfill.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey: apiKey });
+      
       const response = await ai.models.generateContent({
-        model: 'gemini-1.5-pro-latest', // Using Pro model for complex reasoning as requested
+        model: 'gemini-3-flash-preview', // Updated to latest stable Flash model for high-speed text generation
         contents: prompt,
         config: {
           systemInstruction: systemInstruction,
@@ -40,10 +48,18 @@ export const AIAgent: React.FC<AIAgentProps> = ({ isOpen, onClose }) => {
       });
 
       const text = response.text;
-      setOutput(text || "Error: No intelligence generated.");
-    } catch (error) {
+      setOutput(text || "Error: Intelligence stream empty.");
+    } catch (error: any) {
       console.error("Agent Error:", error);
-      setOutput("System Failure: Unable to establish uplink with generation node.");
+      let errorMessage = "System Failure: Unable to establish uplink.";
+      
+      if (error.message?.includes('API key')) {
+        errorMessage = "Auth Error: API Key invalid or missing.";
+      } else if (error.message?.includes('404')) {
+        errorMessage = "Model Error: Neural node offline (404).";
+      }
+      
+      setOutput(errorMessage);
     } finally {
       setIsGenerating(false);
     }
