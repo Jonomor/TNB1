@@ -1,14 +1,23 @@
+export interface PricingVariant {
+  id: string;
+  label: string;
+  price: string;
+  ctaText: string;
+  externalUrl?: string;
+}
+
 export interface PricingTier {
   id: string;
   title: string;
   subtitle: string;
-  price: string;
+  price?: string;
   features: string[];
-  ctaText: string;
+  ctaText?: string;
   isRecommended?: boolean;
   type: 'digital' | 'physical' | 'suite';
   requiresAcknowledgement?: boolean;
   externalUrl?: string;
+  variants?: PricingVariant[];
 }
 
 export interface ComparisonPoint {
