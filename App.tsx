@@ -279,7 +279,7 @@ const App: React.FC = () => {
                             </p>
                         </div>
 
-                        <VoiceAssistant className="w-full py-4 text-sm uppercase tracking-widest bg-electric-teal/10 hover:bg-electric-teal/20 border-electric-teal/50 hover:border-electric-teal text-white shadow-[0_0_15px_rgba(56,189,248,0.2)]" />
+                       // <VoiceAssistant className="w-full py-4 text-sm uppercase tracking-widest bg-electric-teal/10 hover:bg-electric-teal/20 border-electric-teal/50 hover:border-electric-teal text-white shadow-[0_0_15px_rgba(56,189,248,0.2)]" />
                         
                         <div className="grid grid-cols-2 gap-4 w-full pt-6 border-t border-white/5">
                              <div className="text-center">
