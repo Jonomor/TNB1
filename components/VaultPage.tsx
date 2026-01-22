@@ -13,21 +13,21 @@ export const VaultPage: React.FC = () => {
       size: "42.5MB", 
       ref: "NB-2027-ANALYSIS", 
       desc: "Full technical appendix and Protocol 22 specifications.",
-      path: "/vault-files/NB-Institutional-2027.pdf"
+      path: "/TNB1/vault-files/NB-Institutional-2027.pdf"
     },
     { 
       title: "Letter of Authenticity & Institutional License", 
       size: "1.2MB", 
       ref: "NB-LOA-SERIALIZED", 
       desc: "Serialized certificate of forensic authenticity.",
-      path: "/vault-files/NB-Letter-of-Authenticity.pdf"
+      path: "/TNB1/vault-files/NB-Letter-of-Authenticity.pdf"
     },
     { 
       title: "Excel-Based Liquidity Model (V1.4)", 
       size: "8.4MB", 
       ref: "NB-LM-ATOMIC", 
       desc: "Interactive calculator for atomic settlement velocity.",
-      path: "/vault-files/NB-Liquidity-Model.xlsx"
+      path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
     }
   ];
 
