@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
 import { Button } from './components/Button';
@@ -25,6 +25,7 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { AIAgent } from './components/AIAgent';
+import { VaultPage } from './components/VaultPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
@@ -39,6 +40,22 @@ const App: React.FC = () => {
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'joining' | 'joined'>('idle');
+
+  // Client-Side Routing for Vault Page
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  // Return Vault Page if route matches
+  if (currentPath.includes('/vault')) {
+    return <VaultPage />;
+  }
 
   const assetBase = getAssetBase();
   
