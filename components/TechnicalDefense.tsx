@@ -2,11 +2,13 @@ import React from 'react';
 import { Section } from './Section';
 import { Button } from './Button';
 import { TrendingDown, TrendingUp, AlertTriangle, BookOpen, Activity } from 'lucide-react';
-import { getAssetBase } from '../utils/assets';
 
-export const TechnicalDefense: React.FC = () => {
-const assetBase = getAssetBase();
-  
+interface TechnicalDefenseProps {
+  onOrder?: () => void;
+  onRead?: () => void;
+}
+
+export const TechnicalDefense: React.FC<TechnicalDefenseProps> = ({ onOrder, onRead }) => {
   return (
     <Section id="technical-defense" className="bg-matte-black border-y border-white/5 relative overflow-hidden">
       {/* Background noise/grid */}
@@ -62,10 +64,10 @@ const assetBase = getAssetBase();
           </div>
 
            <div className="pt-4 flex gap-4">
-              <Button variant="primary" className="text-xs">
+              <Button variant="primary" className="text-xs" onClick={onOrder}>
                 Acquire The Institutional Suite
               </Button>
-              <Button variant="outline" className="text-xs">
+              <Button variant="outline" className="text-xs" onClick={onRead}>
                 <BookOpen size={14} className="mr-2" /> Read Full Analysis
               </Button>
            </div>
@@ -76,7 +78,7 @@ const assetBase = getAssetBase();
            <div className="absolute -inset-1 bg-gradient-to-tr from-crimson/20 to-electric-teal/20 opacity-50 blur-xl group-hover:opacity-75 transition-opacity"></div>
            <div className="relative bg-charcoal border border-white/10 p-2 shadow-2xl">
               <img 
-                src={`${assetBase}thedecoupling.jpg`}
+                src="./thedecoupling.png"
                 alt="The Decoupling: Price vs Utility Infographic" 
                 className="w-full h-auto"
               />
