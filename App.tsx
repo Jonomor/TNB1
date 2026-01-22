@@ -416,73 +416,59 @@ const App: React.FC = () => {
       <StrategicDialogue />
 
       <Section id="intelligence-gallery" label="Intelligence Exhibits // Forensic Series">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {/* Exhibit A: Mechanical Bridge */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
-               <img src="exhibit-a.jpg" alt="Exhibit A" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div className="flex justify-between items-center font-mono text-[10px]">
-              <span className="text-electric-teal font-bold">EXHIBIT_01: MECHANICAL BRIDGE</span>
-              <span className="text-white/20">REF: NB-ALPHA</span>
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-a.jpg" alt="Mechanical Bridge" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_01: MECHANICAL BRIDGE [ATOMIC SETTLEMENT]</span>
+              <span className="text-white/20">REF: NB-2027-ALPHA</span>
             </div>
           </div>
 
           {/* Exhibit B: Nostro Entanglement */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
-              <img src="exhibit-b.jpg" alt="Exhibit B" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div className="flex justify-between items-center font-mono text-[10px]">
-              <span className="text-electric-teal font-bold">EXHIBIT_02: NOSTRO ENTANGLEMENT</span>
-              <span className="text-white/20">REF: NB-BETA</span>
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-b.jpg" alt="Nostro Entanglement" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_02: NOSTRO ENTANGLEMENT [DORMANT CAPITAL]</span>
+              <span className="text-white/20">REF: NB-2027-BETA</span>
             </div>
           </div>
 
           {/* Exhibit C: New World Mesh */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
-              <img src="exhibit-c.jpg" alt="Exhibit C" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div className="flex justify-between items-center font-mono text-[10px]">
-              <span className="text-electric-teal font-bold">EXHIBIT_03: ISO 20022 MESH</span>
-              <span className="text-white/20">REF: NB-GAMMA</span>
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-c.jpg" alt="Standardized Messaging" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_03: ISO 20022 MESSAGING MESH</span>
+              <span className="text-white/20">REF: ISO-22-GAMMA</span>
             </div>
           </div>
 
           {/* Exhibit D: Unified Ledger */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
-               <img src="exhibit-d.jpg" alt="Exhibit D" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div className="flex justify-between items-center font-mono text-[10px]">
-              <span className="text-electric-teal font-bold">EXHIBIT_04: UNIFIED LEDGER</span>
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-d.jpg" alt="Unified Ledger" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_04: UNIFIED LEDGER [SYSTEM FINALITY]</span>
               <span className="text-white/20">REF: NB-DELTA</span>
             </div>
           </div>
 
-          {/* Exhibit E: The Mill */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-             <div className="aspect-video bg-charcoal mb-4 overflow-hidden relative">
-               <img src="exhibit-e.jpg" alt="Exhibit E" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-               <div className="absolute inset-0 bg-electric-teal/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-             </div>
-             <div className="flex justify-between items-center font-mono text-[10px]">
-               <span className="text-electric-teal font-bold">EXHIBIT_05: LIQUIDITY MILL</span>
-               <span className="text-white/20">REF: NB-EPSILON</span>
-             </div>
+          {/* Exhibit E: The Liquidity Bridge (New) */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-e.jpg" alt="Liquidity Bridge" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_05: LIQUIDITY BRIDGE [UNLOCKED CAPITAL]</span>
+              <span className="text-white/20">REF: NB-EPSILON</span>
+            </div>
           </div>
 
-          {/* Exhibit F: ZKP Layer */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-             <div className="aspect-video bg-charcoal mb-4 overflow-hidden relative">
-               <img src="exhibit-f.jpg" alt="Exhibit F" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-               <div className="absolute inset-0 bg-crimson/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-             </div>
-             <div className="flex justify-between items-center font-mono text-[10px]">
-               <span className="text-electric-teal font-bold">EXHIBIT_06: ZKP PRIVACY</span>
-               <span className="text-white/20">REF: NB-ZETA</span>
-             </div>
+          {/* Exhibit F: ZKP Privacy Layer (New) */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+            <img src="exhibit-f.jpg" alt="ZKP Layer" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
+            <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal">EXHIBIT_06: ZKP PRIVACY LAYER [INSTITUTIONAL]</span>
+              <span className="text-white/20">REF: NB-ZETA-PRO</span>
+            </div>
           </div>
         </div>
       </Section>
