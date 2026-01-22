@@ -7,6 +7,30 @@ export const VaultPage: React.FC = () => {
     window.location.href = '/';
   };
 
+  const downloads = [
+    { 
+      title: "The Neutral Bridge: Institutional Edition (PDF)", 
+      size: "42.5MB", 
+      ref: "NB-2027-ANALYSIS", 
+      desc: "Full technical appendix and Protocol 22 specifications.",
+      path: "/vault-files/NB-Institutional-2027.pdf"
+    },
+    { 
+      title: "Letter of Authenticity & Institutional License", 
+      size: "1.2MB", 
+      ref: "NB-LOA-SERIALIZED", 
+      desc: "Serialized certificate of forensic authenticity.",
+      path: "/vault-files/NB-Letter-of-Authenticity.pdf"
+    },
+    { 
+      title: "Excel-Based Liquidity Model (V1.4)", 
+      size: "8.4MB", 
+      ref: "NB-LM-ATOMIC", 
+      desc: "Interactive calculator for atomic settlement velocity.",
+      path: "/vault-files/NB-Liquidity-Model.xlsx"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-[#050505] text-off-white font-mono p-4 md:p-8 selection:bg-electric-teal selection:text-black">
       {/* Terminal Container */}
@@ -48,11 +72,7 @@ export const VaultPage: React.FC = () => {
               <Download size={16} /> 1. Executive Downloads
             </h2>
             <div className="grid gap-4">
-              {[
-                { title: "The Neutral Bridge: Institutional Edition (PDF)", size: "42.5MB", ref: "NB-2027-ANALYSIS", desc: "Full technical appendix and Protocol 22 specifications." },
-                { title: "Letter of Authenticity & Institutional License", size: "1.2MB", ref: "NB-LOA-SERIALIZED", desc: "Serialized certificate of forensic authenticity." },
-                { title: "Excel-Based Liquidity Model (V1.4)", size: "8.4MB", ref: "NB-LM-ATOMIC", desc: "Interactive calculator for atomic settlement velocity." }
-              ].map((item, i) => (
+              {downloads.map((item, i) => (
                 <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 border border-white/10 bg-white/5 hover:bg-electric-teal/5 hover:border-electric-teal/40 transition-all group cursor-pointer">
                   <div className="flex items-start gap-4">
                       <div className="mt-1 text-electric-teal/40 group-hover:text-electric-teal transition-colors">
@@ -66,9 +86,13 @@ export const VaultPage: React.FC = () => {
                   </div>
                   <div className="mt-4 md:mt-0 flex items-center gap-4">
                       <span className="text-[10px] text-white/20 font-mono">{item.size}</span>
-                      <Button variant="outline" className="text-xs h-8 px-4 border-white/20 hover:border-electric-teal text-white/60 hover:text-electric-teal">
+                      <a 
+                        href={item.path}
+                        download
+                        className="flex items-center justify-center font-sans font-semibold tracking-wide rounded-sm uppercase transition-all duration-200 ease-in-out text-xs h-8 px-4 border border-white/20 hover:border-electric-teal text-white/60 hover:text-electric-teal bg-transparent"
+                      >
                           Download
-                      </Button>
+                      </a>
                   </div>
                 </div>
               ))}
