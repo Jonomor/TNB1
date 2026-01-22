@@ -279,7 +279,10 @@ const App: React.FC = () => {
                             </p>
                         </div>
 
-                       // <VoiceAssistant className="w-full py-4 text-sm uppercase tracking-widest bg-electric-teal/10 hover:bg-electric-teal/20 border-electric-teal/50 hover:border-electric-teal text-white shadow-[0_0_15px_rgba(56,189,248,0.2)]" />
+                       <div className="w-full py-3 px-4 bg-white/5 border border-white/10 text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                            <Activity size={12} className="text-white/20" />
+                               Link Encrypted — Institutional Access Only
+                       </div>
                         
                         <div className="grid grid-cols-2 gap-4 w-full pt-6 border-t border-white/5">
                              <div className="text-center">
