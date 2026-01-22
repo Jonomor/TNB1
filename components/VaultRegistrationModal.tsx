@@ -7,39 +7,10 @@ interface VaultRegistrationModalProps {
   onClose: () => void;
 }
 
-// =========================================================================================
-// ARCHITECT INSTRUCTIONS FOR REDEMPTION PROTOCOL
-// =========================================================================================
-// 
-// 1. FORM SETUP:
-//    Create a Google Form with these specific questions:
-//    - "Email Address" (Enable email collection)
-//    - "Amazon Order ID" (Short answer validation: \d{3}-\d{7}-\d{7})
-//    
-// 2. EMBEDDING:
-//    Replace the `GOOGLE_FORM_URL` const below with your form's "Send > Embed HTML" src link.
-//    Ensure the link ends with `?embedded=true`.
-//
-// 3. THE BRAIN (GOOGLE APPS SCRIPT):
-//    In your Google Form Sheet -> Extensions -> Apps Script -> Paste this code:
-//
-/* 
-   function onFormSubmit(e) {
-     // Trigger: On Form Submit
-     var email = e.values[1]; // Adjust index based on column order
-     var orderId = e.values[2];
-     
-     var subject = "Institutional Access Granted | Order: " + orderId;
-     var body = "SECURE TRANSMISSION\n\n" +
-                "Identity Verified. Your Amazon Order ID has been logged.\n\n" +
-                "ACCESS VAULT: https://theneutralbridge.com/?access=granted\n" + 
-                "LICENSE KEY: NB-" + Math.floor(Math.random() * 100000) + "-X\n\n" +
-                "Welcome to the Bridge.\n- K. Morgan";
-                
-     MailApp.sendEmail(email, subject, body);
-   }
-*/
-// =========================================================================================
+// INSTRUCTIONS:
+// 1. Create a Google Form with "Email Address" and "Amazon Order ID" fields.
+// 2. Replace GOOGLE_FORM_URL below with your form's embed link (ending in ?embedded=true).
+// 3. Use Google Apps Script on the Sheet to email the license key automatically.
 
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfD_placeholder/viewform?embedded=true"; 
 
@@ -84,7 +55,6 @@ export const VaultRegistrationModal: React.FC<VaultRegistrationModalProps> = ({ 
 
            {/* Google Form Embed */}
            <div className="w-full h-full min-h-[500px] bg-white">
-              {/* Note: In a real deployment, ensure your Google Form allows embedding (X-Frame-Options) */}
               <iframe 
                 src={GOOGLE_FORM_URL} 
                 width="100%" 
