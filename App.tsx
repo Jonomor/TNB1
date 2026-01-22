@@ -23,14 +23,23 @@ import { PreOrderBridge } from './components/PreOrderBridge';
 import { VoiceAssistant } from './components/VoiceAssistant';
 import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
+import { VaultRegistrationModal } from './components/VaultRegistrationModal';
+import { AIAgent } from './components/AIAgent';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
-import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePreview, setActivePreview] = useState<'retail' | 'institutional' | null>(null);
   const [isVaultOpen, setIsVaultOpen] = useState(false);
+  const [isRedemptionOpen, setIsRedemptionOpen] = useState(false);
+  const [isAgentOpen, setIsAgentOpen] = useState(false);
+  
+  // Newsletter State
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'joining' | 'joined'>('idle');
+
   const assetBase = getAssetBase();
   
   // Legal Modal State
@@ -53,6 +62,17 @@ const App: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     scrollToSection(id);
+  };
+
+  const handleJoinNewsletter = () => {
+    // Removed email check for demo purposes so button always provides feedback
+    setNewsletterStatus('joining');
+    // Simulate API call
+    setTimeout(() => {
+      setNewsletterStatus('joined');
+      setNewsletterEmail('');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    }, 1500);
   };
 
   const pricingTiers: PricingTier[] = [
@@ -184,6 +204,14 @@ const App: React.FC = () => {
         isOpen={isVaultOpen}
         onClose={() => setIsVaultOpen(false)}
       />
+      <VaultRegistrationModal 
+        isOpen={isRedemptionOpen}
+        onClose={() => setIsRedemptionOpen(false)}
+      />
+      <AIAgent 
+        isOpen={isAgentOpen}
+        onClose={() => setIsAgentOpen(false)}
+      />
       <LegalModal 
         isOpen={legalModalOpen}
         initialTab={activeLegalTab}
@@ -242,6 +270,7 @@ const App: React.FC = () => {
                 </span>
               </div>
 
+              {/* REVERTED HEADLINE TO GENERIC AS REQUESTED */}
               <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
                 The Architecture of the <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
@@ -386,45 +415,77 @@ const App: React.FC = () => {
       {/* Strategic Dialogue */}
       <StrategicDialogue />
 
-<Section id="intelligence-gallery" label="Intelligence Exhibits // Forensic Series">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-    {/* Exhibit A: Mechanical Bridge */}
-    <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="exhibit-a.jpg" alt="Exhibit A" className="w-full grayscale group-hover:grayscale-0 transition-all" />
-      <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
-        <span className="text-electric-teal">EXHIBIT_01: MECHANICAL BRIDGE</span>
-        <span className="text-white/20">REF: NB-2027-ALPHA</span>
-      </div>
-    </div>
+      <Section id="intelligence-gallery" label="Intelligence Exhibits // Forensic Series">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Exhibit A: Mechanical Bridge */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
+               <img src="exhibit-a.jpg" alt="Exhibit A" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+            </div>
+            <div className="flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal font-bold">EXHIBIT_01: MECHANICAL BRIDGE</span>
+              <span className="text-white/20">REF: NB-ALPHA</span>
+            </div>
+          </div>
 
-    {/* Exhibit B: Nostro Entanglement */}
-    <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="exhibit-b.jpg" alt="Exhibit B" className="w-full grayscale group-hover:grayscale-0 transition-all" />
-      <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
-        <span className="text-electric-teal">EXHIBIT_02: NOSTRO ENTANGLEMENT</span>
-        <span className="text-white/20">REF: NB-2027-BETA</span>
-      </div>
-    </div>
+          {/* Exhibit B: Nostro Entanglement */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
+              <img src="exhibit-b.jpg" alt="Exhibit B" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+            </div>
+            <div className="flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal font-bold">EXHIBIT_02: NOSTRO ENTANGLEMENT</span>
+              <span className="text-white/20">REF: NB-BETA</span>
+            </div>
+          </div>
 
-    {/* Exhibit C: New World Mesh */}
-    <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="exhibit-c.jpg" alt="Exhibit C" className="w-full grayscale group-hover:grayscale-0 transition-all" />
-      <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
-        <span className="text-electric-teal">EXHIBIT_03: STANDARDIZED MESSAGING</span>
-        <span className="text-white/20">REF: ISO-20022-GAMMA</span>
-      </div>
-    </div>
+          {/* Exhibit C: New World Mesh */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
+              <img src="exhibit-c.jpg" alt="Exhibit C" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+            </div>
+            <div className="flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal font-bold">EXHIBIT_03: ISO 20022 MESH</span>
+              <span className="text-white/20">REF: NB-GAMMA</span>
+            </div>
+          </div>
 
-    {/* Exhibit D: Unified Ledger */}
-    <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="exhibit-d.jpg" alt="Exhibit D" className="w-full grayscale group-hover:grayscale-0 transition-all" />
-      <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
-        <span className="text-electric-teal">EXHIBIT_04: UNIFIED LEDGER SYSTEM</span>
-        <span className="text-white/20">REF: NB-SYSTEM-DELTA</span>
-      </div>
-    </div>
-  </div>
-</Section>
+          {/* Exhibit D: Unified Ledger */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+            <div className="aspect-video bg-charcoal mb-4 overflow-hidden">
+               <img src="exhibit-d.jpg" alt="Exhibit D" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+            </div>
+            <div className="flex justify-between items-center font-mono text-[10px]">
+              <span className="text-electric-teal font-bold">EXHIBIT_04: UNIFIED LEDGER</span>
+              <span className="text-white/20">REF: NB-DELTA</span>
+            </div>
+          </div>
+
+          {/* Exhibit E: The Mill */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+             <div className="aspect-video bg-charcoal mb-4 overflow-hidden relative">
+               <img src="exhibit-e.jpg" alt="Exhibit E" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+               <div className="absolute inset-0 bg-electric-teal/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+             </div>
+             <div className="flex justify-between items-center font-mono text-[10px]">
+               <span className="text-electric-teal font-bold">EXHIBIT_05: LIQUIDITY MILL</span>
+               <span className="text-white/20">REF: NB-EPSILON</span>
+             </div>
+          </div>
+
+          {/* Exhibit F: ZKP Layer */}
+          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
+             <div className="aspect-video bg-charcoal mb-4 overflow-hidden relative">
+               <img src="exhibit-f.jpg" alt="Exhibit F" className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+               <div className="absolute inset-0 bg-crimson/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+             </div>
+             <div className="flex justify-between items-center font-mono text-[10px]">
+               <span className="text-electric-teal font-bold">EXHIBIT_06: ZKP PRIVACY</span>
+               <span className="text-white/20">REF: NB-ZETA</span>
+             </div>
+          </div>
+        </div>
+      </Section>
       
       {/* System Architecture Comparison */}
       <SystemArchitecture />
@@ -549,7 +610,10 @@ const App: React.FC = () => {
         </div>
         
         {/* Institutional Value Bundle Table */}
-        <InstitutionalBundle onOpenVault={() => setIsVaultOpen(true)} />
+        <InstitutionalBundle 
+           onOpenVault={() => setIsVaultOpen(true)} 
+           onRedeem={() => setIsRedemptionOpen(true)}
+        />
 
         {/* Price Justification Table */}
         <PriceJustification />
@@ -583,9 +647,15 @@ const App: React.FC = () => {
             <input 
               type="email" 
               placeholder="Enter your email address" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
             />
-            <Button variant="primary">Join The Bridge</Button>
+            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'}>
+              {newsletterStatus === 'idle' && "Join The Bridge"}
+              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
+              {newsletterStatus === 'joined' && "Access Granted"}
+            </Button>
           </div>
         </div>
       </Section>
@@ -655,6 +725,9 @@ const App: React.FC = () => {
               <button onClick={() => openLegal('privacy')} className="hover:text-white text-left">Privacy Policy</button>
               <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
               <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
+              <button onClick={() => setIsAgentOpen(true)} className="hover:text-electric-teal text-left mt-2 flex items-center gap-2">
+                 <Cpu size={12} /> Agent Access
+              </button>
             </div>
           </div>
         </div>
