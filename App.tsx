@@ -20,11 +20,9 @@ import { StrategicDialogue } from './components/StrategicDialogue';
 import { IntelligenceVault } from './components/IntelligenceVault';
 import { TechnicalDefense } from './components/TechnicalDefense';
 import { PreOrderBridge } from './components/PreOrderBridge';
-import { VoiceAssistant } from './components/VoiceAssistant';
 import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
-import { AIAgent } from './components/AIAgent';
 import { VaultPage } from './components/VaultPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
@@ -35,7 +33,6 @@ const App: React.FC = () => {
   const [activePreview, setActivePreview] = useState<'retail' | 'institutional' | null>(null);
   const [isVaultOpen, setIsVaultOpen] = useState(false);
   const [isRedemptionOpen, setIsRedemptionOpen] = useState(false);
-  const [isAgentOpen, setIsAgentOpen] = useState(false);
   
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -224,10 +221,6 @@ const App: React.FC = () => {
       <VaultRegistrationModal 
         isOpen={isRedemptionOpen}
         onClose={() => setIsRedemptionOpen(false)}
-      />
-      <AIAgent 
-        isOpen={isAgentOpen}
-        onClose={() => setIsAgentOpen(false)}
       />
       <LegalModal 
         isOpen={legalModalOpen}
@@ -728,9 +721,6 @@ const App: React.FC = () => {
               <button onClick={() => openLegal('privacy')} className="hover:text-white text-left">Privacy Policy</button>
               <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
               <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
-              <button onClick={() => setIsAgentOpen(true)} className="hover:text-electric-teal text-left mt-2 flex items-center gap-2">
-                 <Cpu size={12} /> Agent Access
-              </button>
             </div>
           </div>
         </div>
