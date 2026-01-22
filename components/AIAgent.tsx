@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { NEUTRAL_BRIDGE_SYSTEM_PROMPT, STANDARD_MARKETING_PROMPT, BRIEFING_TEMPLATE } from '../src/constants/prompts';
-import { Terminal, Copy, Cpu, X, FileText, Share2, Loader2, ShieldAlert } from 'lucide-react';
+import { Terminal, Copy, Cpu, X, FileText, Share2, Loader2, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { Button } from './Button';
 
 interface AIAgentProps {
@@ -29,37 +29,72 @@ export const AIAgent: React.FC<AIAgentProps> = ({ isOpen, onClose }) => {
         ? NEUTRAL_BRIDGE_SYSTEM_PROMPT 
         : STANDARD_MARKETING_PROMPT;
 
-      // Access API Key safely from the window polyfill if strict process.env fails in browser
-      const apiKey = process.env.API_KEY || (window as any).process?.env?.API_KEY;
+      // Robust API Key Retrieval
+      let apiKey = '';
+      try {
+        // @ts-ignore
+        if (typeof process !== 'undefined' && process.env?.API_KEY) {
+           // @ts-ignore
+           apiKey = process.env.API_KEY;
+        }
+      } catch (e) { /* ignore reference error */ }
+      
+      if (!apiKey) {
+         apiKey = (window as any).process?.env?.API_KEY;
+      }
 
       if (!apiKey) {
-        throw new Error("API Key not found. Please check index.html polyfill.");
+        throw new Error("CRITICAL: API Key could not be located in environment variables.");
       }
+
+      console.log("Initializing Agent with Key: " + apiKey.substring(0, 8) + "...");
 
       const ai = new GoogleGenAI({ apiKey: apiKey });
       
+      // Using explicit content structure for maximum compatibility
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview', // Updated to latest stable Flash model for high-speed text generation
-        contents: prompt,
+        model: 'gemini-3-flash-preview',
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: prompt }]
+          }
+        ],
         config: {
           systemInstruction: systemInstruction,
-          temperature: 0.2, // Low temp for sober/factual output
+          temperature: 0.2,
+          // Removed maxOutputTokens to prevent truncation unless necessary
         }
       });
 
       const text = response.text;
-      setOutput(text || "Error: Intelligence stream empty.");
-    } catch (error: any) {
-      console.error("Agent Error:", error);
-      let errorMessage = "System Failure: Unable to establish uplink.";
-      
-      if (error.message?.includes('API key')) {
-        errorMessage = "Auth Error: API Key invalid or missing.";
-      } else if (error.message?.includes('404')) {
-        errorMessage = "Model Error: Neural node offline (404).";
+      if (!text) {
+        throw new Error("Empty response received from Neural Node.");
       }
+      setOutput(text);
       
-      setOutput(errorMessage);
+    } catch (error: any) {
+      console.error("Agent Error Details:", error);
+      
+      let errorHeader = "SYSTEM ERROR";
+      let errorDetails = error.message || error.toString();
+
+      // Forensic Error Mapping
+      if (errorDetails.includes('404')) {
+        errorHeader = "MODEL NOT FOUND (404)";
+        errorDetails = "The requested neural model 'gemini-3-flash-preview' is currently offline or inaccessible.";
+      } else if (errorDetails.includes('400')) {
+        errorHeader = "BAD REQUEST (400)";
+        errorDetails = "Invalid request parameters. Check syntax and constraints.";
+      } else if (errorDetails.includes('403') || errorDetails.includes('API key')) {
+        errorHeader = "ACCESS DENIED (403)";
+        errorDetails = "API Key authentication failed. Credentials may be invalid or expired.";
+      } else if (errorDetails.includes('503')) {
+        errorHeader = "SERVICE UNAVAILABLE (503)";
+        errorDetails = "Neural grid is overloaded. Please retry uplink.";
+      }
+
+      setOutput(`[${errorHeader}]\n\n${errorDetails}\n\nTrace: ${new Date().toISOString()}`);
     } finally {
       setIsGenerating(false);
     }
@@ -197,9 +232,21 @@ export const AIAgent: React.FC<AIAgentProps> = ({ isOpen, onClose }) => {
             <div className="flex-1 p-8 overflow-y-auto">
               {output ? (
                 <div className="prose prose-invert max-w-none">
-                  <pre className="whitespace-pre-wrap font-mono text-sm text-white/80 leading-relaxed">
-                    {output}
-                  </pre>
+                  {output.includes('SYSTEM ERROR') || output.includes('FAILURE') ? (
+                    <div className="border border-crimson/50 bg-crimson/10 p-4 rounded-sm">
+                       <div className="flex items-center gap-2 mb-2 text-crimson">
+                          <AlertTriangle size={16} />
+                          <span className="font-bold text-sm">UPLINK FAILED</span>
+                       </div>
+                       <pre className="whitespace-pre-wrap font-mono text-xs text-crimson/80 leading-relaxed">
+                          {output}
+                       </pre>
+                    </div>
+                  ) : (
+                    <pre className="whitespace-pre-wrap font-mono text-sm text-white/80 leading-relaxed">
+                      {output}
+                    </pre>
+                  )}
                 </div>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-white/20">
