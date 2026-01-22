@@ -58,54 +58,60 @@ const App: React.FC = () => {
   const pricingTiers: PricingTier[] = [
     {
       id: 'retail',
-      title: 'Retail Edition (E-Book)',
-      subtitle: 'Digital Kindle Edition for immediate strategic deployment.',
-      price: '$9.99',
+      title: 'The Neutral Bridge: Ripple, XRP, and the Engineered Reset of Global Finance',
+      subtitle: 'Wealth preservation and the 2027 roadmap.',
       type: 'physical',
       features: [
-        'Kindle / E-Book Format',
-        'Instant Digital Delivery',
         'Asset Preservation Logic',
+        '2027 Timeline Analysis',
+        'Retail Survival Guide',
         'Compatible with all Devices'
       ],
-      ctaText: 'Order on Amazon',
-      isRecommended: false,
-      externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
+      isRecommended: true,
+      variants: [
+        {
+          id: 'ebook',
+          label: 'E-Book',
+          price: '$9.99',
+          ctaText: 'Order on Amazon',
+          externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
+        },
+        {
+          id: 'paperback',
+          label: 'Paperback',
+          price: '$29.99',
+          ctaText: 'Order Paperback',
+          externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
+        }
+      ]
     },
     {
-      id: 'bundle',
-      title: 'Digital Bundle',
-      subtitle: 'Includes both Retail & Institutional PDF/ePub.',
-      price: '$49.00',
-      type: 'digital',
-      features: [
-        'Instant Access (PDF/ePub)',
-        'Retail Edition Included',
-        'Institutional Edition Included',
-        'Monthly Newsletter Access',
-        'Bonus: Transition Readiness Checklist'
-      ],
-      ctaText: 'Get The Bundle',
-      isRecommended: true
-    },
-    {
-      id: 'suite',
-      title: 'Institutional Suite',
-      subtitle: 'Hardcover Institutional Edition + Raw Data.',
-      price: '$159.99',
+      id: 'institutional',
+      title: 'The Neutral Bridge: A Systems Analysis of the 2027 Reset of Global Finance',
+      subtitle: 'Engineering-grade analysis with raw models.',
       type: 'suite',
       features: [
-        'Hardcover Institutional Edition',
         'Serialized Raw Data Appendix',
+        'Excel-Based Liquidity Model',
         'Quarterly Strategy Briefings',
         'Priority Analyst Support',
-        'Unique Digital License ID',
-        'Excel-Based Liquidity Model',
         'Snypre System AI Whitelist'
       ],
-      ctaText: 'Acquire Intelligence',
-      isRecommended: false,
-      requiresAcknowledgement: true
+      requiresAcknowledgement: true,
+      variants: [
+         {
+          id: 'ebook-inst',
+          label: 'E-Book',
+          price: '$99.99',
+          ctaText: 'Download Digital Suite',
+        },
+        {
+          id: 'hardcover',
+          label: 'Hardcover',
+          price: '$159.99',
+          ctaText: 'Order Hardcover Suite',
+        }
+      ]
     }
   ];
 
@@ -532,7 +538,7 @@ const App: React.FC = () => {
 
       {/* Pricing */}
       <Section id="pricing" label="Secure Your Intelligence">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
           {pricingTiers.map((tier) => (
             <PricingCard key={tier.id} tier={tier} />
           ))}
