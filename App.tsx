@@ -103,7 +103,8 @@ const App: React.FC = () => {
           id: 'ebook-inst',
           label: 'E-Book',
           price: '$99.99',
-          ctaText: 'Download Digital Suite',
+          ctaText: 'Order on Amazon',
+          externalUrl: 'https://www.amazon.com/dp/B0GHRYD6BJ'
         },
         {
           id: 'hardcover',
