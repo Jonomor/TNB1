@@ -78,7 +78,7 @@ export const TechnicalDefense: React.FC<TechnicalDefenseProps> = ({ onOrder, onR
            <div className="absolute -inset-1 bg-gradient-to-tr from-crimson/20 to-electric-teal/20 opacity-50 blur-xl group-hover:opacity-75 transition-opacity"></div>
            <div className="relative bg-charcoal border border-white/10 p-2 shadow-2xl">
               <img 
-                src="./thedecoupling.png"
+                src="thedecoupling.jpg"
                 alt="The Decoupling: Price vs Utility Infographic" 
                 className="w-full h-auto"
               />
