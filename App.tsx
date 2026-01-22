@@ -344,7 +344,10 @@ const App: React.FC = () => {
       <EngineeringRigor />
 
       {/* Chapter 4 Technical Defense */}
-      <TechnicalDefense />
+      <TechnicalDefense 
+        onOrder={() => scrollToSection('pricing')}
+        onRead={() => setActivePreview('institutional')}
+      />
 
       {/* About The Author - Simplified */}
       <Section id="about" className="bg-charcoal border-b border-white/5">
