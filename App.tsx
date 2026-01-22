@@ -377,7 +377,7 @@ const App: React.FC = () => {
   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
     {/* Exhibit A: Mechanical Bridge */}
     <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="/the-neutral-bridge-infographic.jpg" alt="Exhibit A" className="w-full grayscale group-hover:grayscale-0 transition-all" />
+      <img src="exhibit-a.jpg" alt="Exhibit A" className="w-full grayscale group-hover:grayscale-0 transition-all" />
       <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
         <span className="text-electric-teal">EXHIBIT_01: MECHANICAL BRIDGE</span>
         <span className="text-white/20">REF: NB-2027-ALPHA</span>
@@ -386,7 +386,7 @@ const App: React.FC = () => {
 
     {/* Exhibit B: Nostro Entanglement */}
     <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="/infographic.jpg" alt="Exhibit B" className="w-full grayscale group-hover:grayscale-0 transition-all" />
+      <img src="exhibit-b.jpg" alt="Exhibit B" className="w-full grayscale group-hover:grayscale-0 transition-all" />
       <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
         <span className="text-electric-teal">EXHIBIT_02: NOSTRO ENTANGLEMENT</span>
         <span className="text-white/20">REF: NB-2027-BETA</span>
@@ -395,7 +395,7 @@ const App: React.FC = () => {
 
     {/* Exhibit C: New World Mesh */}
     <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="/infographic-2.jpg" alt="Exhibit C" className="w-full grayscale group-hover:grayscale-0 transition-all" />
+      <img src="exhibit-c.jpg" alt="Exhibit C" className="w-full grayscale group-hover:grayscale-0 transition-all" />
       <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
         <span className="text-electric-teal">EXHIBIT_03: STANDARDIZED MESSAGING</span>
         <span className="text-white/20">REF: ISO-20022-GAMMA</span>
@@ -404,7 +404,7 @@ const App: React.FC = () => {
 
     {/* Exhibit D: Unified Ledger */}
     <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all">
-      <img src="/infographic-3.jpg" alt="Exhibit D" className="w-full grayscale group-hover:grayscale-0 transition-all" />
+      <img src="exhibit-d.jpg" alt="Exhibit D" className="w-full grayscale group-hover:grayscale-0 transition-all" />
       <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
         <span className="text-electric-teal">EXHIBIT_04: UNIFIED LEDGER SYSTEM</span>
         <span className="text-white/20">REF: NB-SYSTEM-DELTA</span>
