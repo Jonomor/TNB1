@@ -34,17 +34,18 @@ export const PreOrderBridge: React.FC = () => {
   }, []);
 
   // 2. Secure Redirect Logic
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  // Updated Amazon KDP URL
-  const AMAZON_KDP_URL = "https://www.amazon.com/dp/B0GHP8PGCL";
+  const [redirectingType, setRedirectingType] = useState<'retail' | 'institutional' | null>(null);
 
-  const handleRedirect = () => {
-    setIsRedirecting(true);
+  const RETAIL_URL = "https://www.amazon.com/Neutral-Bridge-Ripple-Engineered-Finance-ebook/dp/B0GHP8PGCL";
+  const INST_URL = "https://www.amazon.com/Neutral-Bridge-System-Analysis-Financial-ebook/dp/B0GHRYD6BJ";
+
+  const handleRedirect = (type: 'retail' | 'institutional') => {
+    setRedirectingType(type);
+    const url = type === 'retail' ? RETAIL_URL : INST_URL;
     
     // 2-second delay to establish "Secure Bridge" feel
     setTimeout(() => {
-      window.location.href = AMAZON_KDP_URL;
+      window.location.href = url;
     }, 2000);
   };
 
@@ -87,70 +88,79 @@ export const PreOrderBridge: React.FC = () => {
           </div>
 
           {/* Pre-Order Interface */}
-          <div className="w-full max-w-3xl bg-[#121212] border border-white/10 p-1 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px]">
+          <div className="w-full max-w-4xl bg-[#121212] border border-white/10 p-1 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.02)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px]">
              <div className="border border-white/5 p-8 md:p-12 flex flex-col items-center">
                 
-                {/* Dual Tier Teaser */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-12">
-                   <div className="text-left space-y-2 group cursor-default">
-                      <div className="flex items-center gap-2">
-                        <Book className="text-[#00E5FF] group-hover:scale-110 transition-transform" size={18} />
-                        <h4 className="font-serif text-white text-lg">Retail Edition (E-Book)</h4>
+                {/* Dual Tier Grid with Buttons */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-8">
+                   {/* Retail Column */}
+                   <div className="flex flex-col justify-between h-full bg-white/5 border border-white/10 p-6 hover:border-[#00E5FF]/30 transition-colors group text-left">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Book className="text-[#00E5FF]" size={20} />
+                          <h4 className="font-serif text-white text-xl">Retail Edition</h4>
+                        </div>
+                        <p className="text-xs text-white/50 leading-relaxed mb-6">
+                           Wealth preservation logic. Includes "Hidden Accumulation" analysis and retail survival guide.
+                        </p>
                       </div>
-                      <p className="text-xs text-white/50 leading-relaxed pl-7 border-l border-[#00E5FF]/30">
-                        Secure your copy for wealth preservation analysis.
-                      </p>
+                      <button 
+                        onClick={() => handleRedirect('retail')}
+                        disabled={redirectingType !== null}
+                        className={`w-full py-3 font-mono text-xs font-bold tracking-wider border transition-all duration-300 flex items-center justify-center gap-2
+                          ${redirectingType === 'retail' 
+                            ? 'bg-[#121212] text-[#00E5FF] border-[#00E5FF]' 
+                            : 'bg-transparent text-[#00E5FF] border-[#00E5FF] hover:bg-[#00E5FF] hover:text-[#121212]'
+                          }`}
+                      >
+                         {redirectingType === 'retail' ? (
+                           <><Loader2 size={12} className="animate-spin"/> REDIRECTING...</>
+                         ) : (
+                           "ORDER EBOOK ($9.99)"
+                         )}
+                      </button>
                    </div>
-                   <div className="text-left space-y-2 group cursor-default">
-                      <div className="flex items-center gap-2">
-                         <Shield className="text-white group-hover:scale-110 transition-transform" size={18} />
-                         <h4 className="font-serif text-white text-lg">Institutional Edition</h4>
+
+                   {/* Institutional Column */}
+                   <div className="flex flex-col justify-between h-full bg-white/5 border border-white/10 p-6 hover:border-white/30 transition-colors group text-left">
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                           <Shield className="text-white" size={20} />
+                           <h4 className="font-serif text-white text-xl">Institutional Suite</h4>
+                        </div>
+                        <p className="text-xs text-white/50 leading-relaxed mb-6">
+                           Full systems engineering blueprint. Includes raw data appendices and liquidity models.
+                        </p>
                       </div>
-                      <p className="text-xs text-white/50 leading-relaxed pl-7 border-l border-white/30">
-                        Gain the systems engineering blueprint for the 2027 Reset.
-                      </p>
+                      <button 
+                        onClick={() => handleRedirect('institutional')}
+                        disabled={redirectingType !== null}
+                        className={`w-full py-3 font-mono text-xs font-bold tracking-wider border transition-all duration-300 flex items-center justify-center gap-2
+                           ${redirectingType === 'institutional' 
+                             ? 'bg-[#121212] text-white border-white' 
+                             : 'bg-transparent text-white border-white/30 hover:bg-white hover:text-[#121212] hover:border-white'
+                           }`}
+                      >
+                         {redirectingType === 'institutional' ? (
+                           <><Loader2 size={12} className="animate-spin"/> REDIRECTING...</>
+                         ) : (
+                           "ORDER SUITE ($99.99)"
+                         )}
+                      </button>
                    </div>
                 </div>
 
-                {/* Secure Redirect Button */}
-                <div className="w-full max-w-md">
-                   <button 
-                    onClick={handleRedirect}
-                    disabled={isRedirecting}
-                    className={`w-full relative group overflow-hidden px-8 py-5 font-mono text-sm font-bold tracking-[0.15em] transition-all duration-300 border
-                      ${isRedirecting 
-                        ? 'bg-[#121212] text-[#00E5FF] border-[#00E5FF] cursor-wait' 
-                        : 'bg-[#00E5FF] text-[#121212] border-[#00E5FF] hover:bg-[#00cce6] shadow-[0_0_30px_rgba(0,229,255,0.4)] hover:shadow-[0_0_50px_rgba(0,229,255,0.6)]'
-                      }`}
-                  >
-                    {/* Button Content */}
-                    <div className="relative z-10 flex items-center justify-center gap-3">
-                      {isRedirecting ? (
-                        <>
-                          <Loader2 size={16} className="animate-spin" />
-                          ESTABLISHING SECURE BRIDGE...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingCart size={16} />
-                          ORDER ON AMAZON
-                        </>
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Redirect Status / Buffer Message */}
-                  <div className="h-8 mt-3 flex items-center justify-center">
-                    {isRedirecting ? (
+                {/* Redirect Status */}
+                <div className="h-6 flex items-center justify-center">
+                    {redirectingType ? (
                        <p className="text-[10px] text-[#00E5FF] font-mono animate-pulse uppercase flex items-center gap-2">
-                         <Lock size={10} /> Redirecting to Amazon Global Fulfillment...
+                         <Lock size={10} /> Establishing Secure Bridge to Amazon...
                        </p>
                     ) : (
-                       <p className="text-[10px] text-white/30 font-mono uppercase tracking-widest group-hover:text-white/50 transition-colors">
-                         High-Speed Secure Checkout
+                       <p className="text-[10px] text-white/30 font-mono uppercase tracking-widest">
+                         Secure Global Fulfillment via Amazon KDP
                        </p>
                     )}
-                  </div>
                 </div>
 
                 {/* Intelligence Vault Sync Message */}
