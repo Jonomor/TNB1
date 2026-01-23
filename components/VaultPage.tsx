@@ -9,20 +9,27 @@ export const VaultPage: React.FC = () => {
     window.location.href = '/';
   };
 
-  const downloads = [
+const downloads = [
     { 
-      title: "The Neutral Bridge: Institutional Edition (PDF)", 
-      size: "42.5MB", 
-      ref: "NB-2027-ANALYSIS", 
-      desc: "Full technical appendix and Protocol 22 specifications.",
+      title: "The Neutral Bridge: Institutional Edition (2027)", 
+      size: "4.2MB", 
+      ref: "NB-INST-2027-MASTER", 
+      desc: "Combined Institutional License Agreement and Letter of Authenticity.",
       path: "/TNB1/vault-files/NB-Institutional-2027.pdf"
     },
     { 
-      title: "Letter of Authenticity & Institutional License", 
-      size: "1.2MB", 
-      ref: "NB-LOA-SERIALIZED", 
-      desc: "Serialized certificate of forensic authenticity.",
-      path: "/TNB1/vault-files/NB-Letter-of-Authenticity.pdf"
+      title: "Forensic Verification Kit (Technical Appendix)", 
+      size: "1.8MB", 
+      ref: "NB-VERIFY-KIT-V2", 
+      desc: "The $3B acquisition log and Protocol 22 technical audit.",
+      path: "/TNB1/vault-files/NB-Verification-Kit.pdf"
+    },
+    { 
+      title: "Q1 2026 Institutional Intelligence Briefing", 
+      size: "2.4MB", 
+      ref: "NB-INTEL-Q1-26", 
+      desc: "Restricted briefing on the Basel III transition and liquidity bridges.",
+      path: "/TNB1/vault-files/NB-Institutional-Intelligence-Briefing.pdf"
     },
     { 
       title: "Excel-Based Liquidity Model (V1.4)", 
