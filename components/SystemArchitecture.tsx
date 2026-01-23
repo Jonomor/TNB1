@@ -18,7 +18,7 @@ export const SystemArchitecture: React.FC = () => {
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
            
            {/* Legacy Column - Increased Contrast */}
-           <div className="bg-matte-black border border-white/20 p-8 relative hover:border-white/30 transition-colors duration-300">
+           <div className="bg-white/5 border border-white/20 p-8 relative hover:border-white/30 transition-colors duration-300">
              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-charcoal border border-white/20 px-3 py-1">
                <span className="font-mono text-[10px] text-white/50 uppercase tracking-widest">Legacy Architecture (SWIFT/MT)</span>
              </div>
