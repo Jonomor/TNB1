@@ -135,6 +135,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({ tier }) => {
             cursor: tier.requiresAcknowledgement && !acknowledged ? 'not-allowed' : 'pointer'
           }}
           onClick={handlePurchase}
+          analyticsLabel={`Pricing_Tier_${tier.id}_${selectedVariant ? selectedVariant.id : 'default'}`}
         >
           {tier.requiresAcknowledgement && !acknowledged ? 'Accept Disclosures' : displayCta}
         </Button>
