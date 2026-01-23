@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Terminal } from 'lucide-react';
 
-const LOCATIONS = [
-  "New York", "London", "Singapore", "Zurich", "Dubai", "Tokyo", "Frankfurt", 
-  "Hong Kong", "Riyadh", "Geneva", "Chicago", "Shanghai"
-];
-
 const NOTIFICATIONS = [
-  "secured 'The Neutral Bridge: Ripple, XRP, and the Engineered Reset'",
-  "acquired 'The Neutral Bridge: System Analysis of the 2027 Reset'",
-  "purchased the Digital Bundle (Retail + Institutional)"
+  "Institutional Edition purchased • 2m ago",
+  "Retail Edition purchased • 5m ago",
+  "New Pre-order confirmed • 1m ago",
+  "Strategy Briefing access granted • Just now"
 ];
 
 export const SocialProof: React.FC = () => {
@@ -18,10 +14,9 @@ export const SocialProof: React.FC = () => {
 
   useEffect(() => {
     const triggerNotification = () => {
-      const location = LOCATIONS[Math.floor(Math.random() * LOCATIONS.length)];
       const notification = NOTIFICATIONS[Math.floor(Math.random() * NOTIFICATIONS.length)];
       
-      setMessage(`Investor in ${location} ${notification}`);
+      setMessage(notification);
       setVisible(true);
 
       setTimeout(() => {
@@ -50,8 +45,8 @@ export const SocialProof: React.FC = () => {
           <Terminal size={14} className="text-electric-teal" />
         </div>
         <div>
-          <p className="font-mono text-[10px] text-electric-teal uppercase tracking-wider mb-1">
-            Confirmed Transaction
+          <p className="font-mono text-[10px] text-electric-teal/50 uppercase tracking-wider mb-1">
+            [DEMO FEED] Confirmed Activity
           </p>
           <p className="font-sans text-xs text-white leading-relaxed">
             {message}
