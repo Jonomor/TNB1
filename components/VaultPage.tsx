@@ -1,9 +1,11 @@
 import React from 'react';
 import { Terminal, Shield, Download, Lock, Activity, Eye, FileText, LogOut } from 'lucide-react';
 import { Button } from './Button';
+import { trackEvent } from '../utils/analytics';
 
 export const VaultPage: React.FC = () => {
   const handleLogout = () => {
+    trackEvent('vault_logout', { category: 'Auth', label: 'Manual Logout' });
     window.location.href = '/';
   };
 
@@ -30,6 +32,14 @@ export const VaultPage: React.FC = () => {
       path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
     }
   ];
+
+  const handleDownloadClick = (filename: string, ref: string) => {
+    trackEvent('file_download', {
+      category: 'Vault Assets',
+      label: filename,
+      ref_code: ref
+    });
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-off-white font-mono p-4 md:p-8 selection:bg-electric-teal selection:text-black">
@@ -89,6 +99,7 @@ export const VaultPage: React.FC = () => {
                       <a 
                         href={item.path}
                         download
+                        onClick={() => handleDownloadClick(item.title, item.ref)}
                         className="flex items-center justify-center font-sans font-semibold tracking-wide rounded-sm uppercase transition-all duration-200 ease-in-out text-xs h-8 px-4 border border-white/20 hover:border-electric-teal text-white/60 hover:text-electric-teal bg-transparent"
                       >
                           Download
