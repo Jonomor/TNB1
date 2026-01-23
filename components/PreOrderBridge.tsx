@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Shield, Book, Clock, Lock, Loader2 } from 'lucide-react';
+import { trackEvent } from '../utils/analytics';
 
 export const PreOrderBridge: React.FC = () => {
   // 1. Independent Launch Timer Logic (Target: Feb 18, 2026 09:00:00 EST)
@@ -40,6 +41,12 @@ export const PreOrderBridge: React.FC = () => {
   const INST_URL = "https://www.amazon.com/Neutral-Bridge-System-Analysis-Financial-ebook/dp/B0GHRYD6BJ";
 
   const handleRedirect = (type: 'retail' | 'institutional') => {
+    // Track the outbound click
+    trackEvent('outbound_click', {
+      category: 'Conversion',
+      label: `Amazon_${type.charAt(0).toUpperCase() + type.slice(1)}`
+    });
+
     setRedirectingType(type);
     const url = type === 'retail' ? RETAIL_URL : INST_URL;
     
@@ -116,7 +123,7 @@ export const PreOrderBridge: React.FC = () => {
                          {redirectingType === 'retail' ? (
                            <><Loader2 size={12} className="animate-spin"/> REDIRECTING...</>
                          ) : (
-                           "ORDER EBOOK ($9.99)"
+                           "ORDER RETAIL ON AMAZON ($9.99)"
                          )}
                       </button>
                    </div>
@@ -144,7 +151,7 @@ export const PreOrderBridge: React.FC = () => {
                          {redirectingType === 'institutional' ? (
                            <><Loader2 size={12} className="animate-spin"/> REDIRECTING...</>
                          ) : (
-                           "ORDER SUITE ($99.99)"
+                           "ORDER INSTITUTIONAL ON AMAZON ($99.99)"
                          )}
                       </button>
                    </div>
