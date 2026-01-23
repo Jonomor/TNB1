@@ -58,10 +58,10 @@ export const BridgeCalculator: React.FC = () => {
               </div>
 
               <div className="text-[10px] text-white/40 font-mono space-y-1 bg-black/20 p-3 border border-white/5 rounded">
-                 <p>Assumptions:</p>
-                 <p>• Cost of Capital: 5% APY</p>
-                 <p>• Legacy Settlement: T+2 Days</p>
-                 <p>• Bridge Settlement: 3 Seconds</p>
+                 <p className="font-bold text-white/60 mb-1">Assumptions Used:</p>
+                 <p>• Cost of Capital: 5% APY (Standard Reference Rate)</p>
+                 <p>• Legacy Settlement: T+2 Days (SWIFT/Correspondent Avg)</p>
+                 <p>• Bridge Settlement: 3 Seconds (XRPL Ledger Finality)</p>
               </div>
 
             </div>
@@ -75,7 +75,7 @@ export const BridgeCalculator: React.FC = () => {
              
              <div className="space-y-6">
                  <div>
-                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Legacy Cost (Trapped Capital)</div>
+                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Estimated Trapped Pre-funding (Annual)</div>
                    <div className="text-2xl font-mono text-crimson">
                      ${legacyCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                    </div>
@@ -91,12 +91,12 @@ export const BridgeCalculator: React.FC = () => {
                  <div className="h-px bg-white/10 my-2"></div>
 
                  <div>
-                   <div className="font-mono text-xs text-electric-teal uppercase tracking-widest mb-1">Projected Annual Savings</div>
+                   <div className="font-mono text-xs text-electric-teal uppercase tracking-widest mb-1">Total Capital Released</div>
                    <div className="text-4xl font-serif text-white">
                      ${(savings * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                    </div>
                    <p className="text-[10px] text-white/40 mt-2 mb-4">
-                     *Capital released for re-deployment.
+                     *Liquidity immediately available for re-deployment.
                    </p>
                    
                    <Button onClick={scrollToPricing} variant="outline" fullWidth className="text-xs group hover:bg-white hover:text-black">
