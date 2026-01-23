@@ -542,7 +542,6 @@ const App: React.FC = () => {
             {/* Book Cover Image Slot - Retail UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 rounded-sm pointer-events-none"></div>
                  <img 
                    src={`${assetBase}retailedition.jpg`} 
                    alt="The Neutral Bridge Retail Edition Cover" 
@@ -572,7 +571,6 @@ const App: React.FC = () => {
             {/* Book Cover Image Slot - Institutional UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 rounded-sm pointer-events-none"></div>
                  <img 
                    src={`${assetBase}institutionedition.jpg`}
                    alt="The Neutral Bridge Institutional Edition Cover" 
@@ -764,5 +762,3 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-export default App;
