@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { ArrowRight, RefreshCw, DollarSign, Activity } from 'lucide-react';
 
 export const BridgeCalculator: React.FC = () => {
   const [volume, setVolume] = useState<string>('10000000');
-  const [calculated, setCalculated] = useState(false);
-
+  
   // Constants
   const LEGACY_SETTLEMENT_DAYS = 2; // T+2
   const BRIDGE_SETTLEMENT_SECONDS = 3; 
   const INTEREST_RATE = 0.05; // Cost of capital (5%)
 
-  const handleCalculate = () => {
-    setCalculated(true);
-  };
-
+  // Auto Calculate
   const vol = parseFloat(volume) || 0;
   
   // Logic: Cost of Dead Capital = (Volume * Rate) * (Days / 365)
@@ -23,6 +19,11 @@ export const BridgeCalculator: React.FC = () => {
   const bridgeCost = (vol * INTEREST_RATE) * ((BRIDGE_SETTLEMENT_SECONDS / 86400) / 365); 
   
   const savings = legacyCost - bridgeCost;
+
+  const scrollToPricing = () => {
+    const el = document.getElementById('pricing');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="bg-charcoal/50 border border-white/5 p-8 md:p-12 relative overflow-hidden group">
@@ -56,30 +57,32 @@ export const BridgeCalculator: React.FC = () => {
                 </div>
               </div>
 
-              <Button onClick={handleCalculate} variant="outline" className="w-full justify-between group">
-                Execute Analysis <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
-              </Button>
+              <div className="text-[10px] text-white/40 font-mono space-y-1 bg-black/20 p-3 border border-white/5 rounded">
+                 <p>Assumptions:</p>
+                 <p>• Cost of Capital: 5% APY</p>
+                 <p>• Legacy Settlement: T+2 Days</p>
+                 <p>• Bridge Settlement: 3 Seconds</p>
+              </div>
+
             </div>
           </div>
 
           {/* Output Section */}
-          <div className="flex-1 bg-matte-black border border-white/10 p-6 flex flex-col justify-center">
-             {!calculated ? (
-               <div className="text-center text-white/30">
-                 <RefreshCw className="mx-auto mb-4 animate-spin-slow" size={32} />
-                 <p className="font-mono text-xs uppercase">Awaiting Data Input...</p>
-               </div>
-             ) : (
-               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex-1 bg-matte-black border border-white/10 p-6 flex flex-col justify-center relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-2 opacity-30">
+               <RefreshCw className="animate-spin-slow text-white" size={20} />
+             </div>
+             
+             <div className="space-y-6">
                  <div>
-                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Legacy Cost (T+2)</div>
+                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Legacy Cost (Trapped Capital)</div>
                    <div className="text-2xl font-mono text-crimson">
                      ${legacyCost.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                    </div>
                  </div>
                  
                  <div>
-                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Neutral Bridge Cost (~3s)</div>
+                   <div className="font-mono text-xs text-white/40 uppercase tracking-widest mb-1">Neutral Bridge Cost</div>
                    <div className="text-2xl font-mono text-electric-teal">
                      ${bridgeCost.toLocaleString(undefined, { maximumFractionDigits: 4 })}
                    </div>
@@ -92,12 +95,15 @@ export const BridgeCalculator: React.FC = () => {
                    <div className="text-4xl font-serif text-white">
                      ${(savings * 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                    </div>
-                   <p className="text-[10px] text-white/40 mt-2">
-                     *Capital released for re-deployment. This is the mathematical basis for the Institutional Edition's valuation.
+                   <p className="text-[10px] text-white/40 mt-2 mb-4">
+                     *Capital released for re-deployment.
                    </p>
+                   
+                   <Button onClick={scrollToPricing} variant="outline" fullWidth className="text-xs group hover:bg-white hover:text-black">
+                      Get the Full Liquidity Model (Institutional) <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                   </Button>
                  </div>
                </div>
-             )}
           </div>
 
         </div>
