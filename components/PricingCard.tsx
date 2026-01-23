@@ -85,11 +85,16 @@ export const PricingCard: React.FC<PricingCardProps> = ({ tier }) => {
           </div>
         )}
 
-        <div className="flex items-baseline space-x-1">
-          <span className={`text-4xl font-bold font-serif ${isRecommended ? 'text-electric-teal' : 'text-white'}`}>
-            {displayPrice}
-          </span>
-          <span className="text-white/30 text-xs font-mono uppercase">USD</span>
+        <div className="flex flex-col">
+           <div className="flex items-baseline space-x-1">
+              <span className={`text-4xl font-bold font-serif ${isRecommended ? 'text-electric-teal' : 'text-white'}`}>
+                {displayPrice}
+              </span>
+              <span className="text-white/30 text-xs font-mono uppercase">USD</span>
+           </div>
+           <span className="text-[10px] text-white/50 mt-1 font-mono uppercase tracking-wide">
+             {tier.id === 'retail' ? 'Ships Feb 18 • PDF/EPUB Available' : 'Hardcover Pre-order • Ships Feb 18'}
+           </span>
         </div>
       </div>
 
@@ -137,7 +142,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({ tier }) => {
           onClick={handlePurchase}
           analyticsLabel={`Pricing_Tier_${tier.id}_${selectedVariant ? selectedVariant.id : 'default'}`}
         >
-          {tier.requiresAcknowledgement && !acknowledged ? 'Accept Disclosures' : displayCta}
+          {displayCta}
         </Button>
         
         {isSuite && (
