@@ -17,8 +17,8 @@ export const SystemArchitecture: React.FC = () => {
 
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
            
-           {/* Legacy Column */}
-           <div className="bg-matte-black/50 border border-white/10 p-8 relative grayscale opacity-70 hover:opacity-100 transition-opacity duration-300">
+           {/* Legacy Column - Increased Contrast */}
+           <div className="bg-matte-black border border-white/20 p-8 relative hover:border-white/30 transition-colors duration-300">
              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-charcoal border border-white/20 px-3 py-1">
                <span className="font-mono text-[10px] text-white/50 uppercase tracking-widest">Legacy Architecture (SWIFT/MT)</span>
              </div>
@@ -28,21 +28,21 @@ export const SystemArchitecture: React.FC = () => {
                   <Clock className="text-crimson shrink-0" size={20} />
                   <div>
                     <h4 className="text-white font-bold text-sm">T+2 Settlement</h4>
-                    <p className="text-white/50 text-xs mt-1">Value moves slower than data. Requires dormant capital in nostro accounts.</p>
+                    <p className="text-white/60 text-xs mt-1">Value moves slower than data. Requires dormant capital in nostro accounts.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Layers className="text-crimson shrink-0" size={20} />
                   <div>
                     <h4 className="text-white font-bold text-sm">Fragmented Liquidity</h4>
-                    <p className="text-white/50 text-xs mt-1">Closed-loop RTGS systems trapped within national borders.</p>
+                    <p className="text-white/60 text-xs mt-1">Closed-loop RTGS systems trapped within national borders.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Server className="text-crimson shrink-0" size={20} />
                   <div>
                     <h4 className="text-white font-bold text-sm">Messaging Only</h4>
-                    <p className="text-white/50 text-xs mt-1">SWIFT sends instructions, not value. Finality is delayed.</p>
+                    <p className="text-white/60 text-xs mt-1">SWIFT sends instructions, not value. Finality is delayed.</p>
                   </div>
                 </div>
              </div>
@@ -59,7 +59,7 @@ export const SystemArchitecture: React.FC = () => {
                   <Clock className="text-electric-teal shrink-0" size={20} />
                   <div>
                     <h4 className="text-white font-bold text-sm">~3 Second Settlement</h4>
-                    <p className="text-white/70 text-xs mt-1">Settlement Finality is immediate. Capital Velocity increases ~800x.</p>
+                    <p className="text-white/70 text-xs mt-1">Settlement finality in seconds; reduces pre-funding requirements.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
