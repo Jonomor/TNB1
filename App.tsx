@@ -27,7 +27,7 @@ import { VaultPage } from './components/VaultPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
-import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -542,12 +542,13 @@ const App: React.FC = () => {
             {/* Book Cover Image Slot - Retail UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 rounded-sm pointer-events-none"></div>
                  <img 
                    src={`${assetBase}retailedition.jpg`} 
                    alt="The Neutral Bridge Retail Edition Cover" 
-                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20 mix-blend-normal" 
+                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)]" 
                  />
-                 <div className="absolute inset-0 bg-electric-teal/20 blur-md -z-10 rounded-sm"></div>
+                 <div className="absolute inset-0 bg-electric-teal/10 blur-xl -z-10 rounded-sm"></div>
                </div>
             </div>
           </div>
@@ -571,10 +572,11 @@ const App: React.FC = () => {
             {/* Book Cover Image Slot - Institutional UPDATED - Fixed Path */}
             <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
                <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 rounded-sm pointer-events-none"></div>
                  <img 
                    src={`${assetBase}institutionedition.jpg`}
                    alt="The Neutral Bridge Institutional Edition Cover" 
-                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
+                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
                  />
                </div>
             </div>
@@ -729,14 +731,7 @@ const App: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-electric-teal/60" />
-                <span>inquiries@theneutralbridge.com</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Clock size={14} className="mt-0.5 text-electric-teal/60" />
-                <div className="flex flex-col">
-                  <span>Mon–Fri: 5:00 AM – 11:00 PM</span>
-                  <span>Sat–Sun: 7:00 AM – 9:00 PM</span>
-                </div>
+                <a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a>
               </div>
             </div>
 
