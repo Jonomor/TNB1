@@ -27,7 +27,7 @@ import { VaultPage } from './components/VaultPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
-import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -134,14 +134,14 @@ const App: React.FC = () => {
           id: 'ebook',
           label: 'E-Book',
           price: '$9.99',
-          ctaText: 'Order on Amazon',
+          ctaText: 'Buy Retail',
           externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
         },
         {
           id: 'paperback',
           label: 'Paperback',
           price: '$29.99',
-          ctaText: 'Order Paperback',
+          ctaText: 'Buy Retail',
           externalUrl: 'https://www.amazon.com/dp/B0GHP8PGCL'
         }
       ]
@@ -164,14 +164,14 @@ const App: React.FC = () => {
           id: 'ebook-inst',
           label: 'E-Book',
           price: '$99.99',
-          ctaText: 'Order on Amazon',
+          ctaText: 'Buy Institutional',
           externalUrl: 'https://www.amazon.com/dp/B0GHRYD6BJ'
         },
         {
           id: 'hardcover',
           label: 'Hardcover',
           price: '$159.99',
-          ctaText: 'Order Hardcover Suite',
+          ctaText: 'Buy Institutional',
         }
       ]
     }
@@ -213,15 +213,15 @@ const App: React.FC = () => {
   const testimonials: Testimonial[] = [
     {
       quote: "The most sober and technically sound explanation of the XRP ledger's role in global finance I have read to date.",
-      author: "Senior Fintech Analyst"
+      author: "Reader Persona: Fintech Analyst"
     },
     {
       quote: "Finally, a book that treats the 'Reset' as an engineering challenge rather than a conspiracy theory.",
-      author: "Former Compliance Officer"
+      author: "Reader Persona: Compliance Officer"
     },
     {
       quote: "If you hold XRP, this is your manual. If you don't, this is your warning.",
-      author: "Private Office Fund"
+      author: "Reader Persona: Private Office Fund"
     }
   ];
 
@@ -258,12 +258,15 @@ const App: React.FC = () => {
 
       {/* Navigation - Adjusted top spacing to clear DayZeroBar */}
       <nav className="fixed top-8 w-full z-50 bg-matte-black/90 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth'}); }}>
              <div className="w-8 h-8 bg-electric-teal flex items-center justify-center rounded-sm">
                <Terminal size={18} className="text-black" />
              </div>
-             <span className="font-serif font-bold text-lg tracking-tight">The Neutral Bridge</span>
+             <div>
+                <span className="font-serif font-bold text-lg tracking-tight block leading-none">The Neutral Bridge</span>
+                <span className="font-mono text-[9px] text-electric-teal uppercase tracking-wider block mt-1">Launch: Feb 18, 2026</span>
+             </div>
           </a>
 
           {/* Desktop Nav */}
@@ -542,7 +545,7 @@ const App: React.FC = () => {
                  <img 
                    src={`${assetBase}retailedition.jpg`} 
                    alt="The Neutral Bridge Retail Edition Cover" 
-                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20" 
+                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-electric-teal/20 mix-blend-normal" 
                  />
                  <div className="absolute inset-0 bg-electric-teal/20 blur-md -z-10 rounded-sm"></div>
                </div>
@@ -672,7 +675,7 @@ const App: React.FC = () => {
       <Section id="newsletter" className="py-20 bg-gradient-to-b from-matte-black to-slate-grey border-t border-white/10">
         <div className="max-w-xl mx-auto text-center px-6">
           <h2 className="font-serif text-3xl mb-2">Stay Ahead of the Reset</h2>
-          <p className="text-white/60 mb-8">Join 15,000+ subscribers receiving bi-weekly technical updates.</p>
+          <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <input 
               type="email" 
@@ -722,11 +725,11 @@ const App: React.FC = () => {
             <div className="flex flex-col gap-2 mb-8 text-sm text-white/50 font-sans">
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-electric-teal/60" />
-                <span>123 Neutral Bridge, Downtown District, City 90210</span>
+                <span>Location: United States (Remote)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Phone size={14} className="text-electric-teal/60" />
-                <span>(555) 123-4567</span>
+                <Mail size={14} className="text-electric-teal/60" />
+                <span>inquiries@theneutralbridge.com</span>
               </div>
               <div className="flex items-start gap-2">
                 <Clock size={14} className="mt-0.5 text-electric-teal/60" />
