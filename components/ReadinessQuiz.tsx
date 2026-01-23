@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from './Button';
-import { Check, X, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Check, X, AlertTriangle, ShieldCheck, ArrowRight } from 'lucide-react';
 
 const QUESTIONS = [
   "Are you aware of the 3 technical pillars of the ISO 20022 migration?",
@@ -35,6 +35,8 @@ export const ReadinessQuiz: React.FC = () => {
     const el = document.getElementById('pricing');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const isHighReadiness = yesCount >= 3;
 
   return (
     <div className="bg-charcoal border border-white/5 p-8 md:p-12 relative overflow-hidden">
@@ -78,19 +80,27 @@ export const ReadinessQuiz: React.FC = () => {
         ) : (
           <div className="animate-in zoom-in-95 duration-500">
             <div className="w-16 h-16 bg-electric-teal/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              {yesCount >= 4 ? <ShieldCheck size={32} className="text-electric-teal"/> : <AlertTriangle size={32} className="text-electric-teal"/>}
+              {isHighReadiness ? <ShieldCheck size={32} className="text-electric-teal"/> : <AlertTriangle size={32} className="text-electric-teal"/>}
             </div>
             
             <h3 className="font-serif text-3xl text-white mb-4">Diagnostic Complete</h3>
             
-            <p className="text-lg text-white/70 mb-8 leading-relaxed max-w-2xl mx-auto">
-              {yesCount >= 4 
-                ? "Your answers indicate a high level of preparedness. However, the 'Day Zero' transition is volatile. I recommend the Institutional Suite to validate your strategy against the engineering roadmap."
-                : "Your technical roadmap for the 2027 liquidity reset has significant gaps. Relying on legacy banking logic is a critical risk. The Institutional Edition is designed specifically to close this knowledge gap."}
-            </p>
+            <div className="bg-white/5 border border-white/10 p-6 mb-8 max-w-xl mx-auto">
+               <span className="font-mono text-xs text-white/40 uppercase tracking-widest block mb-2">Recommended Path</span>
+               <div className="text-xl font-bold text-electric-teal mb-2">
+                 {isHighReadiness ? "Institutional Edition" : "Retail Edition Start"}
+               </div>
+               <p className="text-sm text-white/70 leading-relaxed">
+                  {isHighReadiness 
+                    ? "Your high awareness suggests you are ready for the deep-dive technical engineering specs. Secure the Institutional Suite to validate your strategy."
+                    : "You have critical knowledge gaps regarding the 2027 transition. Start with the Retail Edition to understand the basics, or upgrade to Institutional for the full roadmap."}
+               </p>
+            </div>
 
             <div className="flex justify-center gap-4">
-              <Button variant="primary" onClick={scrollToPricing}>Secure Institutional Edition</Button>
+              <Button variant="primary" onClick={scrollToPricing} className="flex items-center gap-2">
+                 Show Recommended Path <ArrowRight size={14} />
+              </Button>
               <Button variant="ghost" onClick={reset}>Restart Diagnostic</Button>
             </div>
           </div>
