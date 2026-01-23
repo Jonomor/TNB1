@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
 import { Button } from './components/Button';
@@ -26,6 +26,7 @@ import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
+import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Phone, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -41,12 +42,37 @@ const App: React.FC = () => {
   // Client-Side Routing for Vault Page
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
+  // Scroll Tracking Refs
+  const scrollMilestones = useRef(new Set<number>());
+
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
     };
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  // Scroll Tracking Effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const percentage = Math.round((scrolled / height) * 100);
+      
+      [25, 50, 75, 90, 100].forEach(milestone => {
+        if (percentage >= milestone && !scrollMilestones.current.has(milestone)) {
+          scrollMilestones.current.add(milestone);
+          trackEvent('scroll_milestone', { 
+            category: 'Engagement', 
+            label: `${milestone}% Depth` 
+          });
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Return Vault Page if route matches
@@ -63,6 +89,7 @@ const App: React.FC = () => {
   const openLegal = (tab: LegalTab) => {
     setActiveLegalTab(tab);
     setLegalModalOpen(true);
+    trackEvent('view_legal', { category: 'Legal', label: tab });
   };
 
   const scrollToSection = (id: string) => {
@@ -76,12 +103,12 @@ const App: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     scrollToSection(id);
+    trackEvent('nav_click', { category: 'Navigation', label: id });
   };
 
   const handleJoinNewsletter = () => {
-    // Removed email check for demo purposes so button always provides feedback
+    trackEvent('newsletter_signup', { category: 'Lead Gen', label: 'Footer Input' });
     setNewsletterStatus('joining');
-    // Simulate API call
     setTimeout(() => {
       setNewsletterStatus('joined');
       setNewsletterEmail('');
@@ -244,7 +271,7 @@ const App: React.FC = () => {
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
-            <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
+            <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')} analyticsLabel="Nav_CTA_OrderNow">Order Now</Button>
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -259,7 +286,7 @@ const App: React.FC = () => {
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-lg font-serif text-left">The Architect</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-lg font-serif text-left">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-lg font-serif text-left">Pricing</a>
-            <Button variant="primary" className="w-full" onClick={() => scrollToSection('pricing')}>Order Now</Button>
+            <Button variant="primary" className="w-full" onClick={() => scrollToSection('pricing')} analyticsLabel="Mobile_Nav_CTA">Order Now</Button>
           </div>
         )}
       </nav>
@@ -293,11 +320,12 @@ const App: React.FC = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button variant="primary" className="min-w-[200px]" onClick={() => scrollToSection('pricing')}>Order Your Copy Now</Button>
+                <Button variant="primary" className="min-w-[200px]" onClick={() => scrollToSection('pricing')} analyticsLabel="Hero_CTA_Order">Order Your Copy Now</Button>
                 <Button 
                   variant="outline" 
                   className="min-w-[200px] flex gap-2 items-center"
                   onClick={() => setActivePreview('retail')}
+                  analyticsLabel="Hero_Read_Preview"
                 >
                   <BookOpen size={16} /> Read Preview
                 </Button>
@@ -504,7 +532,7 @@ const App: React.FC = () => {
               </div>
               <div className="mt-8">
                 <p className="text-sm text-white/60 mb-6">Focus: Asset Preservation</p>
-                <Button variant="ghost" className="pl-0 border-b border-electric-teal rounded-none px-0 py-2 h-auto" onClick={() => setActivePreview('retail')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
+                <Button variant="ghost" className="pl-0 border-b border-electric-teal rounded-none px-0 py-2 h-auto" onClick={() => setActivePreview('retail')} analyticsLabel="View_Details_Retail">View Details <ArrowRight size={14} className="ml-2"/></Button>
               </div>
             </div>
 
@@ -533,7 +561,7 @@ const App: React.FC = () => {
               </div>
               <div className="mt-8">
                 <p className="text-sm text-white/60 mb-6">Focus: System Architecture</p>
-                <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto justify-start pl-0 hover:bg-transparent" onClick={() => setActivePreview('institutional')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
+                <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto justify-start pl-0 hover:bg-transparent" onClick={() => setActivePreview('institutional')} analyticsLabel="View_Details_Institutional">View Details <ArrowRight size={14} className="ml-2"/></Button>
               </div>
             </div>
 
@@ -607,8 +635,14 @@ const App: React.FC = () => {
         
         {/* Institutional Value Bundle Table */}
         <InstitutionalBundle 
-           onOpenVault={() => setIsVaultOpen(true)} 
-           onRedeem={() => setIsRedemptionOpen(true)}
+           onOpenVault={() => {
+             setIsVaultOpen(true);
+             trackEvent('open_vault_demo', { category: 'Interaction', label: 'Bundle Section' });
+           }} 
+           onRedeem={() => {
+             setIsRedemptionOpen(true);
+             trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
+           }}
         />
 
         {/* Price Justification Table */}
@@ -647,7 +681,7 @@ const App: React.FC = () => {
               onChange={(e) => setNewsletterEmail(e.target.value)}
               className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
             />
-            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'}>
+            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'} analyticsLabel="Newsletter_Signup">
               {newsletterStatus === 'idle' && "Join The Bridge"}
               {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
               {newsletterStatus === 'joined' && "Access Granted"}
@@ -667,7 +701,7 @@ const App: React.FC = () => {
         <p className="text-white/50 max-w-2xl mx-auto mb-12">
           History shows that those who understand the infrastructure of the new system before it goes live are the ones who thrive.
         </p>
-        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')}>Order Your Copy Now</Button>
+        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')} analyticsLabel="Footer_CTA_Order">Order Your Copy Now</Button>
       </section>
 
       {/* Disclaimer */}
