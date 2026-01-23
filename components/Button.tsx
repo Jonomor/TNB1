@@ -1,8 +1,10 @@
 import React from 'react';
+import { trackButtonClick } from '../utils/analytics';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   fullWidth?: boolean;
+  analyticsLabel?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({ 
@@ -10,6 +12,8 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary', 
   fullWidth = false,
   className = '',
+  analyticsLabel,
+  onClick,
   ...props 
 }) => {
   const baseStyles = "font-sans font-semibold tracking-wide px-8 py-4 transition-all duration-200 ease-in-out flex items-center justify-center rounded-sm uppercase text-xs sm:text-sm";
@@ -23,9 +27,19 @@ export const Button: React.FC<ButtonProps> = ({
 
   const widthClass = fullWidth ? "w-full" : "";
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (analyticsLabel) {
+      trackButtonClick(analyticsLabel);
+    }
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
   return (
     <button 
       className={`${baseStyles} ${variants[variant]} ${widthClass} ${className}`}
+      onClick={handleClick}
       {...props}
     >
       {children}
