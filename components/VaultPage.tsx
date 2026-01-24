@@ -1,12 +1,11 @@
 import React from 'react';
-import { Terminal, Shield, Download, Lock, Activity, Eye, FileText, LogOut } from 'lucide-react';
+import { Terminal, Shield, Download, Lock, Activity, Eye, FileText, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from './Button';
 import { trackEvent } from '../utils/analytics';
 
 export const VaultPage: React.FC = () => {
   const handleLogout = () => {
     trackEvent('vault_logout', { category: 'Auth', label: 'Manual Logout' });
-    // This redirects back to your main site root
     window.location.href = '/TNB1/';
   };
 
@@ -31,13 +30,6 @@ export const VaultPage: React.FC = () => {
       ref: "NB-LM-ATOMIC", 
       desc: "Interactive calculator for atomic settlement velocity and liquidity multipliers.",
       path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
-    },
-    { 
-      title: "The Neutral Bridge: Institutional Edition (2027)", 
-      size: "4.2MB", 
-      ref: "NB-INST-2027-MASTER", 
-      desc: "Combined Institutional License Agreement and Letter of Authenticity.",
-      path: "/TNB1/vault-files/NB-Institutional-2027.pdf"
     }
   ];
 
@@ -51,13 +43,9 @@ export const VaultPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-off-white font-mono p-4 md:p-8 selection:bg-electric-teal selection:text-black">
-      {/* Terminal Container */}
       <div className="max-w-5xl mx-auto border border-electric-teal/30 bg-[#0a0a0a] shadow-[0_0_50px_rgba(56,189,248,0.1)] relative overflow-hidden min-h-[90vh] flex flex-col">
-        
-        {/* Scanline Effect */}
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[5] bg-[length:100%_4px,3px_100%]"></div>
         
-        {/* Terminal Header */}
         <div className="flex items-center justify-between border-b border-electric-teal/30 bg-electric-teal/5 px-6 py-3 relative z-10">
           <div className="flex items-center gap-3 text-electric-teal">
             <Terminal size={18} />
@@ -68,10 +56,7 @@ export const VaultPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-6 md:p-12 space-y-12 relative z-10 flex-1">
-          
-          {/* Status Block */}
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between border-l-2 border-electric-teal pl-6 py-4 bg-electric-teal/5">
             <div className="space-y-1">
                 <p className="text-sm text-electric-teal uppercase font-bold tracking-widest flex items-center gap-2">
@@ -79,15 +64,14 @@ export const VaultPage: React.FC = () => {
                 </p>
                 <p className="text-xs text-white/60 font-mono">Encryption Layer: Active (ZKP-Protocol-22)</p>
             </div>
-            <div className="text-[10px] text-white/40 max-w-md text-right md:text-left font-mono leading-relaxed">
-              "Your Institutional License Key has been verified. Access to the forensic digital layer, including the Intelligence Briefing and Verification Kit, is now permitted."
+            <div className="text-[10px] text-white/40 max-w-md text-right md:text-left font-mono leading-relaxed italic">
+              "System activation complete. Direct paths to the Briefing and Verification Kit are now live below."
             </div>
           </div>
 
-          {/* 1. Executive Downloads */}
           <section>
             <h2 className="text-electric-teal text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest border-b border-electric-teal/20 pb-2 w-fit">
-              <Download size={16} /> 1. Forensic Intelligence Suite
+              <Download size={16} /> 1. Institutional Suite Downloads
             </h2>
             <div className="grid gap-4">
               {downloads.map((item, i) => (
@@ -118,56 +102,54 @@ export const VaultPage: React.FC = () => {
             </div>
           </section>
 
-          {/* 2. Intelligence Exhibits */}
           <section>
             <h2 className="text-white text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest border-b border-white/20 pb-2 w-fit">
-              <Activity size={16} /> 2. Technical Evidence Exhibits
+              <Activity size={16} /> 2. System Roadmap & Tech Specs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                    { id: "01", title: "Vertical Integration Timeline", desc: "Acquisition log of the $3B+ infrastructure layer." },
-                    { id: "02", title: "Regulatory License Map", desc: "Proof of 75+ global approvals for institutional bridge operations." },
-                    { id: "03", title: "Slippage Mathematics", desc: "The load-bearing math for $10T+ daily liquidity volumes." },
-                    { id: "04", title: "Protocol 22 Schematics", desc: "Zero-Knowledge Proof (ZKP) privacy specifications." },
-                    { id: "05", title: "The BIS Multiplier", desc: "Constrained supply dynamics and market cap expansion models." },
-                    { id: "06", title: "2027 Activation Roadmap", desc: "The final technical countdown to sovereign implementation." }
+                    { id: "01", title: "Activation Roadmap", desc: "Q1 2027 technical countdown to sovereign implementation.", source: "Briefing p.8" },
+                    { id: "02", title: "Protocol 22 Specs", desc: "ZKP architecture and View Key audit specifications.", source: "Verify Kit p.5" },
+                    { id: "03", title: "Vertical Integration", desc: "Forensic log of the $3B+ infrastructure buildout.", source: "Verify Kit p.1" },
+                    { id: "04", title: "Slippage Math", desc: "Load-bearing data for $10T+ daily liquidity volumes.", source: "Verify Kit p.4" },
+                    { id: "05", title: "BIS Multiplier", desc: "Exponential growth frameworks for illiquid supply.", source: "Briefing p.7" },
+                    { id: "06", title: "Reset Glossary", desc: "Technical definitions for institutional auditors.", source: "Verify Kit p.10" }
                 ].map((ex, i) => (
                     <div key={i} className="flex items-center justify-between p-4 border border-white/5 bg-[#0f0f0f] hover:border-white/20 transition-colors">
                         <div>
-                            <span className="text-[10px] text-electric-teal font-mono uppercase mr-2">Exhibit {ex.id}</span>
-                            <span className="text-xs text-white font-bold block md:inline">{ex.title}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-electric-teal font-mono uppercase">Exhibit {ex.id}</span>
+                              <span className="text-[9px] text-white/30 font-mono italic">[{ex.source}]</span>
+                            </div>
+                            <span className="text-xs text-white font-bold block md:inline mt-1">{ex.title}</span>
                             <p className="text-[10px] text-white/40 mt-1">{ex.desc}</p>
                         </div>
-                        <button className="text-white/20 hover:text-white transition-colors">
-                            <Eye size={16} />
-                        </button>
+                        <ChevronRight size={14} className="text-white/10" />
                     </div>
                 ))}
             </div>
           </section>
 
-          {/* 3. Quarterly Briefings */}
           <section className="bg-charcoal/50 p-6 border border-white/10 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4">
                   <Lock size={40} className="text-white/5" />
               </div>
               <h2 className="text-white text-xs font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">
-                3. Institutional Communications
+                3. Quarterly Intelligence Feed
               </h2>
               <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 bg-electric-teal rounded-full animate-pulse"></div>
-                  <span className="text-xs text-electric-teal font-mono">System Status: Whitelist Active</span>
+                  <span className="text-xs text-electric-teal font-mono">Feed Status: Active Uplink</span>
               </div>
               <p className="text-[11px] text-white/60 leading-relaxed max-w-2xl">
-                  Your forensic license includes priority access to the Q1 2026 Strategy Briefing. These restricted intelligence packets will be routed to your registered email beginning in February 2026.
+                  Institutional license detected. You are now whitelisted for the February 2026 Strategy Briefing. No further action is required.
               </p>
           </section>
 
-          {/* Footer Terminal Text */}
           <div className="pt-8 mt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-end gap-4">
             <div className="flex items-center gap-3 text-white/20 font-mono text-[10px]">
                 <Activity size={12} className="animate-pulse text-crimson" />
-                <span>LIVE DATA STREAM ACTIVE // ISO-20022 HUB</span>
+                <span>UPLINK_STABLE // PORT 443 // ISO-20022</span>
             </div>
             <button 
                 onClick={handleLogout}
