@@ -2,7 +2,11 @@ import React from 'react';
 import { Terminal, Shield, Download, Lock, Activity, FileText, LogOut } from 'lucide-react';
 
 export const VaultPage: React.FC = () => {
-  const handleLogout = () => { window.location.href = '/TNB1/'; };
+  // If you pass 'setView' as a prop to VaultPage:
+const handleLogout = () => {
+  trackEvent('vault_logout', { category: 'Auth', label: 'Manual Logout' });
+  window.location.href = '/TNB1/'; // This forces a reload of the main site
+};
 
   const downloads = [
     { 
