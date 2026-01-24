@@ -75,11 +75,11 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
- // This version doesn't rely on complex path logic that might crash
+ // Inside App.tsx
 const currentPath = window.location.pathname.toLowerCase();
-const isVault = currentPath.endsWith('/vault') || currentPath.endsWith('/vault/');
 
-if (isVault) {
+// This works for both: jonomor.github.io/TNB1/vault AND jonomor.github.io/TNB1/vault/
+if (currentPath.includes('/vault')) {
   return <VaultPage />;
 }
 
