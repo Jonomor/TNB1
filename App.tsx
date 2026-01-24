@@ -40,7 +40,7 @@ const App: React.FC = () => {
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'joining' | 'joined'>('idle');
 
   // Client-Side Routing for Vault Page
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [currentPath, setCurrentPath] = useState(window.location.hash);
 
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
@@ -76,9 +76,9 @@ const App: React.FC = () => {
   }, []);
 
   // Return Vault Page if route matches
-  if (currentPath.includes('/vault')) {
-    return <VaultPage />;
-  }
+  if (currentPath.includes('#/vault')) {
+  return <VaultPage />;
+}
 
   const assetBase = getAssetBase();
   
