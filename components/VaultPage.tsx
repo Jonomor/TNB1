@@ -6,37 +6,38 @@ import { trackEvent } from '../utils/analytics';
 export const VaultPage: React.FC = () => {
   const handleLogout = () => {
     trackEvent('vault_logout', { category: 'Auth', label: 'Manual Logout' });
-    window.location.href = '/';
+    // This redirects back to your main site root
+    window.location.href = '/TNB1/';
   };
 
-const downloads = [
+  const downloads = [
+    { 
+      title: "Q1 2026 Institutional Intelligence Briefing", 
+      size: "14.2MB", 
+      ref: "NB-INTEL-Q1-26", 
+      desc: "Visual Roadmap & Analyst Notes for the 2027 Global Financial Reset.",
+      path: "/TNB1/vault-files/NB-Institutional-Intelligence-Briefing.pdf"
+    },
+    { 
+      title: "Forensic Verification Kit (Technical Appendix)", 
+      size: "1.8MB", 
+      ref: "NB-VERIFY-KIT-V2", 
+      desc: "The $3B+ acquisition log and raw forensic evidence for institutional auditors.",
+      path: "/TNB1/vault-files/NB-Verification-Kit.pdf"
+    },
+    { 
+      title: "Excel-Based Liquidity Model (V1.4)", 
+      size: "8.4MB", 
+      ref: "NB-LM-ATOMIC", 
+      desc: "Interactive calculator for atomic settlement velocity and liquidity multipliers.",
+      path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
+    },
     { 
       title: "The Neutral Bridge: Institutional Edition (2027)", 
       size: "4.2MB", 
       ref: "NB-INST-2027-MASTER", 
       desc: "Combined Institutional License Agreement and Letter of Authenticity.",
       path: "/TNB1/vault-files/NB-Institutional-2027.pdf"
-    },
-    { 
-      title: "Forensic Verification Kit (Technical Appendix)", 
-      size: "1.8MB", 
-      ref: "NB-VERIFY-KIT-V2", 
-      desc: "The $3B acquisition log and Protocol 22 technical audit.",
-      path: "/TNB1/vault-files/NB-Verification-Kit.pdf"
-    },
-    { 
-      title: "Q1 2026 Institutional Intelligence Briefing", 
-      size: "2.4MB", 
-      ref: "NB-INTEL-Q1-26", 
-      desc: "Restricted briefing on the Basel III transition and liquidity bridges.",
-      path: "/TNB1/vault-files/NB-Institutional-Intelligence-Briefing.pdf"
-    },
-    { 
-      title: "Excel-Based Liquidity Model (V1.4)", 
-      size: "8.4MB", 
-      ref: "NB-LM-ATOMIC", 
-      desc: "Interactive calculator for atomic settlement velocity.",
-      path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
     }
   ];
 
@@ -79,14 +80,14 @@ const downloads = [
                 <p className="text-xs text-white/60 font-mono">Encryption Layer: Active (ZKP-Protocol-22)</p>
             </div>
             <div className="text-[10px] text-white/40 max-w-md text-right md:text-left font-mono leading-relaxed">
-              "Your Institutional License Key has been verified against the XRPL Ledger. You are now permitted to download the forensic digital layer."
+              "Your Institutional License Key has been verified. Access to the forensic digital layer, including the Intelligence Briefing and Verification Kit, is now permitted."
             </div>
           </div>
 
           {/* 1. Executive Downloads */}
           <section>
             <h2 className="text-electric-teal text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest border-b border-electric-teal/20 pb-2 w-fit">
-              <Download size={16} /> 1. Executive Downloads
+              <Download size={16} /> 1. Forensic Intelligence Suite
             </h2>
             <div className="grid gap-4">
               {downloads.map((item, i) => (
@@ -120,53 +121,53 @@ const downloads = [
           {/* 2. Intelligence Exhibits */}
           <section>
             <h2 className="text-white text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest border-b border-white/20 pb-2 w-fit">
-              <Activity size={16} /> 2. Forensic Intelligence Exhibits
+              <Activity size={16} /> 2. Technical Evidence Exhibits
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               {[
-                   { id: "01", title: "The Mechanical Bridge", desc: "3-second atomic settlement vs T+2 legacy." },
-                   { id: "02", title: "Nostro Entanglement", desc: "$27T in dormant, pre-funded capital." },
-                   { id: "03", title: "ISO 20022 Mesh", desc: "Transition to organized data grids." },
-                   { id: "04", title: "Unified Ledger", desc: "Architectural finality schematic." },
-                   { id: "05", title: "Liquidity Bridge", desc: "Visualization of unlocked capital." },
-                   { id: "06", title: "Privacy Layer (ZKP)", desc: "Proof for sovereign compliance." }
-               ].map((ex, i) => (
-                   <div key={i} className="flex items-center justify-between p-4 border border-white/5 bg-[#0f0f0f] hover:border-white/20 transition-colors">
-                       <div>
-                           <span className="text-[10px] text-electric-teal font-mono uppercase mr-2">Exhibit {ex.id}</span>
-                           <span className="text-xs text-white font-bold block md:inline">{ex.title}</span>
-                           <p className="text-[10px] text-white/40 mt-1">{ex.desc}</p>
-                       </div>
-                       <button className="text-white/20 hover:text-white transition-colors">
-                           <Eye size={16} />
-                       </button>
-                   </div>
-               ))}
+                {[
+                    { id: "01", title: "Vertical Integration Timeline", desc: "Acquisition log of the $3B+ infrastructure layer." },
+                    { id: "02", title: "Regulatory License Map", desc: "Proof of 75+ global approvals for institutional bridge operations." },
+                    { id: "03", title: "Slippage Mathematics", desc: "The load-bearing math for $10T+ daily liquidity volumes." },
+                    { id: "04", title: "Protocol 22 Schematics", desc: "Zero-Knowledge Proof (ZKP) privacy specifications." },
+                    { id: "05", title: "The BIS Multiplier", desc: "Constrained supply dynamics and market cap expansion models." },
+                    { id: "06", title: "2027 Activation Roadmap", desc: "The final technical countdown to sovereign implementation." }
+                ].map((ex, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 border border-white/5 bg-[#0f0f0f] hover:border-white/20 transition-colors">
+                        <div>
+                            <span className="text-[10px] text-electric-teal font-mono uppercase mr-2">Exhibit {ex.id}</span>
+                            <span className="text-xs text-white font-bold block md:inline">{ex.title}</span>
+                            <p className="text-[10px] text-white/40 mt-1">{ex.desc}</p>
+                        </div>
+                        <button className="text-white/20 hover:text-white transition-colors">
+                            <Eye size={16} />
+                        </button>
+                    </div>
+                ))}
             </div>
           </section>
 
           {/* 3. Quarterly Briefings */}
           <section className="bg-charcoal/50 p-6 border border-white/10 relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4">
-                 <Lock size={40} className="text-white/5" />
-             </div>
-             <h2 className="text-white text-xs font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">
-               3. Quarterly Strategy Briefings
-             </h2>
-             <div className="flex items-center gap-3 mb-2">
-                 <div className="w-2 h-2 bg-electric-teal rounded-full animate-pulse"></div>
-                 <span className="text-xs text-electric-teal font-mono">Snypre System AI: Whitelist Active</span>
-             </div>
-             <p className="text-[11px] text-white/60 leading-relaxed max-w-2xl">
-                 Your license includes priority access to the Q1 2026 Strategy Briefing. The first intelligence packet will be routed to your registered email in February 2026.
-             </p>
+              <div className="absolute top-0 right-0 p-4">
+                  <Lock size={40} className="text-white/5" />
+              </div>
+              <h2 className="text-white text-xs font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">
+                3. Institutional Communications
+              </h2>
+              <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-2 bg-electric-teal rounded-full animate-pulse"></div>
+                  <span className="text-xs text-electric-teal font-mono">System Status: Whitelist Active</span>
+              </div>
+              <p className="text-[11px] text-white/60 leading-relaxed max-w-2xl">
+                  Your forensic license includes priority access to the Q1 2026 Strategy Briefing. These restricted intelligence packets will be routed to your registered email beginning in February 2026.
+              </p>
           </section>
 
           {/* Footer Terminal Text */}
           <div className="pt-8 mt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-end gap-4">
             <div className="flex items-center gap-3 text-white/20 font-mono text-[10px]">
-               <Activity size={12} className="animate-pulse text-crimson" />
-               <span>LIVE DATA STREAM ACTIVE // PORT 443</span>
+                <Activity size={12} className="animate-pulse text-crimson" />
+                <span>LIVE DATA STREAM ACTIVE // ISO-20022 HUB</span>
             </div>
             <button 
                 onClick={handleLogout}
