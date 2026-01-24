@@ -50,6 +50,7 @@ const App: React.FC = () => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
     };
+    // REMOVED: window.location.href refresh check to stop the flickering loop
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
@@ -76,8 +77,11 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Return Vault Page if route matches
-  if (currentPath.includes('/vault')) {
+  // Consolidated Routing Logic
+  // Using the existing 'currentPath' state to avoid "already declared" errors
+  const normalizedPath = (currentPath || '').toLowerCase();
+
+  if (normalizedPath.includes('/vault')) {
     return <VaultPage />;
   }
 
