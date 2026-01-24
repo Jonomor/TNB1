@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
@@ -49,7 +50,6 @@ const App: React.FC = () => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
     };
-    window.location.href = window.location.href; // Refresh check
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
@@ -76,11 +76,8 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Consolidated Routing Logic
-  // Using the existing 'currentPath' state to avoid "already declared" errors
-  const normalizedPath = currentPath.toLowerCase();
-
-  if (normalizedPath.includes('/vault')) {
+  // Return Vault Page if route matches
+  if (currentPath.includes('/vault')) {
     return <VaultPage />;
   }
 
