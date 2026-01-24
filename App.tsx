@@ -652,21 +652,24 @@ if (normalizedPath.includes('/tnb1/vault') || normalizedPath.endsWith('/vault'))
         </div>
         
         {/* Institutional Value Bundle Table */}
-        <InstitutionalBundle 
-         onOpenVault={() => {
-  // 1. Update the URL without reloading the page
-  window.history.pushState({}, '', '/TNB1/vault');
-  
-  // 2. Tell the App component the path changed
-  setCurrentPath('/TNB1/vault');
-  
-  trackEvent('open_vault_page', { category: 'Navigation', label: 'Bundle Section' });
-}}
-           onRedeem={() => {
-             setIsRedemptionOpen(true);
-             trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
-           }}
-        />
+       <InstitutionalBundle 
+  onOpenVault={() => {
+    // 1. Force the React state to update immediately
+    setCurrentPath('/tnb1/vault'); 
+    
+    // 2. Update the browser URL bar so the user can bookmark it
+    window.history.pushState({}, '', '/TNB1/vault');
+    
+    // 3. Optional: Scroll to top so the vault starts at the header
+    window.scrollTo(0, 0);
+
+    trackEvent('open_vault_page', { category: 'Navigation', label: 'Bundle Section' });
+  }} 
+  onRedeem={() => {
+    setIsRedemptionOpen(true);
+    trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
+  }}
+/>
 
         {/* Price Justification Table */}
         <PriceJustification />
