@@ -30,6 +30,8 @@ import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
 
+const [view, setView] = useState<'home' | 'vault'>('home');
+
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePreview, setActivePreview] = useState<'retail' | 'institutional' | null>(null);
@@ -91,7 +93,8 @@ const App: React.FC = () => {
 const normalizedPath = (currentPath || '').toLowerCase();
 
 // This check handles both local development and the GitHub subfolder
-if (normalizedPath.endsWith('/vault') || normalizedPath.includes('/vault/')) {
+// Simple State-Based Routing
+if (view === 'vault') {
   return <VaultPage />;
 }
 
@@ -654,17 +657,14 @@ if (normalizedPath.endsWith('/vault') || normalizedPath.includes('/vault/')) {
         {/* Institutional Value Bundle Table */}
        <InstitutionalBundle 
   onOpenVault={() => {
-    // 1. Force the React state to update immediately
-    setCurrentPath('/tnb1/vault'); 
-    
-    // 2. Update the browser URL bar so the user can bookmark it
-    window.history.pushState({}, '', '/TNB1/vault');
-    
-    // 3. Optional: Scroll to top so the vault starts at the header
-    window.scrollTo(0, 0);
+  // 1. Swap the component view
+  setView('vault');
+  
+  // 2. Scroll to top so the terminal starts at the header
+  window.scrollTo(0, 0);
 
-    trackEvent('open_vault_page', { category: 'Navigation', label: 'Bundle Section' });
-  }} 
+  trackEvent('open_vault_component', { category: 'Interaction', label: 'Bundle Section' });
+}}
   onRedeem={() => {
     setIsRedemptionOpen(true);
     trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
