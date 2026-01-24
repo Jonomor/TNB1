@@ -49,6 +49,7 @@ const App: React.FC = () => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
     };
+    window.location.href = window.location.href; // Refresh check
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
@@ -75,13 +76,13 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
- // Inside App.tsx
-const currentPath = window.location.pathname.toLowerCase();
+  // Consolidated Routing Logic
+  // Using the existing 'currentPath' state to avoid "already declared" errors
+  const normalizedPath = currentPath.toLowerCase();
 
-// This works for both: jonomor.github.io/TNB1/vault AND jonomor.github.io/TNB1/vault/
-if (currentPath.includes('/vault')) {
-  return <VaultPage />;
-}
+  if (normalizedPath.includes('/vault')) {
+    return <VaultPage />;
+  }
 
   const assetBase = getAssetBase();
   
