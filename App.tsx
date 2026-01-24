@@ -87,11 +87,11 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Consolidated Routing Logic
+ // Consolidated Routing Logic
 const normalizedPath = (currentPath || '').toLowerCase();
 
-// Check for the subfolder because of GitHub Pages
-if (normalizedPath.includes('/tnb1/vault') || normalizedPath.endsWith('/vault')) {
+// This check handles both local development and the GitHub subfolder
+if (normalizedPath.endsWith('/vault') || normalizedPath.includes('/vault/')) {
   return <VaultPage />;
 }
 
