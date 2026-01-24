@@ -36,9 +36,18 @@ const handleLogout = () => {
             <Terminal size={18} />
             <span className="text-sm font-bold uppercase tracking-widest">Secure Uplink // Authorized Access</span>
           </div>
-          <button onClick={handleLogout} className="text-red-500 text-[10px] border border-red-500/30 px-3 py-1 hover:bg-red-500/10 transition-all">
-            [ TERMINATE_SESSION ]
-          </button>
+          // Inside your VaultPage component
+<button 
+  onClick={() => {
+    // 1. Clear the hash from the URL
+    window.location.hash = ''; 
+    // 2. Force a reload to the landing page
+    window.location.href = 'https://jonomor.github.io/TNB1/'; 
+  }}
+  className="..." 
+>
+  [ TERMINATE_SESSION ]
+</button>
         </div>
 
         <div className="p-6 md:p-12 space-y-12">
