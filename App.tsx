@@ -75,11 +75,11 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Improved routing check to handle GitHub subfolders properly
-const isVaultPath = window.location.pathname.toLowerCase().endsWith('/vault') || 
-                    window.location.pathname.toLowerCase().endsWith('/vault/');
+ // This version doesn't rely on complex path logic that might crash
+const currentPath = window.location.pathname.toLowerCase();
+const isVault = currentPath.endsWith('/vault') || currentPath.endsWith('/vault/');
 
-if (isVaultPath) {
+if (isVault) {
   return <VaultPage />;
 }
 
