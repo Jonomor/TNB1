@@ -75,10 +75,13 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Return Vault Page if route matches
-  if (currentPath.includes('/vault')) {
-    return <VaultPage />;
-  }
+  // Improved routing check to handle GitHub subfolders properly
+const isVaultPath = window.location.pathname.toLowerCase().endsWith('/vault') || 
+                    window.location.pathname.toLowerCase().endsWith('/vault/');
+
+if (isVaultPath) {
+  return <VaultPage />;
+}
 
   const assetBase = getAssetBase();
   
