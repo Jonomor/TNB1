@@ -47,13 +47,13 @@ const App: React.FC = () => {
   const scrollMilestones = useRef(new Set<number>());
 
   useEffect(() => {
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-    // REMOVED: window.location.href refresh check to stop the flickering loop
-    window.addEventListener('popstate', handleLocationChange);
-    return () => window.removeEventListener('popstate', handleLocationChange);
-  }, []);
+  const handleLocationChange = () => {
+    setCurrentPath(window.location.pathname);
+  };
+  
+  window.addEventListener('popstate', handleLocationChange);
+  return () => window.removeEventListener('popstate', handleLocationChange);
+}, []);
 
   // Scroll Tracking Effect
   useEffect(() => {
@@ -78,12 +78,12 @@ const App: React.FC = () => {
   }, []);
 
   // Consolidated Routing Logic
-  // Using the existing 'currentPath' state to avoid "already declared" errors
-  const normalizedPath = (currentPath || '').toLowerCase();
+const normalizedPath = (currentPath || '').toLowerCase();
 
-  if (normalizedPath.includes('/vault')) {
-    return <VaultPage />;
-  }
+// Check for the subfolder because of GitHub Pages
+if (normalizedPath.includes('/tnb1/vault') || normalizedPath.endsWith('/vault')) {
+  return <VaultPage />;
+}
 
   const assetBase = getAssetBase();
   
@@ -643,10 +643,15 @@ const App: React.FC = () => {
         
         {/* Institutional Value Bundle Table */}
         <InstitutionalBundle 
-           onOpenVault={() => {
-             setIsVaultOpen(true);
-             trackEvent('open_vault_demo', { category: 'Interaction', label: 'Bundle Section' });
-           }} 
+         onOpenVault={() => {
+  // 1. Update the URL without reloading the page
+  window.history.pushState({}, '', '/TNB1/vault');
+  
+  // 2. Tell the App component the path changed
+  setCurrentPath('/TNB1/vault');
+  
+  trackEvent('open_vault_page', { category: 'Navigation', label: 'Bundle Section' });
+}}
            onRedeem={() => {
              setIsRedemptionOpen(true);
              trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
