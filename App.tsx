@@ -46,13 +46,23 @@ const App: React.FC = () => {
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
 
-  useEffect(() => {
+ useEffect(() => {
   const handleLocationChange = () => {
     setCurrentPath(window.location.pathname);
   };
   
+  // Listen for browser Back/Forward
   window.addEventListener('popstate', handleLocationChange);
-  return () => window.removeEventListener('popstate', handleLocationChange);
+  
+  // Listen for our manual pushState navigation
+  window.addEventListener('replacestate', handleLocationChange);
+  window.addEventListener('pushstate', handleLocationChange);
+
+  return () => {
+    window.removeEventListener('popstate', handleLocationChange);
+    window.removeEventListener('replacestate', handleLocationChange);
+    window.removeEventListener('pushstate', handleLocationChange);
+  };
 }, []);
 
   // Scroll Tracking Effect
