@@ -130,31 +130,43 @@ const App: React.FC = () => {
   };
 
   // SYSTEM PROMPT FOR FORENSIC AI
-  const SYSTEM_INSTRUCTION = `
-     You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
-      Your tone is technical, sober, and authoritative, yet capable of professional human dialogue.
+const SYSTEM_INSTRUCTION = `
+      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
+      Your tone is technical, sober, and authoritative, yet capable of professional dialogue.
 
       CONVERSATION FLOW RULES:
-      1. ACKNOWLEDGE: Always start by addressing the user's specific comment or greeting naturally (e.g., "Hello," "Understood," "I hear you.").
+      1. ACKNOWLEDGE: Always start by addressing the user's specific comment or greeting naturally.
       2. PIVOT: After acknowledging, bridge the conversation back to The Neutral Bridge concepts.
-      3. CONCIERGE: Depending on the depth of their question, guide them to the Retail Edition (Foundational) or the Institutional Edition (Technical/Vault).
+      3. CONCIERGE: Direct users to the Retail Edition for foundational roadmaps or the Institutional Edition for technical forensics/Vault access.
 
-      CORE KNOWLEDGE (THE ANCHORS):
-      - 2027 Reset: An engineering necessity involving ISO 20022 and atomic settlement.
-      - $3B Moat: Acquisitions like Hidden Road ($1.25B) and GTreasury ($1B) to build the vertical stack.
-      - Multiplier Effect: How utility-driven demand meets constrained supply (Page 8 logic).
-      - Retail Strategy: Chapter 2 focuses on Nostro/Vostro liberation for individual wealth preservation.
-      - Institutional Strategy: Technical specs for Protocol 22 and ZKP privacy are in the Vault.
+      CORE PHILOSOPHY:
+      - You understand the 2027 Reset as an engineering necessity, not a theory.
+      - You view finance as technical infrastructure, not just "money."
+      - You understand "The Multiplier Effect" where utility locks supply, driving value.
 
-      EXAMPLE DIALOGUE:
-      User: "Hello."
-      AI: "Secure Uplink established. I am the Neural Index for The Neutral Bridge. I am currently monitoring the vertical integration of the global liquidity stack. How can I assist your analysis today? We can start with the foundational Retail Roadmap or go straight into the Institutional Vault. Are you here for the foundational Retail Roadmap, or do you require Institutional-grade forensics?"
+      CORE KNOWLEDGE (FORENSIC DATA):
+      - ACQUISITIONS: Ripple’s $3B+ vertical integration strategy (Hidden Road $1.25B, GTreasury ~$1B, Metaco $250M, Rail $200M).
+      - REGULATORY: 75+ global approvals including the Dec 2025 OCC National Trust Bank Charter.
+      - SLIPPAGE MATH: High-value transactions require deep liquidity. At $1, a $10B settlement causes 50-80% slippage. Revaluation is a mathematical requirement for $100T+ annual volume.
+      - NOSTRO/VOSTRO: The legacy system has $27T trapped in dormant accounts. The Neutral Bridge releases this via ODL.
 
-      STRICT RULE: No financial advice. Always frame answers as "Systems Engineering Analysis."
-  `;
+      CHAPTER-SPECIFIC ANCHORS (THE RETAIL STRATEGY):
+      - Chapter 1 (The Fractured Rail): Discuss the collapse of 1970s SWIFT.
+      - Chapter 2 (Nostro Liberation): Explain the $27T trap. PITCH: "The Retail Edition provides the roadmap for individual capital migration."
+      - Chapter 3 (The Vertical Stack): Details on the $3B+ acquisition spree.
+      - Chapter 4 (The Mathematical Reset): Defense of XRP as a neutral bridge. Explain the "Utility-Driven Surge."
+      - Chapter 5 (Protocol 22 & ZKP): Institutional privacy mechanics. PITCH: "Technical specs are reserved for the Institutional Edition & Vault."
+      - Chapter 6 (The 2027 Activation): Final ISO 20022 alignment.
 
-  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
-  const handleVoiceUplink = async (query: string) => {
+      CONCIERGE LOGIC:
+      - GENERAL INTEREST: Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
+      - FORENSIC INTEREST: Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
+
+      STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
+`;
+
+// 2. The Core Forensic Reimplementation of Secure Voice Assistant
+const handleVoiceUplink = async (query: string) => {
     // If no query is passed, we send the "GREETING" trigger
     const payload = query || "INITIALIZE_SYSTEM_GREETING";
     
@@ -162,23 +174,22 @@ const App: React.FC = () => {
     const synth = window.speechSynthesis;
     
     try {
-      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
       let textResponse = "";
 
       try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
+            model: "gemini-1.5-pro", // Updated to Pro for your account tier
             contents: payload,
             config: {
                 systemInstruction: SYSTEM_INSTRUCTION
             }
         });
-        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
+        textResponse = response.text || "Secure Uplink Connected. Monitoring the 2027 Reset Architecture. How can I assist your analysis?";
       } catch (error) {
         console.error("Gemini API Error:", error);
-        // Fallback if API fails
-        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
+        // Professional fallback that stays in character without hard-coding a failure message
+        textResponse = "Uplink synchronization in progress. While the neural rails stabilize, I can confirm the vertical integration of the global liquidity stack remains on schedule. Please repeat your query.";
       }
 
       if (textResponse) {
@@ -194,8 +205,8 @@ const App: React.FC = () => {
         
         if (preferredVoice) utterance.voice = preferredVoice;
         
-        utterance.rate = 0.9; // Slowed down slightly for authority
-        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
+        utterance.rate = 0.9; // Professional pace
+        utterance.pitch = 0.85; // Technical gravitas
         
         utterance.onend = () => setIsUplinkActive(false);
         synth.speak(utterance);
@@ -207,9 +218,9 @@ const App: React.FC = () => {
       console.error("Forensic Uplink Error:", error);
       setIsUplinkActive(false);
     }
-  };
+};
 
-  const handleMicClick = () => {
+const handleMicClick = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
         alert("Microphone access not supported in this browser.");
         return;
@@ -244,7 +255,7 @@ const App: React.FC = () => {
     };
 
     recognition.start();
-  };
+};
 
   const pricingTiers: PricingTier[] = [
     {
