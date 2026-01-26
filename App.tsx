@@ -424,7 +424,7 @@ const App: React.FC = () => {
                 onClick={enterTerminal}
                 className="w-full bg-electric-teal text-black font-mono font-bold py-4 px-8 rounded-sm hover:bg-white transition-all duration-300 uppercase tracking-widest text-xs"
             >
-                [ AUTHORIZE_AND_ENTER ]
+                [AUTHORIZE_AND_ENTER]
             </button>
             
             <div className="mt-6 font-mono text-[8px] text-white/20 uppercase tracking-widest">
