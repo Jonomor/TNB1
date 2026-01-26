@@ -913,12 +913,15 @@ const handleVoiceUplink = async (query: string) => {
   <span className="font-bold text-white mb-2">Legal</span>
   <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
   <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
-<a 
-  href="#/privacy"
-  className="hover:text-white text-left block"
+<button 
+  onClick={() => {
+    window.location.hash = '#/privacy';
+    window.location.reload();
+  }} 
+  className="hover:text-white text-left"
 >
   Privacy Policy
-</a>
+</button>
 </div>
           </div>
         </div>
