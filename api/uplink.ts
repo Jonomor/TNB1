@@ -1,43 +1,41 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export const config = {
-  runtime: 'edge', // Using Edge runtime for faster, more reliable global response
+  runtime: 'edge', 
 };
 
 export default async function handler(req) {
-  // --- 1. MANDATORY CORS HEADERS ---
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
   };
 
-  // Handle Pre-flight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers });
-  }
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
 
-  // --- 2. THE SECURITY CHECK ---
-  if (!process.env.GEMINI_API_KEY) {
-    return new Response(JSON.stringify({ text: "ERROR: API_KEY_MISSING" }), { status: 500, headers });
-  }
+  const API_KEY = process.env.GEMINI_API_KEY;
+  if (!API_KEY) return new Response(JSON.stringify({ text: "Vercel Error: GEMINI_API_KEY missing." }), { status: 500, headers });
 
   try {
     const { prompt } = await req.json();
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-pro",
-      systemInstruction: "You are the Neutral Bridge Secure Uplink. Tone: Forensic/Technical. Direct to Retail or Institutional editions. No financial advice."
+    
+    // Direct API Call to Google (No SDK needed, more stable)
+    const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
+    
+    const aiResponse = await fetch(googleUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt || "INITIALIZE_SYSTEM_GREETING" }] }],
+        systemInstruction: {
+          parts: [{ text: `You are the Neutral Bridge Secure Uplink. Tone: Technical, sober, authoritative. Focus: $3B+ acquisitions (Hidden Road, GTreasury, Metaco), 2027 Reset, $27T Nostro/Vostro liberation. Direct to Retail or Institutional editions. Strictly NO financial advice.` }]
+        }
+      })
     });
 
-    const result = await model.generateContent(prompt || "INITIALIZE_SYSTEM_GREETING");
-    const response = await result.response;
-    
-    return new Response(JSON.stringify({ text: response.text() }), {
-      status: 200,
-      headers: { ...headers, 'Content-Type': 'application/json' },
-    });
+    const data = await aiResponse.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Connection Stable. Systems Nominal.";
+
+    return new Response(JSON.stringify({ text }), { status: 200, headers });
   } catch (error) {
-    return new Response(JSON.stringify({ text: `UPLINK_ERROR: ${error.message}` }), { status: 500, headers });
+    return new Response(JSON.stringify({ text: `Forensic Error: ${error.message}` }), { status: 500, headers });
   }
 }
