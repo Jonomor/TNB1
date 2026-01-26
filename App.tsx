@@ -517,85 +517,62 @@ const App: React.FC = () => {
               </div>
 
               {/* HEADLINE UPDATED TO SPECIFIC BOOK TITLE */}
-              <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
-                The Neutral Bridge <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
-                  Ripple, XRP, and the Engineered Reset
-                </span>
-              </h1>
+  <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
+    The Neutral Bridge <br/>
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
+      Ripple, XRP, and the Engineered Reset
+    </span>
+  </h1>
 
-              <p className="font-sans text-lg md:text-xl text-white/60 leading-relaxed mb-12">
-                An engineering-grade analysis of the "Neutral Bridge" theory—explaining how XRP and Ripple are positioned to facilitate the 2027 global liquidity reset.
-              </p>
+  <p className="font-sans text-lg md:text-xl text-white/60 leading-relaxed mb-12">
+    An engineering-grade analysis of the "Neutral Bridge" theory—explaining how XRP and Ripple are positioned to facilitate the 2027 global liquidity reset.
+  </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                <Button variant="primary" className="min-w-[200px]" onClick={() => scrollToSection('pricing')} analyticsLabel="Hero_CTA_Order">Order Your Copy Now</Button>
-                <Button 
-                  variant="outline" 
-                  className="min-w-[200px] flex gap-2 items-center"
-                  onClick={() => setActivePreview('retail')}
-                  analyticsLabel="Hero_Read_Preview"
-                >
-                  <BookOpen size={16} /> Read Preview
-                </Button>
-              </div>
+  <div className="flex flex-col sm:flex-row gap-4 mb-8">
+    <Button variant="primary" className="min-w-[200px]" onClick={() => scrollToSection('pricing')} analyticsLabel="Hero_CTA_Order">Order Your Copy Now</Button>
+    <Button 
+      variant="outline" 
+      className="min-w-[200px] flex gap-2 items-center"
+      onClick={() => setActivePreview('retail')}
+      analyticsLabel="Hero_Read_Preview"
+    >
+      <BookOpen size={16} /> Read Preview
+    </Button>
+  </div>
+</div>
 
-                {/* Forensic Query Input */}
-                <div className="mt-8 relative max-w-md w-full group mx-auto lg:mx-0">
-                    <div className="absolute -inset-0.5 bg-electric-teal/20 blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                    <div className="relative flex items-center bg-black border border-white/10 px-4 py-2">
-                    <Terminal size={16} className="text-electric-teal mr-3" />
-                    <input
-                        type="text"
-                        placeholder="QUERY SECURE UPLINK..."
-                        value={userQuery}
-                        onChange={(e) => setUserQuery(e.target.value)}
-                        className="bg-transparent border-none outline-none text-xs font-mono text-white w-full placeholder:text-white/20"
-                        onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            handleVoiceUplink(e.currentTarget.value);
-                            setUserQuery('');
-                        }
-                        }}
-                    />
-                    <kbd className="hidden sm:inline-block px-1.5 py-0.5 border border-white/20 rounded text-[8px] font-mono text-white/40 uppercase">Enter</kbd>
-                    </div>
-                </div>
+{/* Right: AI Voice Interface */}
+<div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
+    {/* Decorative Tech Background */}
+    <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
+    
+    <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
+        
+        {/* Disconnect Button - Top Right */}
+        <button 
+          onClick={handleDisconnect}
+          className="absolute top-4 right-4 text-white/20 hover:text-crimson transition-colors p-1"
+          title="Disconnect Uplink"
+        >
+          <PowerOff size={14} />
+        </button>
 
-            </div>
-
-            {/* Right: AI Voice Interface */}
-            <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
-                {/* Decorative Tech Background */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
-                
-                <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
-                    
-                    {/* Disconnect Button - Top Right */}
-                    <button 
-                      onClick={handleDisconnect}
-                      className="absolute top-4 right-4 text-white/20 hover:text-crimson transition-colors p-1"
-                      title="Disconnect Uplink"
-                    >
-                      <PowerOff size={14} />
-                    </button>
-
-                    <div className="flex flex-col items-center text-center space-y-6">
-                        {/* Audio Visualization Ring - INTERACTIVE */}
-                        <button 
-                           onClick={() => handleVoiceUplink("")}
-                           className={`w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative transition-all duration-300 group/mic ${isUplinkActive ? 'scale-110 border-electric-teal shadow-[0_0_30px_rgba(56,189,248,0.4)]' : 'hover:scale-105 hover:border-white/30'}`}
-                        >
-                             <div className={`absolute inset-0 border border-electric-teal/30 rounded-full ${isUplinkActive ? 'animate-ping opacity-60' : 'opacity-0'}`}></div>
-                             <div className="absolute inset-2 border border-white/5 rounded-full"></div>
-                             
-                             {/* Oscillating Waveform Placeholder / Blinking Logic */}
-                             {isUplinkActive ? (
-                               <Activity size={32} className="text-electric-teal animate-bounce" />
-                             ) : (
-                               <Mic size={32} className="text-electric-teal group-hover/mic:scale-110 transition-transform" />
-                             )}
-                        </button>
+        <div className="flex flex-col items-center text-center space-y-6">
+            {/* Audio Visualization Ring - INTERACTIVE */}
+            <button 
+               onClick={() => handleVoiceUplink("")}
+               className={`w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative transition-all duration-300 group/mic ${isUplinkActive ? 'scale-110 border-electric-teal shadow-[0_0_30px_rgba(56,189,248,0.4)]' : 'hover:scale-105 hover:border-white/30'}`}
+            >
+                 <div className={`absolute inset-0 border border-electric-teal/30 rounded-full ${isUplinkActive ? 'animate-ping opacity-60' : 'opacity-0'}`}></div>
+                 <div className="absolute inset-2 border border-white/5 rounded-full"></div>
+                 
+                 {/* Oscillating Waveform Placeholder / Blinking Logic */}
+                 {isUplinkActive ? (
+                   <Activity size={32} className="text-electric-teal animate-bounce" />
+                 ) : (
+                   <Mic size={32} className="text-electric-teal group-hover/mic:scale-110 transition-transform" />
+                 )}
+            </button>
                         
                         <div className="w-full">
                             <h3 className="text-white font-serif text-2xl mb-4">Secure Voice Uplink</h3>
