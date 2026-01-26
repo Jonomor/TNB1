@@ -166,52 +166,50 @@ const SYSTEM_INSTRUCTION = `
 `;
 
 // 2. The Core Forensic Reimplementation of Secure Voice Assistant (Vercel Edition)
-  const handleVoiceUplink = async (query: string) => {
-    const payload = query || "INITIALIZE_SYSTEM_GREETING";
-    
-    setIsUplinkActive(true);
-    const synth = window.speechSynthesis;
-    
-    try {
-      // REPLACE THE URL BELOW with your actual Vercel deployment URL
-      const response = await fetch('https://https://tnb-1.vercel.app/api/uplink', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: payload }),
-      });
+const handleVoiceUplink = async (query: string) => {
+  const payload = query || "INITIALIZE_SYSTEM_GREETING";
+  
+  setIsUplinkActive(true);
+  const synth = window.speechSynthesis;
+  
+  try {
+    // FIX: Removed double https and pointed to the SECURE Vercel tunnel
+    const response = await fetch('https://tnb-1.vercel.app/api/uplink', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: payload }),
+    });
 
-      if (!response.ok) throw new Error("Vercel Uplink Offline");
+    if (!response.ok) throw new Error("Vercel Uplink Offline");
 
-      const data = await response.json();
-      const textResponse = data.text;
+    const data = await response.json();
+    const textResponse = data.text;
 
-      if (textResponse) {
-        const utterance = new SpeechSynthesisUtterance(textResponse);
-        
-        // Voice Selection Logic
-        const voices = synth.getVoices();
-        const preferredVoice = voices.find(v => 
-             v.name.includes("Google US English") || 
-             v.name.includes("Zira") || 
-             v.name.includes("Samantha")
-        ) || voices[0];
-        
-        if (preferredVoice) utterance.voice = preferredVoice;
-        utterance.rate = 0.9; 
-        utterance.pitch = 0.85; 
-        
-        utterance.onend = () => setIsUplinkActive(false);
-        synth.speak(utterance);
-        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
-      }
-    } catch (error) {
-      console.error("Forensic Uplink Error:", error);
-      // Clean, non-looping error notification
-      const errorNotice = new SpeechSynthesisUtterance("Uplink connection refused. Please verify Vercel deployment status.");
-      synth.speak(errorNotice);
-      setIsUplinkActive(false);
+    if (textResponse) {
+      const utterance = new SpeechSynthesisUtterance(textResponse);
+      
+      const voices = synth.getVoices();
+      const preferredVoice = voices.find(v => 
+           v.name.includes("Google US English") || 
+           v.name.includes("Zira") || 
+           v.name.includes("Samantha")
+      ) || voices[0];
+      
+      if (preferredVoice) utterance.voice = preferredVoice;
+      utterance.rate = 0.9; 
+      utterance.pitch = 0.85; 
+      
+      utterance.onend = () => setIsUplinkActive(false);
+      synth.speak(utterance);
+      trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
     }
-  };
+  } catch (error) {
+    console.error("Forensic Uplink Error:", error);
+    const errorNotice = new SpeechSynthesisUtterance("Uplink connection refused. Please verify Vercel deployment status.");
+    synth.speak(errorNotice);
+    setIsUplinkActive(false);
+  }
+};
 
   const handleMicClick = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
