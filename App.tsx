@@ -166,7 +166,7 @@ const SYSTEM_INSTRUCTION = `
 `;
 
 // 2. The Core Forensic Reimplementation of Secure Voice Assistant
-const handleVoiceUplink = async (query: string) => {
+  const handleVoiceUplink = async (query: string) => {
     // If no query is passed, we send the "GREETING" trigger
     const payload = query || "INITIALIZE_SYSTEM_GREETING";
     
@@ -174,23 +174,22 @@ const handleVoiceUplink = async (query: string) => {
     const synth = window.speechSynthesis;
     
     try {
-      let textResponse = "";
+      // THE FIX: We fetch from your Vercel API endpoint, NOT the Google SDK directly
+      // Replace 'https://your-vercel-project.vercel.app' with your actual Vercel URL
+      const response = await fetch('https://your-vercel-project.vercel.app/api/uplink', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: payload }),
+      });
 
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({
-            model: "gemini-1.5-pro", // Updated to Pro for your account tier
-            contents: payload,
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION
-            }
-        });
-        textResponse = response.text || "Secure Uplink Connected. Monitoring the 2027 Reset Architecture. How can I assist your analysis?";
-      } catch (error) {
-        console.error("Gemini API Error:", error);
-        // Professional fallback that stays in character without hard-coding a failure message
-        textResponse = "Uplink synchronization in progress. While the neural rails stabilize, I can confirm the vertical integration of the global liquidity stack remains on schedule. Please repeat your query.";
+      if (!response.ok) {
+        throw new Error(`Uplink Error: ${response.statusText}`);
       }
+
+      const data = await response.json();
+      const textResponse = data.text;
 
       if (textResponse) {
         const utterance = new SpeechSynthesisUtterance(textResponse);
@@ -216,46 +215,12 @@ const handleVoiceUplink = async (query: string) => {
       }
     } catch (error) {
       console.error("Forensic Uplink Error:", error);
+      // If the Vercel fetch fails, we let the user know without a generic loop
+      const errorNotice = new SpeechSynthesisUtterance("Uplink connection refused. Please verify Vercel deployment status.");
+      synth.speak(errorNotice);
       setIsUplinkActive(false);
     }
-};
-
-const handleMicClick = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Microphone access not supported in this browser.");
-        return;
-    }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-        setIsListening(true);
-        setIsUplinkActive(true);
-    };
-
-    recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setUserQuery(transcript);
-        handleVoiceUplink(transcript);
-    };
-
-    recognition.onerror = (event: any) => {
-        console.error("Speech recognition error", event.error);
-        setIsListening(false);
-        setIsUplinkActive(false);
-    };
-
-    recognition.onend = () => {
-        setIsListening(false);
-    };
-
-    recognition.start();
-};
+  };
 
   const pricingTiers: PricingTier[] = [
     {
