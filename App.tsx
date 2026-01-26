@@ -540,7 +540,10 @@ const App: React.FC = () => {
                 </Button>
               </div>
 
-                
+              
+                </div>
+
+            </div>
 
             {/* Right: AI Voice Interface */}
             <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
