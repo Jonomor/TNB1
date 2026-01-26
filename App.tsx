@@ -755,7 +755,6 @@ const App: React.FC = () => {
             </div>
             <div className="flex flex-col gap-3">
               <span className="font-bold text-white mb-2">Legal</span>
-              <button onClick={() => openLegal('privacy')} className="hover:text-white text-left">Privacy Policy</button>
               <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
               <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
             </div>
