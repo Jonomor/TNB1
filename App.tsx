@@ -24,6 +24,7 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
@@ -75,10 +76,15 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Return Vault Page if route matches
+ // Return Vault Page if route matches
   if (currentPath.includes('#/vault')) {
-  return <VaultPage />;
-}
+    return <VaultPage />;
+  }
+  
+  // Return Privacy Policy if route matches
+  if (currentPath.includes('#/privacy')) {
+    return <PrivacyPolicy />;
+  }
 
   const assetBase = getAssetBase();
   
