@@ -1,41 +1,36 @@
-export const config = {
-  runtime: 'edge', 
-};
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
-  };
+export default async function handler(req, res) {
+  // 1. CORS Setup
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*'); 
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
+  // 2. API Key Check
   const API_KEY = process.env.GEMINI_API_KEY;
-  if (!API_KEY) return new Response(JSON.stringify({ text: "Vercel Error: GEMINI_API_KEY missing." }), { status: 500, headers });
+  if (!API_KEY) {
+    return res.status(500).json({ text: "SYSTEM ERROR: API_KEY_MISSING" });
+  }
 
   try {
-    const { prompt } = await req.json();
-    
-    // Direct API Call to Google (No SDK needed, more stable)
-    const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${API_KEY}`;
-    
-    const aiResponse = await fetch(googleUrl, {
-      method: 'POST',
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt || "INITIALIZE_SYSTEM_GREETING" }] }],
-        systemInstruction: {
-          parts: [{ text: `You are the Neutral Bridge Secure Uplink. Tone: Technical, sober, authoritative. Focus: $3B+ acquisitions (Hidden Road, GTreasury, Metaco), 2027 Reset, $27T Nostro/Vostro liberation. Direct to Retail or Institutional editions. Strictly NO financial advice.` }]
-        }
-      })
+    const { prompt } = req.body;
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-pro",
+      systemInstruction: "You are the Neutral Bridge Secure Uplink. Tone: Forensic/Technical. Direct to Retail or Institutional editions. No financial advice."
     });
 
-    const data = await aiResponse.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Connection Stable. Systems Nominal.";
-
-    return new Response(JSON.stringify({ text }), { status: 200, headers });
+    const result = await model.generateContent(prompt || "INITIALIZE_SYSTEM_GREETING");
+    const response = await result.response;
+    
+    return res.status(200).json({ text: response.text() });
   } catch (error) {
-    return new Response(JSON.stringify({ text: `Forensic Error: ${error.message}` }), { status: 500, headers });
+    console.error(error);
+    return res.status(500).json({ text: "UPLINK_CONNECTION_STALLED" });
   }
 }
