@@ -28,8 +28,18 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
-import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2 } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
+
+// FORENSIC SCRIPTS FOR EXHIBITS (Text-to-Speech)
+const EXHIBIT_SCRIPTS: Record<string, string> = {
+  a: "Uplink active. Exhibit Alpha deconstructs the shift from legacy correspondent rails to atomic settlement. By removing the messaging delay, the bridge provides under 3 second finality, rendering the 1970s SWIFT architecture obsolete.",
+  b: "Exhibit Beta visualizes the 27 trillion dollar liquidity trap. This pre-funded capital sits dormant in global accounts to facilitate trust. The Neutral Bridge releases this capital via On-Demand Liquidity, liberating stagnant global wealth.",
+  c: "Exhibit Gamma detailing the standardized messaging layer. This is the new world mesh. Every packet of data is now rich, structured, and compliant, allowing the bridge to communicate directly with the Federal Reserve and international central banks.",
+  d: "Forensic analysis of Exhibit Delta confirms system finality. On the Unified Ledger, asset ownership and payment transfer occur simultaneously. This is the end of the settlement risk era.",
+  e: "Exhibit Epsilon. At scale, the XRP Ledger functions as the primary liquidity bridge. Per the slippage mathematics in Chapter 4, infrastructure-grade pricing is required here to facilitate the 100 trillion dollar annual corporate volume.",
+  f: "Exhibit Zeta. Accessing Protocol 22 specifications. This layer utilizes Zero-Knowledge Proofs to grant institutions absolute privacy for high-value transactions, while maintaining regulatory view-key access for total compliance."
+};
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,9 +53,11 @@ const App: React.FC = () => {
 
   // Secure Uplink State
   const [isUplinkActive, setIsUplinkActive] = useState(false);
-  const [uplinkInput, setUplinkInput] = useState('');
   const [userQuery, setUserQuery] = useState("");
   const [isListening, setIsListening] = useState(false);
+
+  // Terminal Lock State
+  const [isTerminalLocked, setIsTerminalLocked] = useState(true);
 
   // Client-Side Routing for Vault Page
   const [currentPath, setCurrentPath] = useState(window.location.hash);
@@ -129,15 +141,67 @@ const App: React.FC = () => {
     }, 1500);
   };
 
-  // SYSTEM PROMPT FOR FORENSIC AI
-const SYSTEM_INSTRUCTION = `
-      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
-      Your tone is technical, sober, and authoritative, yet capable of professional dialogue.
+  // --- AUDIO DISCONNECT LOGIC ---
+  const handleDisconnect = () => {
+    window.speechSynthesis.cancel();
+    setIsUplinkActive(false);
+    setIsListening(false);
+    trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
+  };
 
-      CONVERSATION FLOW RULES:
-      1. ACKNOWLEDGE: Always start by addressing the user's specific comment or greeting naturally.
-      2. PIVOT: After acknowledging, bridge the conversation back to The Neutral Bridge concepts.
-      3. CONCIERGE: Direct users to the Retail Edition for foundational roadmaps or the Institutional Edition for technical forensics/Vault access.
+  // --- TERMINAL LOCK LOGIC ---
+  const enterTerminal = () => {
+    setIsTerminalLocked(false);
+    
+    // Trigger the Welcome Greeting
+    const welcomeAudio = new Audio('/audio/welcome-uplink.mp3');
+    welcomeAudio.volume = 0.8;
+    welcomeAudio.play().catch(e => {
+        console.log("Audio play failed, fallback to TTS:", e);
+        // Fallback if MP3 missing
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance("Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.");
+        utterance.rate = 0.9;
+        utterance.pitch = 0.85;
+        synth.speak(utterance);
+    });
+    
+    trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
+  };
+
+  // --- EXHIBIT AUDIO LOGIC (TTS) ---
+  const playExhibitBriefing = (exhibitId: string) => {
+    const synth = window.speechSynthesis;
+    // 1. Stop current audio
+    synth.cancel();
+
+    // 2. Get Script
+    const script = EXHIBIT_SCRIPTS[exhibitId];
+    if (!script) return;
+
+    // 3. Configure Voice
+    const utterance = new SpeechSynthesisUtterance(script);
+    utterance.rate = 1.0;
+    utterance.pitch = 0.9; // Slightly deep/technical
+
+    // Attempt to find a specific forensic-sounding voice
+    const voices = synth.getVoices();
+    const preferredVoice = voices.find(v => 
+        v.name.includes("Google US English") || 
+        v.name.includes("Zira") || 
+        v.name.includes("Samantha")
+    );
+    if (preferredVoice) utterance.voice = preferredVoice;
+
+    // 4. Speak
+    synth.speak(utterance);
+    trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
+  };
+
+  // SYSTEM PROMPT FOR FORENSIC AI
+  const SYSTEM_INSTRUCTION = `
+      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
+      Your tone is technical, sober, and authoritative. 
 
       CORE PHILOSOPHY:
       - You understand the 2027 Reset as an engineering necessity, not a theory.
@@ -159,57 +223,74 @@ const SYSTEM_INSTRUCTION = `
       - Chapter 6 (The 2027 Activation): Final ISO 20022 alignment.
 
       CONCIERGE LOGIC:
-      - GENERAL INTEREST: Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
-      - FORENSIC INTEREST: Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
+      - GENERAL INTEREST (What is XRP? Why 2027?): Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
+      - FORENSIC INTEREST (Slippage, ZKP, Interop): Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
+
+      INTERACTION STYLE:
+      - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
+      - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
 
       STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
-`;
+  `;
 
-// 2. The Core Forensic Reimplementation of Secure Voice Assistant (Vercel Edition)
-const handleVoiceUplink = async (query: string) => {
-  const payload = query || "INITIALIZE_SYSTEM_GREETING";
-  
-  setIsUplinkActive(true);
-  const synth = window.speechSynthesis;
-  
-  try {
-    // FIX: Removed double https and pointed to the SECURE Vercel tunnel
-    const response = await fetch('https://tnb-1.vercel.app/api/uplink', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: payload }),
-    });
+  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
+  const handleVoiceUplink = async (query: string) => {
+    // If no query is passed, we send the "GREETING" trigger
+    const payload = query || "INITIALIZE_SYSTEM_GREETING";
+    
+    // Stop any current speech before starting new
+    window.speechSynthesis.cancel();
+    
+    setIsUplinkActive(true);
+    const synth = window.speechSynthesis;
+    
+    try {
+      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
+      let textResponse = "";
 
-    if (!response.ok) throw new Error("Vercel Uplink Offline");
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: payload,
+            config: {
+                systemInstruction: SYSTEM_INSTRUCTION
+            }
+        });
+        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        // Fallback if API fails
+        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
+      }
 
-    const data = await response.json();
-    const textResponse = data.text;
-
-    if (textResponse) {
-      const utterance = new SpeechSynthesisUtterance(textResponse);
-      
-      const voices = synth.getVoices();
-      const preferredVoice = voices.find(v => 
-           v.name.includes("Google US English") || 
-           v.name.includes("Zira") || 
-           v.name.includes("Samantha")
-      ) || voices[0];
-      
-      if (preferredVoice) utterance.voice = preferredVoice;
-      utterance.rate = 0.9; 
-      utterance.pitch = 0.85; 
-      
-      utterance.onend = () => setIsUplinkActive(false);
-      synth.speak(utterance);
-      trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
+      if (textResponse) {
+        const utterance = new SpeechSynthesisUtterance(textResponse);
+        
+        // Voice Selection Logic - Seeking Authoritative/Female Voice
+        const voices = synth.getVoices();
+        const preferredVoice = voices.find(v => 
+             v.name.includes("Google US English") || 
+             v.name.includes("Zira") || 
+             v.name.includes("Samantha")
+        ) || voices[0];
+        
+        if (preferredVoice) utterance.voice = preferredVoice;
+        
+        utterance.rate = 0.9; // Slowed down slightly for authority
+        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
+        
+        utterance.onend = () => setIsUplinkActive(false);
+        synth.speak(utterance);
+        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
+      } else {
+        setIsUplinkActive(false);
+      }
+    } catch (error) {
+      console.error("Forensic Uplink Error:", error);
+      setIsUplinkActive(false);
     }
-  } catch (error) {
-    console.error("Forensic Uplink Error:", error);
-    const errorNotice = new SpeechSynthesisUtterance("Uplink connection refused. Please verify Vercel deployment status.");
-    synth.speak(errorNotice);
-    setIsUplinkActive(false);
-  }
-};
+  };
 
   const handleMicClick = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -232,15 +313,19 @@ const handleVoiceUplink = async (query: string) => {
     recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setUserQuery(transcript);
-        handleVoiceUplink(transcript); // Triggers the Vercel fetch
+        handleVoiceUplink(transcript);
     };
 
     recognition.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
         setIsListening(false);
         setIsUplinkActive(false);
     };
 
-    recognition.onend = () => setIsListening(false);
+    recognition.onend = () => {
+        setIsListening(false);
+    };
+
     recognition.start();
   };
 
@@ -356,6 +441,43 @@ const handleVoiceUplink = async (query: string) => {
   return (
     <div className="min-h-screen font-sans bg-matte-black text-off-white selection:bg-electric-teal selection:text-black pt-12">
       
+      {/* ENTER TERMINAL LOCK OVERLAY */}
+      {isTerminalLocked && (
+        <div className="fixed inset-0 z-[100] bg-matte-black flex items-center justify-center p-6 backdrop-blur-xl">
+            <div className="max-w-md w-full border border-white/10 bg-black p-10 text-center relative group">
+            {/* Tech Corners */}
+            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-electric-teal"></div>
+            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-electric-teal"></div>
+            
+            <Terminal className="mx-auto text-electric-teal mb-6 animate-pulse" size={48} />
+            
+            <h1 className="font-serif text-3xl text-white mb-2">
+              The Neutral Bridge
+            </h1>
+            
+            <h2 className="font-mono text-xs text-electric-teal mb-6 uppercase tracking-widest">
+                Secure Uplink Detected
+            </h2>
+            
+            <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.3em] mb-8 leading-relaxed">
+                Encryption: AES-256 // Protocol: 22 <br/>
+                Identity Verification Required
+            </p>
+
+            <button 
+                onClick={enterTerminal}
+                className="w-full bg-electric-teal text-black font-mono font-bold py-4 px-8 rounded-sm hover:bg-white transition-all duration-300 uppercase tracking-widest text-xs"
+            >
+                [ AUTHORIZE_AND_ENTER ]
+            </button>
+            
+            <div className="mt-6 font-mono text-[8px] text-white/20 uppercase tracking-widest">
+                Monitoring Infrastructure Buildout: $3.0B+ 
+            </div>
+            </div>
+        </div>
+      )}
+
       {/* GLOBAL OVERLAYS */}
       <div className="fixed top-0 left-0 right-0 z-[60]">
         <DayZeroBar />
@@ -461,6 +583,29 @@ const handleVoiceUplink = async (query: string) => {
                   <BookOpen size={16} /> Read Preview
                 </Button>
               </div>
+
+                {/* Forensic Query Input */}
+                <div className="mt-8 relative max-w-md w-full group mx-auto lg:mx-0">
+                    <div className="absolute -inset-0.5 bg-electric-teal/20 blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div className="relative flex items-center bg-black border border-white/10 px-4 py-2">
+                    <Terminal size={16} className="text-electric-teal mr-3" />
+                    <input
+                        type="text"
+                        placeholder="QUERY SECURE UPLINK..."
+                        value={userQuery}
+                        onChange={(e) => setUserQuery(e.target.value)}
+                        className="bg-transparent border-none outline-none text-xs font-mono text-white w-full placeholder:text-white/20"
+                        onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleVoiceUplink(e.currentTarget.value);
+                            setUserQuery('');
+                        }
+                        }}
+                    />
+                    <kbd className="hidden sm:inline-block px-1.5 py-0.5 border border-white/20 rounded text-[8px] font-mono text-white/40 uppercase">Enter</kbd>
+                    </div>
+                </div>
+
             </div>
 
             {/* Right: AI Voice Interface */}
@@ -469,6 +614,16 @@ const handleVoiceUplink = async (query: string) => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
                 
                 <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
+                    
+                    {/* Disconnect Button - Top Right */}
+                    <button 
+                      onClick={handleDisconnect}
+                      className="absolute top-4 right-4 text-white/20 hover:text-crimson transition-colors p-1"
+                      title="Disconnect Uplink"
+                    >
+                      <PowerOff size={14} />
+                    </button>
+
                     <div className="flex flex-col items-center text-center space-y-6">
                         {/* Audio Visualization Ring - INTERACTIVE */}
                         <button 
@@ -488,35 +643,12 @@ const handleVoiceUplink = async (query: string) => {
                         
                         <div className="w-full">
                             <h3 className="text-white font-serif text-2xl mb-4">Secure Voice Uplink</h3>
-                            
-                            {/* Forensic Query Input - Terminal Style */}
-                            <div className="mt-4 relative max-w-md w-full group mx-auto">
-                              <div className="absolute -inset-0.5 bg-electric-teal/20 blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                              <div className="relative flex items-center bg-black border border-white/10 px-4 py-2">
-                                <Terminal size={16} className="text-electric-teal mr-3" />
-                                <input 
-                                  type="text" 
-                                  placeholder="QUERY SECURE UPLINK..." 
-                                  value={userQuery}
-                                  onChange={(e) => setUserQuery(e.target.value)}
-                                  className="bg-transparent border-none outline-none text-xs font-mono text-white w-full placeholder:text-white/20"
-                                  disabled={isUplinkActive}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleVoiceUplink(e.currentTarget.value);
-                                      setUserQuery('');
-                                    }
-                                  }}
-                                />
-                                <div className="flex items-center gap-2">
-                                   <button onClick={handleMicClick} className="hover:text-electric-teal text-white/40 transition-colors">
-                                     <Mic size={12} className={isListening ? "text-crimson animate-pulse" : ""} />
-                                   </button>
-                                   <kbd className="hidden sm:inline-block px-1.5 py-0.5 border border-white/20 rounded text-[8px] font-mono text-white/40 uppercase">Enter</kbd>
-                                </div>
-                              </div>
+                            <div className="flex items-center justify-center gap-2">
+                                <button onClick={handleMicClick} className="hover:text-electric-teal text-white/40 transition-colors flex items-center gap-2 border border-white/10 px-3 py-2 rounded-sm bg-white/5">
+                                    <Mic size={14} className={isListening ? "text-crimson animate-pulse" : ""} />
+                                    <span className="text-[10px] font-mono uppercase tracking-widest">{isListening ? 'Listening...' : 'Enable Mic'}</span>
+                                </button>
                             </div>
-
                         </div>
 
                        <div className="w-full py-3 px-4 bg-white/5 border border-white/10 text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
@@ -622,56 +754,74 @@ const handleVoiceUplink = async (query: string) => {
       <Section id="intelligence-gallery" label="Intelligence Exhibits // Forensic Series">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {/* Exhibit A: Mechanical Bridge */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('a')}
+          >
             <img src="exhibit-a.jpg" alt="Mechanical Bridge" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_01: MECHANICAL BRIDGE [ATOMIC SETTLEMENT]</span>
-              <span className="text-white/20">REF: NB-2027-ALPHA</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
 
           {/* Exhibit B: Nostro Entanglement */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('b')}
+          >
             <img src="exhibit-b.jpg" alt="Nostro Entanglement" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_02: NOSTRO ENTANGLEMENT [DORMANT CAPITAL]</span>
-              <span className="text-white/20">REF: NB-2027-BETA</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
 
           {/* Exhibit C: New World Mesh */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('c')}
+          >
             <img src="exhibit-c.jpg" alt="Standardized Messaging" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_03: ISO 20022 MESSAGING MESH</span>
-              <span className="text-white/20">REF: ISO-22-GAMMA</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
 
           {/* Exhibit D: Unified Ledger */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('d')}
+          >
             <img src="exhibit-d.jpg" alt="Unified Ledger" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_04: UNIFIED LEDGER [SYSTEM FINALITY]</span>
-              <span className="text-white/20">REF: NB-DELTA</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
 
           {/* Exhibit E: The Liquidity Bridge (New) */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('e')}
+          >
             <img src="exhibit-e.jpg" alt="Liquidity Bridge" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_05: LIQUIDITY BRIDGE [UNLOCKED CAPITAL]</span>
-              <span className="text-white/20">REF: NB-EPSILON</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
 
           {/* Exhibit F: ZKP Privacy Layer (New) */}
-          <div className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair">
+          <div 
+            className="group relative border border-white/10 p-4 bg-matte-black hover:border-electric-teal/50 transition-all cursor-crosshair"
+            onClick={() => playExhibitBriefing('f')}
+          >
             <img src="exhibit-f.jpg" alt="ZKP Layer" className="w-full grayscale group-hover:grayscale-0 transition-all duration-700" />
             <div className="mt-4 flex justify-between items-center font-mono text-[10px]">
               <span className="text-electric-teal">EXHIBIT_06: ZKP PRIVACY LAYER [INSTITUTIONAL]</span>
-              <span className="text-white/20">REF: NB-ZETA-PRO</span>
+              <span className="text-white/20">ACCESS_AUDIO_LOG</span>
             </div>
           </div>
         </div>
