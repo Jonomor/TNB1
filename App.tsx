@@ -29,6 +29,7 @@ import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
+import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData } from './utils/audio';
 
 // FORENSIC SCRIPTS FOR EXHIBITS (Text-to-Speech)
@@ -65,10 +66,14 @@ const App: React.FC = () => {
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
 
-  // Audio Context Refs for Human-Quality TTS
+  // Audio Context Refs for Human-Quality TTS & Live API
   const audioContextRef = useRef<AudioContext | null>(null);
   const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
   
+  // Live API Refs
+  const liveSessionRef = useRef<Promise<any> | null>(null);
+  const nextStartTimeRef = useRef<number>(0);
+
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
@@ -147,12 +152,17 @@ const App: React.FC = () => {
 
   // --- AUDIO DISCONNECT LOGIC ---
   const handleDisconnect = () => {
-    // 1. Stop Current Audio Source
+    // 1. Close Live Session if active
+    if (liveSessionRef.current) {
+        liveSessionRef.current.then(session => session.close());
+        liveSessionRef.current = null;
+    }
+    // 2. Stop Gemini TTS / Audio Source
     if (currentSourceRef.current) {
         currentSourceRef.current.stop();
         currentSourceRef.current = null;
     }
-    // 2. Stop Browser TTS
+    // 3. Stop Browser TTS
     window.speechSynthesis.cancel();
     
     setIsUplinkActive(false);
@@ -160,8 +170,16 @@ const App: React.FC = () => {
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
-  // --- SECURE UPLINK TTS (Server-Side Proxy) ---
+  // --- GEMINI TTS HELPER (For Exhibits - Static Content) ---
   const playHighQualitySpeech = async (text: string, voiceName: string = 'Kore') => {
+    // Kill Live Session if active to prevent overlap
+    if (liveSessionRef.current) {
+        liveSessionRef.current.then(session => session.close());
+        liveSessionRef.current = null;
+        setIsUplinkActive(false); 
+    }
+
+    // Stop current audio
     if (currentSourceRef.current) {
         currentSourceRef.current.stop();
         currentSourceRef.current = null;
@@ -169,22 +187,32 @@ const App: React.FC = () => {
     window.speechSynthesis.cancel();
 
     try {
-        // We call our secure Vercel endpoint which returns the audio stream
-        const response = await fetch('/api/uplink', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, voice: voiceName, mode: 'TTS' })
-        });
-
-        const data = await response.json();
-        if (!data.base64Audio) throw new Error("Uplink Audio Missing");
-
         if (!audioContextRef.current) {
             audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
         }
-        
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
+
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-tts",
+            contents: { parts: [{ text }] },
+            config: {
+                responseModalities: [Modality.AUDIO],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName }, 
+                    },
+                },
+            },
+        });
+
+        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (!base64Audio) throw new Error("No audio data returned");
+
         const audioBuffer = await decodeAudioData(
-            b64ToUint8Array(data.base64Audio),
+            b64ToUint8Array(base64Audio),
             audioContextRef.current,
             24000,
             1
@@ -198,14 +226,13 @@ const App: React.FC = () => {
 
         source.onended = () => {
             currentSourceRef.current = null;
-            setIsUplinkActive(false);
         };
+
     } catch (error) {
-        console.error("Uplink Error, fallback to browser TTS:", error);
-        // Fallback to browser TTS if the secure uplink is busy
+        console.error("Gemini TTS Error, falling back to browser:", error);
+        const synth = window.speechSynthesis;
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.onend = () => setIsUplinkActive(false);
-        window.speechSynthesis.speak(utterance);
+        synth.speak(utterance);
     }
   };
 
@@ -226,25 +253,136 @@ const App: React.FC = () => {
     }
   };
 
-  // --- VOICE UPLINK LOGIC (Proxy) ---
+  // SYSTEM PROMPT FOR FORENSIC AI
+  const SYSTEM_INSTRUCTION = `
+      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
+      Your tone is technical, sober, and authoritative. 
+
+      CORE PHILOSOPHY:
+      - You understand the 2027 Reset as an engineering necessity, not a theory.
+      - You view finance as technical infrastructure, not just "money."
+      - You understand "The Multiplier Effect" where utility locks supply, driving value.
+
+      CORE KNOWLEDGE (FORENSIC DATA):
+      - ACQUISITIONS: Ripple’s $3B+ vertical integration strategy (Hidden Road $1.25B, GTreasury ~$1B, Metaco $250M, Rail $200M).
+      - REGULATORY: 75+ global approvals including the Dec 2025 OCC National Trust Bank Charter.
+      - SLIPPAGE MATH: High-value transactions require deep liquidity. At $1, a $10B settlement causes 50-80% slippage. Revaluation is a mathematical requirement for $100T+ annual volume.
+      - NOSTRO/VOSTRO: The legacy system has $27T trapped in dormant accounts. The Neutral Bridge releases this via ODL.
+
+      CHAPTER-SPECIFIC ANCHORS (THE RETAIL STRATEGY):
+      - Chapter 1 (The Fractured Rail): Discuss the collapse of 1970s SWIFT.
+      - Chapter 2 (Nostro Liberation): Explain the $27T trap. PITCH: "The Retail Edition provides the roadmap for individual capital migration."
+      - Chapter 3 (The Vertical Stack): Details on the $3B+ acquisition spree.
+      - Chapter 4 (The Mathematical Reset): Defense of XRP as a neutral bridge. Explain the "Utility-Driven Surge."
+      - Chapter 5 (Protocol 22 & ZKP): Institutional privacy mechanics. PITCH: "Technical specs are reserved for the Institutional Edition & Vault."
+      - Chapter 6 (The 2027 Activation): Final ISO 20022 alignment.
+
+      CONCIERGE LOGIC:
+      - GENERAL INTEREST (What is XRP? Why 2027?): Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
+      - FORENSIC INTEREST (Slippage, ZKP, Interop): Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
+
+      INTERACTION STYLE:
+      - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
+      - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
+      - RESPONSE LENGTH: Keep spoken responses concise (under 3 sentences) for faster playback.
+
+      STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
+  `;
+
+  // --- GEMINI LIVE API (LOW LATENCY UPLINK) ---
+  const ensureLiveSession = async () => {
+    if (liveSessionRef.current) return liveSessionRef.current;
+
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const sessionPromise = ai.live.connect({
+      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+      config: {
+        responseModalities: [Modality.AUDIO],
+        systemInstruction: SYSTEM_INSTRUCTION,
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }, // Using Deep Male Voice for Uplink
+        },
+      },
+      callbacks: {
+        onopen: () => {
+            console.log("Secure Uplink: Connection Established");
+        },
+        onmessage: async (msg: LiveServerMessage) => {
+            const base64Audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (base64Audio) {
+                if (!audioContextRef.current) {
+                     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+                }
+                const ctx = audioContextRef.current;
+                
+                // Decode Stream Chunk
+                const audioBuffer = await decodeAudioData(
+                    b64ToUint8Array(base64Audio),
+                    ctx,
+                    24000,
+                    1
+                );
+
+                // Gapless Playback Scheduling
+                const source = ctx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                // Schedule next chunk at the end of the previous one, or immediately if we fell behind
+                const startTime = Math.max(nextStartTimeRef.current, now);
+                source.start(startTime);
+                nextStartTimeRef.current = startTime + audioBuffer.duration;
+            }
+             
+            if (msg.serverContent?.turnComplete) {
+               // Optional: Visual indicator update
+               console.log("Uplink: Turn Complete");
+               // Don't set isUplinkActive false here immediately to avoid cutting off visualizer, 
+               // usually you'd track the audio end, but for simplicity we keep it active while session is open or speaking.
+            }
+        },
+        onclose: () => {
+            console.log("Secure Uplink: Connection Closed");
+            liveSessionRef.current = null;
+            setIsUplinkActive(false);
+        },
+        onerror: (e) => {
+            console.error("Secure Uplink Error", e);
+            setIsUplinkActive(false);
+        }
+      }
+    });
+    liveSessionRef.current = sessionPromise;
+    return sessionPromise;
+  };
+
+  // Replaces the old slow uplink with Live API
   const handleVoiceUplink = async (query: string) => {
-    const payload = query || "INITIALIZE_SYSTEM_GREETING";
     setIsUplinkActive(true);
     
+    // Resume Audio Context if suspended
+    if (!audioContextRef.current) {
+         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+    }
+    if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+    }
+    // Reset scheduling time for new turn
+    nextStartTimeRef.current = audioContextRef.current.currentTime;
+
     try {
-        const response = await fetch('/api/uplink', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: payload })
-        });
-
-        const data = await response.json();
-        const textResponse = data.text || "Systems Nominal. Signal Restored.";
-
-        playHighQualitySpeech(textResponse, 'Fenrir');
-        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
+        const session = await ensureLiveSession();
+        
+        // Use default greeting if empty
+        const textToSend = query || "System Status Report. Brief summary.";
+        
+        // Send to Gemini Live
+        session.send([{ text: textToSend }]);
+        
+        trackEvent('voice_uplink_query', { category: 'Intelligence', label: 'Live API Stream' });
     } catch (error) {
-        console.error("Forensic Uplink Error:", error);
+        console.error("Live API Error:", error);
         setIsUplinkActive(false);
     }
   };
@@ -264,6 +402,8 @@ const App: React.FC = () => {
 
     recognition.onstart = () => {
         setIsListening(true);
+        // We can pre-connect here to save time
+        ensureLiveSession(); 
     };
 
     recognition.onresult = (event: any) => {
