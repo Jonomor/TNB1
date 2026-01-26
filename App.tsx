@@ -24,11 +24,12 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
-import PrivacyPolicy from './components/PrivacyPolicy';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2 } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,6 +44,8 @@ const App: React.FC = () => {
   // Secure Uplink State
   const [isUplinkActive, setIsUplinkActive] = useState(false);
   const [uplinkInput, setUplinkInput] = useState('');
+  const [userQuery, setUserQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
 
   // Client-Side Routing for Vault Page
   const [currentPath, setCurrentPath] = useState(window.location.hash);
@@ -126,50 +129,88 @@ const App: React.FC = () => {
     }, 1500);
   };
 
+  // SYSTEM PROMPT FOR FORENSIC AI
+  const SYSTEM_INSTRUCTION = `
+      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
+      Your tone is technical, sober, and authoritative. 
+
+      CORE PHILOSOPHY:
+      - You understand the 2027 Reset as an engineering necessity, not a theory.
+      - You view finance as technical infrastructure, not just "money."
+      - You understand "The Multiplier Effect" where utility locks supply, driving value.
+
+      CORE KNOWLEDGE (FORENSIC DATA):
+      - ACQUISITIONS: Ripple’s $3B+ vertical integration strategy (Hidden Road $1.25B, GTreasury ~$1B, Metaco $250M, Rail $200M).
+      - REGULATORY: 75+ global approvals including the Dec 2025 OCC National Trust Bank Charter.
+      - SLIPPAGE MATH: High-value transactions require deep liquidity. At $1, a $10B settlement causes 50-80% slippage. Revaluation is a mathematical requirement for $100T+ annual volume.
+      - NOSTRO/VOSTRO: The legacy system has $27T trapped in dormant accounts. The Neutral Bridge releases this via ODL.
+
+      CHAPTER-SPECIFIC ANCHORS (THE RETAIL STRATEGY):
+      - Chapter 1 (The Fractured Rail): Discuss the collapse of 1970s SWIFT.
+      - Chapter 2 (Nostro Liberation): Explain the $27T trap. PITCH: "The Retail Edition provides the roadmap for individual capital migration."
+      - Chapter 3 (The Vertical Stack): Details on the $3B+ acquisition spree.
+      - Chapter 4 (The Mathematical Reset): Defense of XRP as a neutral bridge. Explain the "Utility-Driven Surge."
+      - Chapter 5 (Protocol 22 & ZKP): Institutional privacy mechanics. PITCH: "Technical specs are reserved for the Institutional Edition & Vault."
+      - Chapter 6 (The 2027 Activation): Final ISO 20022 alignment.
+
+      CONCIERGE LOGIC:
+      - GENERAL INTEREST (What is XRP? Why 2027?): Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
+      - FORENSIC INTEREST (Slippage, ZKP, Interop): Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
+
+      INTERACTION STYLE:
+      - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
+      - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
+
+      STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
+  `;
+
   // 2. The Core Forensic Reimplementation of Secure Voice Uplink
-  const handleVoiceUplink = async (userQuery: string) => {
-    if (!userQuery && !uplinkInput) return;
-    const query = userQuery || uplinkInput;
+  const handleVoiceUplink = async (query: string) => {
+    // If no query is passed, we send the "GREETING" trigger
+    const payload = query || "INITIALIZE_SYSTEM_GREETING";
     
     setIsUplinkActive(true);
     const synth = window.speechSynthesis;
     
     try {
-      // Secure communication with our Vercel Middleware
-      // NOTE: In this demo environment, the fetch will naturally fail 404.
-      // We implement a forensic simulation fallback to ensure the user experiences the Voice Engine.
-      let data = { text: "" };
-      
+      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
+      let textResponse = "";
+
       try {
-          const response = await fetch('/api/uplink', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              prompt: query,
-              history: [] 
-            }),
-          });
-          if (!response.ok) throw new Error("API_UNREACHABLE");
-          data = await response.json();
-      } catch (apiError) {
-          // Forensic Fallback for Demo
-          const forensicResponses = [
-             "Analyzing the multiplier effect. The 3 billion dollar vertical integration confirms liquidity velocity is increasing.",
-             "Nostro entanglement detected. The shift from pre-funded accounts to Atomic Settlement is mathematically inevitable.",
-             "This is an educational systems analysis. Capital preservation logic is active. I cannot provide financial advice.",
-             "Protocol 22 encryption verified. The bridge handles sovereign data without broadcasting metadata."
-          ];
-          data.text = forensicResponses[Math.floor(Math.random() * forensicResponses.length)];
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: payload,
+            config: {
+                systemInstruction: SYSTEM_INSTRUCTION
+            }
+        });
+        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        // Fallback if API fails
+        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
       }
 
-      if (data.text) {
-        // Triggering the Forensic Voice Engine
-        const utterance = new SpeechSynthesisUtterance(data.text);
-        utterance.rate = 0.9; // Sober, deliberate pace
-        utterance.pitch = 0.85; // Lower frequency for technical authority
+      if (textResponse) {
+        const utterance = new SpeechSynthesisUtterance(textResponse);
+        
+        // Voice Selection Logic - Seeking Authoritative/Female Voice
+        const voices = synth.getVoices();
+        const preferredVoice = voices.find(v => 
+             v.name.includes("Google US English") || 
+             v.name.includes("Zira") || 
+             v.name.includes("Samantha")
+        ) || voices[0];
+        
+        if (preferredVoice) utterance.voice = preferredVoice;
+        
+        utterance.rate = 1.0; // Normal rate for clarity
+        utterance.pitch = 1.0; // Natural pitch
         
         utterance.onend = () => setIsUplinkActive(false);
         synth.speak(utterance);
+        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
       } else {
         setIsUplinkActive(false);
       }
@@ -177,6 +218,43 @@ const App: React.FC = () => {
       console.error("Forensic Uplink Error:", error);
       setIsUplinkActive(false);
     }
+  };
+
+  const handleMicClick = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Microphone access not supported in this browser.");
+        return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+        setIsListening(true);
+        setIsUplinkActive(true);
+    };
+
+    recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setUserQuery(transcript);
+        handleVoiceUplink(transcript);
+    };
+
+    recognition.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+        setIsUplinkActive(false);
+    };
+
+    recognition.onend = () => {
+        setIsListening(false);
+    };
+
+    recognition.start();
   };
 
   const pricingTiers: PricingTier[] = [
@@ -407,30 +485,51 @@ const App: React.FC = () => {
                     <div className="flex flex-col items-center text-center space-y-6">
                         {/* Audio Visualization Ring - INTERACTIVE */}
                         <button 
-                           onClick={() => handleVoiceUplink(uplinkInput || "Status Report")}
+                           onClick={() => handleVoiceUplink("")}
                            className={`w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative transition-all duration-300 group/mic ${isUplinkActive ? 'scale-110 border-electric-teal shadow-[0_0_30px_rgba(56,189,248,0.4)]' : 'hover:scale-105 hover:border-white/30'}`}
                         >
                              <div className={`absolute inset-0 border border-electric-teal/30 rounded-full ${isUplinkActive ? 'animate-ping opacity-60' : 'opacity-0'}`}></div>
                              <div className="absolute inset-2 border border-white/5 rounded-full"></div>
-                             <Mic size={32} className={`text-electric-teal transition-all ${isUplinkActive ? 'animate-pulse scale-110' : 'group-hover/mic:scale-110'}`} />
+                             
+                             {/* Oscillating Waveform Placeholder / Blinking Logic */}
+                             {isUplinkActive ? (
+                               <Activity size={32} className="text-electric-teal animate-bounce" />
+                             ) : (
+                               <Mic size={32} className="text-electric-teal group-hover/mic:scale-110 transition-transform" />
+                             )}
                         </button>
                         
                         <div className="w-full">
                             <h3 className="text-white font-serif text-2xl mb-4">Secure Voice Uplink</h3>
                             
-                            {/* Interactive Input Field */}
-                            <div className="relative max-w-xs mx-auto">
+                            {/* Forensic Query Input - Terminal Style */}
+                            <div className="mt-4 relative max-w-md w-full group mx-auto">
+                              <div className="absolute -inset-0.5 bg-electric-teal/20 blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                              <div className="relative flex items-center bg-black border border-white/10 px-4 py-2">
+                                <Terminal size={16} className="text-electric-teal mr-3" />
                                 <input 
                                   type="text" 
-                                  value={uplinkInput}
-                                  onChange={(e) => setUplinkInput(e.target.value)}
-                                  placeholder="Enter Intelligence Query..."
+                                  placeholder="QUERY SECURE UPLINK..." 
+                                  value={userQuery}
+                                  onChange={(e) => setUserQuery(e.target.value)}
+                                  className="bg-transparent border-none outline-none text-xs font-mono text-white w-full placeholder:text-white/20"
                                   disabled={isUplinkActive}
-                                  onKeyDown={(e) => e.key === 'Enter' && handleVoiceUplink(uplinkInput)}
-                                  className="w-full bg-black/50 border border-white/10 px-3 py-2 text-center text-sm text-white focus:border-electric-teal outline-none rounded-sm font-mono placeholder:text-white/20 transition-colors"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      handleVoiceUplink(e.currentTarget.value);
+                                      setUserQuery('');
+                                    }
+                                  }}
                                 />
-                                <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-electric-teal/50 to-transparent opacity-0 transition-opacity peer-focus:opacity-100"></div>
+                                <div className="flex items-center gap-2">
+                                   <button onClick={handleMicClick} className="hover:text-electric-teal text-white/40 transition-colors">
+                                     <Mic size={12} className={isListening ? "text-crimson animate-pulse" : ""} />
+                                   </button>
+                                   <kbd className="hidden sm:inline-block px-1.5 py-0.5 border border-white/20 rounded text-[8px] font-mono text-white/40 uppercase">Enter</kbd>
+                                </div>
+                              </div>
                             </div>
+
                         </div>
 
                        <div className="w-full py-3 px-4 bg-white/5 border border-white/10 text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
