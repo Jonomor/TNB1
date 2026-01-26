@@ -435,7 +435,7 @@ const App: React.FC = () => {
 
                        <div className="w-full py-3 px-4 bg-white/5 border border-white/10 text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
                             <Activity size={12} className={isUplinkActive ? 'text-electric-teal animate-bounce' : 'text-white/20'} />
-                               {isUplinkActive ? "UPLINK ACTIVE // TRANSMITTING" : "Link Encrypted — Institutional Access Only"}
+                               {isUplinkActive ? "UPLINK ACTIVE // TRANSMITTING" : "SECURE UPLINK READY"}
                        </div>
                         
                         <div className="grid grid-cols-2 gap-4 w-full pt-6 border-t border-white/5">
