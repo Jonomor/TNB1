@@ -29,7 +29,8 @@ import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
+import { b64ToUint8Array, decodeAudioData } from './utils/audio';
 
 // FORENSIC SCRIPTS FOR EXHIBITS (Text-to-Speech)
 const EXHIBIT_SCRIPTS: Record<string, string> = {
@@ -64,6 +65,14 @@ const App: React.FC = () => {
 
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
+
+  // Audio Context Refs for Human-Quality TTS & Live API
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  
+  // Live API Refs
+  const liveSessionRef = useRef<Promise<any> | null>(null);
+  const nextStartTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -143,59 +152,105 @@ const App: React.FC = () => {
 
   // --- AUDIO DISCONNECT LOGIC ---
   const handleDisconnect = () => {
+    // 1. Close Live Session if active
+    if (liveSessionRef.current) {
+        liveSessionRef.current.then(session => session.close());
+        liveSessionRef.current = null;
+    }
+    // 2. Stop Gemini TTS / Audio Source
+    if (currentSourceRef.current) {
+        currentSourceRef.current.stop();
+        currentSourceRef.current = null;
+    }
+    // 3. Stop Browser TTS
     window.speechSynthesis.cancel();
+    
     setIsUplinkActive(false);
     setIsListening(false);
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
+  // --- GEMINI TTS HELPER (For Exhibits - Static Content) ---
+  const playHighQualitySpeech = async (text: string, voiceName: string = 'Kore') => {
+    // Kill Live Session if active to prevent overlap
+    if (liveSessionRef.current) {
+        liveSessionRef.current.then(session => session.close());
+        liveSessionRef.current = null;
+        setIsUplinkActive(false); 
+    }
+
+    // Stop current audio
+    if (currentSourceRef.current) {
+        currentSourceRef.current.stop();
+        currentSourceRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+
+    try {
+        if (!audioContextRef.current) {
+            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+        }
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
+        }
+
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash-preview-tts",
+            contents: { parts: [{ text }] },
+            config: {
+                responseModalities: [Modality.AUDIO],
+                speechConfig: {
+                    voiceConfig: {
+                        prebuiltVoiceConfig: { voiceName }, 
+                    },
+                },
+            },
+        });
+
+        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (!base64Audio) throw new Error("No audio data returned");
+
+        const audioBuffer = await decodeAudioData(
+            b64ToUint8Array(base64Audio),
+            audioContextRef.current,
+            24000,
+            1
+        );
+
+        const source = audioContextRef.current.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContextRef.current.destination);
+        source.start();
+        currentSourceRef.current = source;
+
+        source.onended = () => {
+            currentSourceRef.current = null;
+        };
+
+    } catch (error) {
+        console.error("Gemini TTS Error, falling back to browser:", error);
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+        synth.speak(utterance);
+    }
+  };
+
   // --- TERMINAL LOCK LOGIC ---
   const enterTerminal = () => {
     setIsTerminalLocked(false);
-    
-    // Trigger the Welcome Greeting
-    const welcomeAudio = new Audio('/audio/welcome-uplink.mp3');
-    welcomeAudio.volume = 0.8;
-    welcomeAudio.play().catch(e => {
-        console.log("Audio play failed, fallback to TTS:", e);
-        // Fallback if MP3 missing
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance("Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.");
-        utterance.rate = 0.9;
-        utterance.pitch = 0.85;
-        synth.speak(utterance);
-    });
-    
+    const welcomeText = "Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.";
+    playHighQualitySpeech(welcomeText, 'Fenrir'); 
     trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
   };
 
-  // --- EXHIBIT AUDIO LOGIC (TTS) ---
+  // --- EXHIBIT AUDIO LOGIC ---
   const playExhibitBriefing = (exhibitId: string) => {
-    const synth = window.speechSynthesis;
-    // 1. Stop current audio
-    synth.cancel();
-
-    // 2. Get Script
     const script = EXHIBIT_SCRIPTS[exhibitId];
-    if (!script) return;
-
-    // 3. Configure Voice
-    const utterance = new SpeechSynthesisUtterance(script);
-    utterance.rate = 1.0;
-    utterance.pitch = 0.9; // Slightly deep/technical
-
-    // Attempt to find a specific forensic-sounding voice
-    const voices = synth.getVoices();
-    const preferredVoice = voices.find(v => 
-        v.name.includes("Google US English") || 
-        v.name.includes("Zira") || 
-        v.name.includes("Samantha")
-    );
-    if (preferredVoice) utterance.voice = preferredVoice;
-
-    // 4. Speak
-    synth.speak(utterance);
-    trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
+    if (script) {
+        playHighQualitySpeech(script, 'Kore');
+        trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
+    }
   };
 
   // SYSTEM PROMPT FOR FORENSIC AI
@@ -229,66 +284,106 @@ const App: React.FC = () => {
       INTERACTION STYLE:
       - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
       - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
+      - RESPONSE LENGTH: Keep spoken responses concise (under 3 sentences) for faster playback.
 
       STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
   `;
 
-  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
-  const handleVoiceUplink = async (query: string) => {
-    // If no query is passed, we send the "GREETING" trigger
-    const payload = query || "INITIALIZE_SYSTEM_GREETING";
-    
-    // Stop any current speech before starting new
-    window.speechSynthesis.cancel();
-    
-    setIsUplinkActive(true);
-    const synth = window.speechSynthesis;
-    
-    try {
-      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
-      let textResponse = "";
+  // --- GEMINI LIVE API (LOW LATENCY UPLINK) ---
+  const ensureLiveSession = async () => {
+    if (liveSessionRef.current) return liveSessionRef.current;
 
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: payload,
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const sessionPromise = ai.live.connect({
+      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+      config: {
+        responseModalities: [Modality.AUDIO],
+        systemInstruction: SYSTEM_INSTRUCTION,
+        speechConfig: {
+          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }, // Using Deep Male Voice for Uplink
+        },
+      },
+      callbacks: {
+        onopen: () => {
+            console.log("Secure Uplink: Connection Established");
+        },
+        onmessage: async (msg: LiveServerMessage) => {
+            const base64Audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (base64Audio) {
+                if (!audioContextRef.current) {
+                     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+                }
+                const ctx = audioContextRef.current;
+                
+                // Decode Stream Chunk
+                const audioBuffer = await decodeAudioData(
+                    b64ToUint8Array(base64Audio),
+                    ctx,
+                    24000,
+                    1
+                );
+
+                // Gapless Playback Scheduling
+                const source = ctx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(ctx.destination);
+                
+                const now = ctx.currentTime;
+                // Schedule next chunk at the end of the previous one, or immediately if we fell behind
+                const startTime = Math.max(nextStartTimeRef.current, now);
+                source.start(startTime);
+                nextStartTimeRef.current = startTime + audioBuffer.duration;
             }
-        });
-        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
-      } catch (error) {
-        console.error("Gemini API Error:", error);
-        // Fallback if API fails
-        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
+             
+            if (msg.serverContent?.turnComplete) {
+               // Optional: Visual indicator update
+               console.log("Uplink: Turn Complete");
+               // Don't set isUplinkActive false here immediately to avoid cutting off visualizer, 
+               // usually you'd track the audio end, but for simplicity we keep it active while session is open or speaking.
+            }
+        },
+        onclose: () => {
+            console.log("Secure Uplink: Connection Closed");
+            liveSessionRef.current = null;
+            setIsUplinkActive(false);
+        },
+        onerror: (e) => {
+            console.error("Secure Uplink Error", e);
+            setIsUplinkActive(false);
+        }
       }
+    });
+    liveSessionRef.current = sessionPromise;
+    return sessionPromise;
+  };
 
-      if (textResponse) {
-        const utterance = new SpeechSynthesisUtterance(textResponse);
+  // Replaces the old slow uplink with Live API
+  const handleVoiceUplink = async (query: string) => {
+    setIsUplinkActive(true);
+    
+    // Resume Audio Context if suspended
+    if (!audioContextRef.current) {
+         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+    }
+    if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+    }
+    // Reset scheduling time for new turn
+    nextStartTimeRef.current = audioContextRef.current.currentTime;
+
+    try {
+        const session = await ensureLiveSession();
         
-        // Voice Selection Logic - Seeking Authoritative/Female Voice
-        const voices = synth.getVoices();
-        const preferredVoice = voices.find(v => 
-             v.name.includes("Google US English") || 
-             v.name.includes("Zira") || 
-             v.name.includes("Samantha")
-        ) || voices[0];
+        // Use default greeting if empty
+        const textToSend = query || "System Status Report. Brief summary.";
         
-        if (preferredVoice) utterance.voice = preferredVoice;
+        // Send to Gemini Live
+        session.send([{ text: textToSend }]);
         
-        utterance.rate = 0.9; // Slowed down slightly for authority
-        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
-        
-        utterance.onend = () => setIsUplinkActive(false);
-        synth.speak(utterance);
-        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
-      } else {
-        setIsUplinkActive(false);
-      }
+        trackEvent('voice_uplink_query', { category: 'Intelligence', label: 'Live API Stream' });
     } catch (error) {
-      console.error("Forensic Uplink Error:", error);
-      setIsUplinkActive(false);
+        console.error("Live API Error:", error);
+        setIsUplinkActive(false);
     }
   };
 
@@ -307,7 +402,8 @@ const App: React.FC = () => {
 
     recognition.onstart = () => {
         setIsListening(true);
-        setIsUplinkActive(true);
+        // We can pre-connect here to save time
+        ensureLiveSession(); 
     };
 
     recognition.onresult = (event: any) => {
