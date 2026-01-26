@@ -540,29 +540,7 @@ const App: React.FC = () => {
                 </Button>
               </div>
 
-                {/* Forensic Query Input */}
-                <div className="mt-8 relative max-w-md w-full group mx-auto lg:mx-0">
-                    <div className="absolute -inset-0.5 bg-electric-teal/20 blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                    <div className="relative flex items-center bg-black border border-white/10 px-4 py-2">
-                    <Terminal size={16} className="text-electric-teal mr-3" />
-                    <input
-                        type="text"
-                        placeholder="QUERY SECURE UPLINK..."
-                        value={userQuery}
-                        onChange={(e) => setUserQuery(e.target.value)}
-                        className="bg-transparent border-none outline-none text-xs font-mono text-white w-full placeholder:text-white/20"
-                        onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            handleVoiceUplink(e.currentTarget.value);
-                            setUserQuery('');
-                        }
-                        }}
-                    />
-                    <kbd className="hidden sm:inline-block px-1.5 py-0.5 border border-white/20 rounded text-[8px] font-mono text-white/40 uppercase">Enter</kbd>
-                    </div>
-                </div>
-
-            </div>
+                
 
             {/* Right: AI Voice Interface */}
             <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
