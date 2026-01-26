@@ -165,28 +165,22 @@ const SYSTEM_INSTRUCTION = `
       STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
 `;
 
-// 2. The Core Forensic Reimplementation of Secure Voice Assistant
+// 2. The Core Forensic Reimplementation of Secure Voice Assistant (Vercel Edition)
   const handleVoiceUplink = async (query: string) => {
-    // If no query is passed, we send the "GREETING" trigger
     const payload = query || "INITIALIZE_SYSTEM_GREETING";
     
     setIsUplinkActive(true);
     const synth = window.speechSynthesis;
     
     try {
-      // THE FIX: We fetch from your Vercel API endpoint, NOT the Google SDK directly
-      // Replace 'https://your-vercel-project.vercel.app' with your actual Vercel URL
+      // REPLACE THE URL BELOW with your actual Vercel deployment URL
       const response = await fetch('https://your-vercel-project.vercel.app/api/uplink', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: payload }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Uplink Error: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error("Vercel Uplink Offline");
 
       const data = await response.json();
       const textResponse = data.text;
@@ -194,7 +188,7 @@ const SYSTEM_INSTRUCTION = `
       if (textResponse) {
         const utterance = new SpeechSynthesisUtterance(textResponse);
         
-        // Voice Selection Logic - Seeking Authoritative/Female Voice
+        // Voice Selection Logic
         const voices = synth.getVoices();
         const preferredVoice = voices.find(v => 
              v.name.includes("Google US English") || 
@@ -203,23 +197,53 @@ const SYSTEM_INSTRUCTION = `
         ) || voices[0];
         
         if (preferredVoice) utterance.voice = preferredVoice;
-        
-        utterance.rate = 0.9; // Professional pace
-        utterance.pitch = 0.85; // Technical gravitas
+        utterance.rate = 0.9; 
+        utterance.pitch = 0.85; 
         
         utterance.onend = () => setIsUplinkActive(false);
         synth.speak(utterance);
         trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
-      } else {
-        setIsUplinkActive(false);
       }
     } catch (error) {
       console.error("Forensic Uplink Error:", error);
-      // If the Vercel fetch fails, we let the user know without a generic loop
+      // Clean, non-looping error notification
       const errorNotice = new SpeechSynthesisUtterance("Uplink connection refused. Please verify Vercel deployment status.");
       synth.speak(errorNotice);
       setIsUplinkActive(false);
     }
+  };
+
+  const handleMicClick = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Microphone access not supported in this browser.");
+        return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+        setIsListening(true);
+        setIsUplinkActive(true);
+    };
+
+    recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setUserQuery(transcript);
+        handleVoiceUplink(transcript); // Triggers the Vercel fetch
+    };
+
+    recognition.onerror = (event: any) => {
+        setIsListening(false);
+        setIsUplinkActive(false);
+    };
+
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
   };
 
   const pricingTiers: PricingTier[] = [
