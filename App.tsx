@@ -1,3 +1,11 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Section } from './components/Section';
+import { PricingCard } from './components/PricingCard';
+import { Button } from './components/Button';
+import { ComparisonRow } from './components/ComparisonRow';
+import { ResetCountdown } from './components/ResetCountdown';
+import { BridgeCalculator } from './components/BridgeCalculator';
+import { PreviewReader } from './components/PreviewReader';
 import { ReadinessQuiz } from './components/ReadinessQuiz';
 import { PriceJustification } from './components/PriceJustification';
 import { SocialProof } from './components/SocialProof';
@@ -20,7 +28,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
-import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2 } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, Clock, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, Cpu } from 'lucide-react';
 
 const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -31,10 +39,6 @@ const App: React.FC = () => {
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'joining' | 'joined'>('idle');
-
-  // Secure Uplink State
-  const [isUplinkActive, setIsUplinkActive] = useState(false);
-  const [uplinkInput, setUplinkInput] = useState('');
 
   // Client-Side Routing for Vault Page
   const [currentPath, setCurrentPath] = useState(window.location.hash);
@@ -116,59 +120,6 @@ const App: React.FC = () => {
       setNewsletterEmail('');
       setTimeout(() => setNewsletterStatus('idle'), 3000);
     }, 1500);
-  };
-
-  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
-  const handleVoiceUplink = async (userQuery: string) => {
-    if (!userQuery && !uplinkInput) return;
-    const query = userQuery || uplinkInput;
-    
-    setIsUplinkActive(true);
-    const synth = window.speechSynthesis;
-    
-    try {
-      // Secure communication with our Vercel Middleware
-      // NOTE: In this demo environment, the fetch will naturally fail 404.
-      // We implement a forensic simulation fallback to ensure the user experiences the Voice Engine.
-      let data = { text: "" };
-      
-      try {
-          const response = await fetch('/api/uplink', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              prompt: query,
-              history: [] 
-            }),
-          });
-          if (!response.ok) throw new Error("API_UNREACHABLE");
-          data = await response.json();
-      } catch (apiError) {
-          // Forensic Fallback for Demo
-          const forensicResponses = [
-             "Analyzing the multiplier effect. The 3 billion dollar vertical integration confirms liquidity velocity is increasing.",
-             "Nostro entanglement detected. The shift from pre-funded accounts to Atomic Settlement is mathematically inevitable.",
-             "This is an educational systems analysis. Capital preservation logic is active. I cannot provide financial advice.",
-             "Protocol 22 encryption verified. The bridge handles sovereign data without broadcasting metadata."
-          ];
-          data.text = forensicResponses[Math.floor(Math.random() * forensicResponses.length)];
-      }
-
-      if (data.text) {
-        // Triggering the Forensic Voice Engine
-        const utterance = new SpeechSynthesisUtterance(data.text);
-        utterance.rate = 0.9; // Sober, deliberate pace
-        utterance.pitch = 0.85; // Lower frequency for technical authority
-        
-        utterance.onend = () => setIsUplinkActive(false);
-        synth.speak(utterance);
-      } else {
-        setIsUplinkActive(false);
-      }
-    } catch (error) {
-      console.error("Forensic Uplink Error:", error);
-      setIsUplinkActive(false);
-    }
   };
 
   const pricingTiers: PricingTier[] = [
@@ -365,11 +316,11 @@ const App: React.FC = () => {
                 </span>
               </div>
 
-              {/* HEADLINE UPDATED TO SPECIFIC BOOK TITLE */}
+              {/* REVERTED HEADLINE TO GENERIC AS REQUESTED */}
               <h1 className="font-serif text-5xl md:text-7xl leading-[1.1] mb-8 text-white">
-                The Neutral Bridge <br/>
+                The Architecture of the <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-teal to-white">
-                  Ripple, XRP, and the Engineered Reset
+                  Next Monetary Era
                 </span>
               </h1>
 
@@ -397,37 +348,23 @@ const App: React.FC = () => {
                 
                 <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
                     <div className="flex flex-col items-center text-center space-y-6">
-                        {/* Audio Visualization Ring - INTERACTIVE */}
-                        <button 
-                           onClick={() => handleVoiceUplink(uplinkInput || "Status Report")}
-                           className={`w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative transition-all duration-300 group/mic ${isUplinkActive ? 'scale-110 border-electric-teal shadow-[0_0_30px_rgba(56,189,248,0.4)]' : 'hover:scale-105 hover:border-white/30'}`}
-                        >
-                             <div className={`absolute inset-0 border border-electric-teal/30 rounded-full ${isUplinkActive ? 'animate-ping opacity-60' : 'opacity-0'}`}></div>
+                        {/* Audio Visualization Ring */}
+                        <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative">
+                             <div className="absolute inset-0 border border-electric-teal/30 rounded-full animate-ping opacity-20"></div>
                              <div className="absolute inset-2 border border-white/5 rounded-full"></div>
-                             <Mic size={32} className={`text-electric-teal transition-all ${isUplinkActive ? 'animate-pulse scale-110' : 'group-hover/mic:scale-110'}`} />
-                        </button>
+                             <Mic size={32} className="text-electric-teal" />
+                        </div>
                         
-                        <div className="w-full">
-                            <h3 className="text-white font-serif text-2xl mb-4">Secure Voice Uplink</h3>
-                            
-                            {/* Interactive Input Field */}
-                            <div className="relative max-w-xs mx-auto">
-                                <input 
-                                  type="text" 
-                                  value={uplinkInput}
-                                  onChange={(e) => setUplinkInput(e.target.value)}
-                                  placeholder="Enter Intelligence Query..."
-                                  disabled={isUplinkActive}
-                                  onKeyDown={(e) => e.key === 'Enter' && handleVoiceUplink(uplinkInput)}
-                                  className="w-full bg-black/50 border border-white/10 px-3 py-2 text-center text-sm text-white focus:border-electric-teal outline-none rounded-sm font-mono placeholder:text-white/20 transition-colors"
-                                />
-                                <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-electric-teal/50 to-transparent opacity-0 transition-opacity peer-focus:opacity-100"></div>
-                            </div>
+                        <div>
+                            <h3 className="text-white font-serif text-2xl mb-2">Secure Voice Uplink</h3>
+                            <p className="text-white/60 text-sm leading-relaxed max-w-xs mx-auto">
+                                Direct neural link to the K. Morgan digital twin. Analyze the $1.97 Death Cross and 2027 Reset data in real-time.
+                            </p>
                         </div>
 
                        <div className="w-full py-3 px-4 bg-white/5 border border-white/10 text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] flex items-center justify-center gap-2">
-                            <Activity size={12} className={isUplinkActive ? 'text-electric-teal animate-bounce' : 'text-white/20'} />
-                               {isUplinkActive ? "UPLINK ACTIVE // TRANSMITTING" : "Link Encrypted — Institutional Access Only"}
+                            <Activity size={12} className="text-white/20" />
+                               Link Encrypted — Institutional Access Only
                        </div>
                         
                         <div className="grid grid-cols-2 gap-4 w-full pt-6 border-t border-white/5">
@@ -798,7 +735,14 @@ const App: React.FC = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-electric-teal/60" />
-                <a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a>
+                <span>inquiries@theneutralbridge.com</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Clock size={14} className="mt-0.5 text-electric-teal/60" />
+                <div className="flex flex-col">
+                  <span>Mon–Fri: 5:00 AM – 11:00 PM</span>
+                  <span>Sat–Sun: 7:00 AM – 9:00 PM</span>
+                </div>
               </div>
             </div>
 
