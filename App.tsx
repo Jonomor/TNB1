@@ -29,8 +29,7 @@ import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
-import { b64ToUint8Array, decodeAudioData } from './utils/audio';
+import { GoogleGenAI } from "@google/genai";
 
 // FORENSIC SCRIPTS FOR EXHIBITS (Text-to-Speech)
 const EXHIBIT_SCRIPTS: Record<string, string> = {
@@ -65,15 +64,6 @@ const App: React.FC = () => {
 
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
-
-  // Audio Context Refs for Human-Quality TTS & Live API
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
-  
-  // Live API Refs
-  const liveSessionRef = useRef<Promise<any> | null>(null);
-  const nextStartTimeRef = useRef<number>(0);
-  const audioSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -153,99 +143,59 @@ const App: React.FC = () => {
 
   // --- AUDIO DISCONNECT LOGIC ---
   const handleDisconnect = () => {
-    // 1. Close Live Session if active
-    if (liveSessionRef.current) {
-        liveSessionRef.current.then(session => session.close());
-        liveSessionRef.current = null;
-    }
-    // 2. Stop Gemini TTS / Audio Source (Exhibits)
-    if (currentSourceRef.current) {
-        currentSourceRef.current.stop();
-        currentSourceRef.current = null;
-    }
-    // 3. Stop All Live Audio Sources
-    audioSourcesRef.current.forEach(source => {
-      try { source.stop(); } catch(e) {}
-    });
-    audioSourcesRef.current.clear();
-
-    // 4. Stop Browser TTS
     window.speechSynthesis.cancel();
-    
     setIsUplinkActive(false);
     setIsListening(false);
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
-  // --- GEMINI TTS HELPER (For Exhibits - Static Content) ---
-  const playHighQualitySpeech = async (text: string, voiceName: string = 'Kore') => {
-    handleDisconnect(); // Ensure clean state before playing exhibit
-
-    try {
-        if (!audioContextRef.current) {
-            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-        }
-        if (audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
-        }
-
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-preview-tts",
-            contents: { parts: [{ text }] },
-            config: {
-                responseModalities: [Modality.AUDIO],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: { voiceName }, 
-                    },
-                },
-            },
-        });
-
-        const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        if (!base64Audio) throw new Error("No audio data returned");
-
-        const audioBuffer = await decodeAudioData(
-            b64ToUint8Array(base64Audio),
-            audioContextRef.current,
-            24000,
-            1
-        );
-
-        const source = audioContextRef.current.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContextRef.current.destination);
-        source.start();
-        currentSourceRef.current = source;
-
-        source.onended = () => {
-            currentSourceRef.current = null;
-        };
-
-    } catch (error) {
-        console.error("Gemini TTS Error, falling back to browser:", error);
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance(text);
-        synth.speak(utterance);
-    }
-  };
-
   // --- TERMINAL LOCK LOGIC ---
   const enterTerminal = () => {
     setIsTerminalLocked(false);
-    const welcomeText = "Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.";
-    playHighQualitySpeech(welcomeText, 'Fenrir'); 
+    
+    // Trigger the Welcome Greeting
+    const welcomeAudio = new Audio('/audio/welcome-uplink.mp3');
+    welcomeAudio.volume = 0.8;
+    welcomeAudio.play().catch(e => {
+        console.log("Audio play failed, fallback to TTS:", e);
+        // Fallback if MP3 missing
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance("Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.");
+        utterance.rate = 0.9;
+        utterance.pitch = 0.85;
+        synth.speak(utterance);
+    });
+    
     trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
   };
 
-  // --- EXHIBIT AUDIO LOGIC ---
+  // --- EXHIBIT AUDIO LOGIC (TTS) ---
   const playExhibitBriefing = (exhibitId: string) => {
+    const synth = window.speechSynthesis;
+    // 1. Stop current audio
+    synth.cancel();
+
+    // 2. Get Script
     const script = EXHIBIT_SCRIPTS[exhibitId];
-    if (script) {
-        playHighQualitySpeech(script, 'Kore');
-        trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
-    }
+    if (!script) return;
+
+    // 3. Configure Voice
+    const utterance = new SpeechSynthesisUtterance(script);
+    utterance.rate = 1.0;
+    utterance.pitch = 0.9; // Slightly deep/technical
+
+    // Attempt to find a specific forensic-sounding voice
+    const voices = synth.getVoices();
+    const preferredVoice = voices.find(v => 
+        v.name.includes("Google US English") || 
+        v.name.includes("Zira") || 
+        v.name.includes("Samantha")
+    );
+    if (preferredVoice) utterance.voice = preferredVoice;
+
+    // 4. Speak
+    synth.speak(utterance);
+    trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
   };
 
   // SYSTEM PROMPT FOR FORENSIC AI
@@ -279,107 +229,66 @@ const App: React.FC = () => {
       INTERACTION STYLE:
       - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
       - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
-      - RESPONSE LENGTH: Keep spoken responses concise (under 2-3 sentences) for faster playback.
 
       STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
   `;
 
-  // --- GEMINI LIVE API (LOW LATENCY UPLINK) ---
-  const ensureLiveSession = async () => {
-    if (liveSessionRef.current) return liveSessionRef.current;
-
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const sessionPromise = ai.live.connect({
-      model: 'gemini-2.5-flash-native-audio-preview-12-2025',
-      config: {
-        responseModalities: [Modality.AUDIO],
-        systemInstruction: SYSTEM_INSTRUCTION,
-        speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Fenrir' } }, // Using Deep Male Voice for Uplink
-        },
-      },
-      callbacks: {
-        onopen: () => {
-            console.log("Secure Uplink: Connection Established");
-        },
-        onmessage: async (msg: LiveServerMessage) => {
-            const base64Audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (base64Audio) {
-                if (!audioContextRef.current) {
-                     audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-                }
-                const ctx = audioContextRef.current;
-                
-                // Decode Stream Chunk
-                const audioBuffer = await decodeAudioData(
-                    b64ToUint8Array(base64Audio),
-                    ctx,
-                    24000,
-                    1
-                );
-
-                // Gapless Playback Scheduling
-                const source = ctx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(ctx.destination);
-                
-                const now = ctx.currentTime;
-                // Schedule next chunk at the end of the previous one, or immediately if we fell behind
-                // We add a tiny buffer (0.05s) if starting fresh to prevent clipping
-                const startTime = Math.max(nextStartTimeRef.current, now);
-                source.start(startTime);
-                nextStartTimeRef.current = startTime + audioBuffer.duration;
-                
-                audioSourcesRef.current.add(source);
-                source.onended = () => audioSourcesRef.current.delete(source);
-            }
-             
-            if (msg.serverContent?.turnComplete) {
-               console.log("Uplink: Turn Complete");
-            }
-        },
-        onclose: () => {
-            console.log("Secure Uplink: Connection Closed");
-            liveSessionRef.current = null;
-            setIsUplinkActive(false);
-        },
-        onerror: (e) => {
-            console.error("Secure Uplink Error", e);
-            setIsUplinkActive(false);
-        }
-      }
-    });
-    liveSessionRef.current = sessionPromise;
-    return sessionPromise;
-  };
-
-  // Replaces the old slow uplink with Live API
+  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
   const handleVoiceUplink = async (query: string) => {
-    setIsUplinkActive(true);
+    // If no query is passed, we send the "GREETING" trigger
+    const payload = query || "INITIALIZE_SYSTEM_GREETING";
     
-    // Resume Audio Context if suspended
-    if (!audioContextRef.current) {
-         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-    }
-    if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-    }
-    // Reset scheduling time for new turn
-    nextStartTimeRef.current = audioContextRef.current.currentTime;
-
+    // Stop any current speech before starting new
+    window.speechSynthesis.cancel();
+    
+    setIsUplinkActive(true);
+    const synth = window.speechSynthesis;
+    
     try {
-        const session = await ensureLiveSession();
+      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
+      let textResponse = "";
+
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: payload,
+            config: {
+                systemInstruction: SYSTEM_INSTRUCTION
+            }
+        });
+        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
+      } catch (error) {
+        console.error("Gemini API Error:", error);
+        // Fallback if API fails
+        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
+      }
+
+      if (textResponse) {
+        const utterance = new SpeechSynthesisUtterance(textResponse);
         
-        // Use default greeting if empty
-        const textToSend = query || "System Status Report. Brief summary.";
+        // Voice Selection Logic - Seeking Authoritative/Female Voice
+        const voices = synth.getVoices();
+        const preferredVoice = voices.find(v => 
+             v.name.includes("Google US English") || 
+             v.name.includes("Zira") || 
+             v.name.includes("Samantha")
+        ) || voices[0];
         
-        // Send to Gemini Live
-        session.send([{ text: textToSend }]);
+        if (preferredVoice) utterance.voice = preferredVoice;
         
-        trackEvent('voice_uplink_query', { category: 'Intelligence', label: 'Live API Stream' });
-    } catch (error) {
-        console.error("Live API Error:", error);
+        utterance.rate = 0.9; // Slowed down slightly for authority
+        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
+        
+        utterance.onend = () => setIsUplinkActive(false);
+        synth.speak(utterance);
+        trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
+      } else {
         setIsUplinkActive(false);
+      }
+    } catch (error) {
+      console.error("Forensic Uplink Error:", error);
+      setIsUplinkActive(false);
     }
   };
 
@@ -398,8 +307,7 @@ const App: React.FC = () => {
 
     recognition.onstart = () => {
         setIsListening(true);
-        // We can pre-connect here to save time
-        ensureLiveSession(); 
+        setIsUplinkActive(true);
     };
 
     recognition.onresult = (event: any) => {
@@ -966,214 +874,4 @@ const App: React.FC = () => {
               <div>
                 <span className="font-mono text-xs text-white/40 uppercase tracking-widest mb-2 block">Institutional Edition</span>
                 <h3 className="font-serif text-3xl text-white mb-2">A Systems Analysis of the <br/>2027 Global Financial Reset</h3>
-              </div>
-              <div className="mt-8">
-                <p className="text-sm text-white/60 mb-6">Focus: System Architecture</p>
-                <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto justify-start pl-0 hover:bg-transparent" onClick={() => setActivePreview('institutional')} analyticsLabel="View_Details_Institutional">View Details <ArrowRight size={14} className="ml-2"/></Button>
-              </div>
-            </div>
 
-            {/* Book Cover Image Slot - Institutional UPDATED - Fixed Path */}
-            <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
-               <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
-                 <img 
-                   src={`${assetBase}institutionedition.jpg`}
-                   alt="The Neutral Bridge Institutional Edition Cover" 
-                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
-                 />
-               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-white/10 pt-12">
-          <div className="hidden md:grid grid-cols-3 gap-8 mb-6 px-4">
-             <div></div>
-             <div className="text-electric-teal font-mono text-xs uppercase tracking-widest pl-4">Retail Edition</div>
-             <div className="text-white/60 font-mono text-xs uppercase tracking-widest pl-4">Institutional Edition</div>
-          </div>
-          {comparisonPoints.map((point, idx) => (
-            <ComparisonRow key={idx} point={point} isLast={idx === comparisonPoints.length - 1} />
-          ))}
-        </div>
-      </Section>
-
-      {/* Intelligence Tiers */}
-      <IntelligenceTiers />
-
-      {/* Readiness Quiz */}
-      <Section id="readiness-check" className="bg-matte-black border-y border-white/5 pb-0 pt-0">
-        <ReadinessQuiz />
-      </Section>
-
-      {/* Value Proposition */}
-      <Section id="why" className="bg-charcoal/50">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="font-serif text-4xl mb-4">Precise. Objective. Necessary.</h2>
-          <p className="text-white/60">Understanding the reset isn't about hope; it's about engineering logic.</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-           {[
-             { title: "Systemic Clarity", desc: "We move past the headlines to look at the plumbing of the IMF, BIS, and Central Banks." },
-             { title: "Engineering Logic", desc: "No market hype. Only a structural analysis of why the current system requires a 'Neutral Bridge'." },
-             { title: "The 2027 Roadmap", desc: "A technical timeline based on ISO 20022 implementation and global liquidity cycles." },
-             { title: "Risk Mitigation", desc: "Understand the transition phase of the Global Reset to protect and position your capital." }
-           ].map((item, i) => (
-             <div key={i} className="bg-matte-black p-8 border border-white/5 hover:border-electric-teal/30 transition-colors">
-               <h3 className="font-serif text-xl mb-4 text-white">{item.title}</h3>
-               <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
-             </div>
-           ))}
-        </div>
-      </Section>
-      
-      {/* Bridge Calculator */}
-      <Section id="calculator" className="pb-0">
-         <BridgeCalculator />
-      </Section>
-
-      {/* Pricing */}
-      <Section id="pricing" label="Secure Your Intelligence">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
-          {pricingTiers.map((tier) => (
-            <PricingCard key={tier.id} tier={tier} />
-          ))}
-        </div>
-        
-        {/* Institutional Value Bundle Table */}
-        <InstitutionalBundle 
-           onOpenVault={() => {
-             setIsVaultOpen(true);
-             trackEvent('open_vault_demo', { category: 'Interaction', label: 'Bundle Section' });
-           }} 
-           onRedeem={() => {
-             setIsRedemptionOpen(true);
-             trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
-           }}
-        />
-
-        {/* Price Justification Table */}
-        <PriceJustification />
-      </Section>
-
-      {/* FAQ Section - Added for Legal/Launch Compliance */}
-      <FAQ />
-
-      {/* Testimonials */}
-      <Section id="testimonials" className="bg-circuit">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t, i) => (
-            <div key={i} className="bg-matte-black/80 backdrop-blur border border-white/10 p-8 relative">
-              <div className="text-crimson font-serif text-4xl absolute top-4 left-4 opacity-50">"</div>
-              <p className="font-serif italic text-white/80 mb-6 relative z-10 pl-4">{t.quote}</p>
-              <div className="flex items-center gap-2 pl-4">
-                <div className="w-8 h-[1px] bg-electric-teal"></div>
-                <span className="text-xs font-mono uppercase tracking-widest text-white/50">{t.author}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* Newsletter */}
-      <Section id="newsletter" className="py-20 bg-gradient-to-b from-matte-black to-slate-grey border-t border-white/10">
-        <div className="max-w-xl mx-auto text-center px-6">
-          <h2 className="font-serif text-3xl mb-2">Stay Ahead of the Reset</h2>
-          <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input 
-              type="email" 
-              placeholder="Enter your email address" 
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
-            />
-            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'} analyticsLabel="Newsletter_Signup">
-              {newsletterStatus === 'idle' && "Join The Bridge"}
-              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
-              {newsletterStatus === 'joined' && "Access Granted"}
-            </Button>
-          </div>
-        </div>
-      </Section>
-
-      {/* Final CTA */}
-      <section className="py-32 text-center px-6 border-t border-white/5 bg-matte-black">
-        <div className="inline-block mb-6">
-          <span className="font-mono text-crimson text-sm uppercase tracking-[0.2em] font-bold">Jan 18, 2027. The Clock is Ticking.</span>
-        </div>
-        <h2 className="font-serif text-4xl md:text-6xl text-white mb-8 max-w-4xl mx-auto">
-          The Bridge is Being Built. <br/> Will You Be On It?
-        </h2>
-        <p className="text-white/50 max-w-2xl mx-auto mb-12">
-          History shows that those who understand the infrastructure of the new system before it goes live are the ones who thrive.
-        </p>
-        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')} analyticsLabel="Footer_CTA_Order">Order Your Copy Now</Button>
-      </section>
-
-      {/* Disclaimer */}
-      <div id="legal">
-        <Disclaimer />
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-black border-t border-white/10 py-16" id="footer">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <Terminal size={16} className="text-electric-teal" />
-              <span className="font-serif font-bold tracking-tight">The Neutral Bridge</span>
-            </div>
-            <p className="text-xs text-white/40 font-mono uppercase tracking-wider mb-6">Engineering the Future of Finance</p>
-            
-            <div className="flex flex-col gap-2 mb-8 text-sm text-white/50 font-sans">
-              <div className="flex items-center gap-2">
-                <MapPin size={14} className="text-electric-teal/60" />
-                <span>Location: United States (Remote)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-electric-teal/60" />
-                <a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a>
-              </div>
-            </div>
-
-            <div className="flex gap-4 text-white/40">
-              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">LinkedIn</a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">X (Twitter)</a>
-            </div>
-          </div>
-
-          <div className="flex gap-16 text-sm text-white/60">
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2">Resources</span>
-              <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
-              <button onClick={() => scrollToSection('newsletter')} className="hover:text-white text-left">Newsletter</button>
-              <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
-            </div>
-           <div className="flex flex-col gap-3">
-  <span className="font-bold text-white mb-2">Legal</span>
-  <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
-  <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
-<button 
-  onClick={() => {
-    window.location.hash = '#/privacy';
-    window.location.reload();
-  }} 
-  className="hover:text-white text-left"
->
-  Privacy Policy
-</button>
-</div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 text-center md:text-left font-sans leading-relaxed">
-          <p>The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.</p>
-          <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-export default App;
