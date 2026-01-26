@@ -1,44 +1,43 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(req, res) {
-  // 1. HARDENED CORS HEADERS
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*'); 
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+export const config = {
+  runtime: 'edge', // Using Edge runtime for faster, more reliable global response
+};
 
+export default async function handler(req) {
+  // --- 1. MANDATORY CORS HEADERS ---
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  // Handle Pre-flight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, { status: 204, headers });
   }
 
-  // 2. DIAGNOSTIC CHECK: Is the Key actually there?
+  // --- 2. THE SECURITY CHECK ---
   if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ text: "SYSTEM ERROR: API Key not detected in Vercel Environment." });
+    return new Response(JSON.stringify({ text: "ERROR: API_KEY_MISSING" }), { status: 500, headers });
   }
 
   try {
-    // 3. SECURE BODY PARSING
-    const body = req.body;
-    const userPrompt = body.prompt || "INITIALIZE_SYSTEM_GREETING";
-
+    const { prompt } = await req.json();
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ 
       model: "gemini-1.5-pro",
-      systemInstruction: `
-        You are the "Neutral Bridge Secure Uplink." 
-        Tone: Technical, sober. 
-        Focus: The $3B acquisition moat and the 2027 Reset. 
-        Direct users to Retail or Institutional editions. 
-        NO financial advice.
-      `
+      systemInstruction: "You are the Neutral Bridge Secure Uplink. Tone: Forensic/Technical. Direct to Retail or Institutional editions. No financial advice."
     });
 
-    const result = await model.generateContent(userPrompt);
+    const result = await model.generateContent(prompt || "INITIALIZE_SYSTEM_GREETING");
     const response = await result.response;
-    return res.status(200).json({ text: response.text() });
-
+    
+    return new Response(JSON.stringify({ text: response.text() }), {
+      status: 200,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    console.error("Uplink Error:", error);
-    return res.status(500).json({ text: `UPLINK FAILURE: ${error.message}` });
+    return new Response(JSON.stringify({ text: `UPLINK_ERROR: ${error.message}` }), { status: 500, headers });
   }
 }
