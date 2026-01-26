@@ -909,12 +909,20 @@ const handleVoiceUplink = async (query: string) => {
               <button onClick={() => scrollToSection('newsletter')} className="hover:text-white text-left">Newsletter</button>
               <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
             </div>
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2">Legal</span>
-              <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
-              <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
-              <button onClick={() => window.location.hash = '/privacy'} className="hover:text-white text-left">Privacy Policy</button>
-            </div>
+           <div className="flex flex-col gap-3">
+  <span className="font-bold text-white mb-2">Legal</span>
+  <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
+  <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
+  <button 
+    onClick={() => {
+      window.location.hash = '/privacy';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }} 
+    className="hover:text-white text-left"
+  >
+    Privacy Policy
+  </button>
+</div>
           </div>
         </div>
         <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 text-center md:text-left font-sans leading-relaxed">
