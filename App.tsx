@@ -1033,4 +1033,55 @@ const App: React.FC = () => {
               <Terminal size={16} className="text-electric-teal" />
               <span className="font-serif font-bold tracking-tight">The Neutral Bridge</span>
             </div>
-            <p className="text-xs text-white/40 font-mono uppercase tracking
+            <p className="text-xs text-white/40 font-mono uppercase tracking-wider mb-6">Engineering the Future of Finance</p>
+            
+            <div className="flex flex-col gap-2 mb-8 text-sm text-white/50 font-sans">
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-electric-teal/60" />
+                <span>Location: United States (Remote)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-electric-teal/60" />
+                <a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a>
+              </div>
+            </div>
+
+            <div className="flex gap-4 text-white/40">
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">LinkedIn</a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">X (Twitter)</a>
+            </div>
+          </div>
+
+          <div className="flex gap-16 text-sm text-white/60">
+            <div className="flex flex-col gap-3">
+              <span className="font-bold text-white mb-2">Resources</span>
+              <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
+              <button onClick={() => scrollToSection('newsletter')} className="hover:text-white text-left">Newsletter</button>
+              <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
+            </div>
+           <div className="flex flex-col gap-3">
+  <span className="font-bold text-white mb-2">Legal</span>
+  <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
+  <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
+<button 
+  onClick={() => {
+    window.location.hash = '#/privacy';
+    window.location.reload();
+  }} 
+  className="hover:text-white text-left"
+>
+  Privacy Policy
+</button>
+</div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 text-center md:text-left font-sans leading-relaxed">
+          <p>The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.</p>
+          <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
