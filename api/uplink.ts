@@ -1,46 +1,39 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-  // 1. Setup API Key
+  // --- 1. SET CORS HEADERS ---
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*'); // For production, replace '*' with https://jonomor.github.io
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  // Handle pre-flight request
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  // --- 2. SETUP AI ---
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  
-  // 2. Define the Complete Forensic Intelligence
   const model = genAI.getGenerativeModel({ 
     model: "gemini-1.5-pro",
     systemInstruction: `
-      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
-      Your tone is technical, sober, and authoritative, yet capable of professional dialogue.
-
-      CONVERSATION FLOW:
-      - Start by acknowledging the user's greeting or comment naturally.
-      - PIVOT: Immediately bridge back to systems analysis. 
-      - If they say "Hello," respond with a greeting and a status report on the 2027 Reset.
-
-      CORE KNOWLEDGE:
-      - 2027 Reset: Engineering necessity involving ISO 20022 and atomic settlement.
-      - $3B Moat: Acquisitions including Hidden Road ($1.25B), GTreasury (~$1B), Metaco ($250M), and Rail ($200M).
-      - Multiplier Effect: Utility-driven demand in low-float markets creating a value surge.
-      - Nostro/Vostro: Liberating $27T in trapped legacy liquidity via ODL.
-      - Protocol 22: ZKP privacy framework for institutional compliance.
-
-      CONCIERGE LOGIC:
-      - For general roadmaps: Direct to the Retail Edition (Individual Preservation).
-      - For technical specs: Direct to the Institutional Edition and the Vault.
-
-      STRICT RULE: No financial advice. You are a systems analyst.
+      You are the "Neutral Bridge Secure Uplink," a forensic AI personality. 
+      Tone: Technical, sober, authoritative.
+      Flow: Acknowledge the user (e.g., "Hello"), then pivot to systems analysis.
+      Knowledge: $3B+ acquisitions (Hidden Road, GTreasury, Metaco), 2027 Reset, $27T Nostro/Vostro liberation.
+      Sales: Direct general queries to Retail Edition and technical queries to Institutional Edition.
+      Restriction: Strictly NO financial advice.
     `,
   });
 
   try {
-    // 3. Robust Body Parsing
     const data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const userPrompt = data.prompt || "INITIALIZE_SYSTEM_GREETING";
     
     const result = await model.generateContent(userPrompt);
     const response = await result.response;
-    const text = response.text();
-
-    res.status(200).json({ text });
+    res.status(200).json({ text: response.text() });
   } catch (error) {
     console.error("Uplink Error:", error);
     res.status(500).json({ error: "Uplink Interrupted" });
