@@ -24,7 +24,7 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
-import { PrivacyPolicy } from './components/PrivacyPolicy';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
@@ -205,8 +205,8 @@ const App: React.FC = () => {
         
         if (preferredVoice) utterance.voice = preferredVoice;
         
-        utterance.rate = 1.0; // Normal rate for clarity
-        utterance.pitch = 1.0; // Natural pitch
+        utterance.rate = 0.9; // Slowed down slightly for authority
+        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
         
         utterance.onend = () => setIsUplinkActive(false);
         synth.speak(utterance);
