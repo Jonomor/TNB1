@@ -874,4 +874,214 @@ const App: React.FC = () => {
               <div>
                 <span className="font-mono text-xs text-white/40 uppercase tracking-widest mb-2 block">Institutional Edition</span>
                 <h3 className="font-serif text-3xl text-white mb-2">A Systems Analysis of the <br/>2027 Global Financial Reset</h3>
+              </div>
+              <div className="mt-8">
+                <p className="text-sm text-white/60 mb-6">Focus: System Architecture</p>
+                <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto justify-start pl-0 hover:bg-transparent" onClick={() => setActivePreview('institutional')} analyticsLabel="View_Details_Institutional">View Details <ArrowRight size={14} className="ml-2"/></Button>
+              </div>
+            </div>
 
+            {/* Book Cover Image Slot - Institutional UPDATED - Fixed Path */}
+            <div className="w-full md:w-40 shrink-0 relative z-10 flex items-center justify-center order-1 md:order-2">
+               <div className="relative group-hover:scale-105 transition-transform duration-500 w-full aspect-[2/3] md:w-auto md:h-full">
+                 <img 
+                   src={`${assetBase}institutionedition.jpg`}
+                   alt="The Neutral Bridge Institutional Edition Cover" 
+                   className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl shadow-black/50" 
+                 />
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 pt-12">
+          <div className="hidden md:grid grid-cols-3 gap-8 mb-6 px-4">
+             <div></div>
+             <div className="text-electric-teal font-mono text-xs uppercase tracking-widest pl-4">Retail Edition</div>
+             <div className="text-white/60 font-mono text-xs uppercase tracking-widest pl-4">Institutional Edition</div>
+          </div>
+          {comparisonPoints.map((point, idx) => (
+            <ComparisonRow key={idx} point={point} isLast={idx === comparisonPoints.length - 1} />
+          ))}
+        </div>
+      </Section>
+
+      {/* Intelligence Tiers */}
+      <IntelligenceTiers />
+
+      {/* Readiness Quiz */}
+      <Section id="readiness-check" className="bg-matte-black border-y border-white/5 pb-0 pt-0">
+        <ReadinessQuiz />
+      </Section>
+
+      {/* Value Proposition */}
+      <Section id="why" className="bg-charcoal/50">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="font-serif text-4xl mb-4">Precise. Objective. Necessary.</h2>
+          <p className="text-white/60">Understanding the reset isn't about hope; it's about engineering logic.</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+           {[
+             { title: "Systemic Clarity", desc: "We move past the headlines to look at the plumbing of the IMF, BIS, and Central Banks." },
+             { title: "Engineering Logic", desc: "No market hype. Only a structural analysis of why the current system requires a 'Neutral Bridge'." },
+             { title: "The 2027 Roadmap", desc: "A technical timeline based on ISO 20022 implementation and global liquidity cycles." },
+             { title: "Risk Mitigation", desc: "Understand the transition phase of the Global Reset to protect and position your capital." }
+           ].map((item, i) => (
+             <div key={i} className="bg-matte-black p-8 border border-white/5 hover:border-electric-teal/30 transition-colors">
+               <h3 className="font-serif text-xl mb-4 text-white">{item.title}</h3>
+               <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+             </div>
+           ))}
+        </div>
+      </Section>
+      
+      {/* Bridge Calculator */}
+      <Section id="calculator" className="pb-0">
+         <BridgeCalculator />
+      </Section>
+
+      {/* Pricing */}
+      <Section id="pricing" label="Secure Your Intelligence">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
+          {pricingTiers.map((tier) => (
+            <PricingCard key={tier.id} tier={tier} />
+          ))}
+        </div>
+        
+        {/* Institutional Value Bundle Table */}
+        <InstitutionalBundle 
+           onOpenVault={() => {
+             setIsVaultOpen(true);
+             trackEvent('open_vault_demo', { category: 'Interaction', label: 'Bundle Section' });
+           }} 
+           onRedeem={() => {
+             setIsRedemptionOpen(true);
+             trackEvent('open_redemption', { category: 'Interaction', label: 'Bundle Section' });
+           }}
+        />
+
+        {/* Price Justification Table */}
+        <PriceJustification />
+      </Section>
+
+      {/* FAQ Section - Added for Legal/Launch Compliance */}
+      <FAQ />
+
+      {/* Testimonials */}
+      <Section id="testimonials" className="bg-circuit">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((t, i) => (
+            <div key={i} className="bg-matte-black/80 backdrop-blur border border-white/10 p-8 relative">
+              <div className="text-crimson font-serif text-4xl absolute top-4 left-4 opacity-50">"</div>
+              <p className="font-serif italic text-white/80 mb-6 relative z-10 pl-4">{t.quote}</p>
+              <div className="flex items-center gap-2 pl-4">
+                <div className="w-8 h-[1px] bg-electric-teal"></div>
+                <span className="text-xs font-mono uppercase tracking-widest text-white/50">{t.author}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {/* Newsletter */}
+      <Section id="newsletter" className="py-20 bg-gradient-to-b from-matte-black to-slate-grey border-t border-white/10">
+        <div className="max-w-xl mx-auto text-center px-6">
+          <h2 className="font-serif text-3xl mb-2">Stay Ahead of the Reset</h2>
+          <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
+            />
+            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'} analyticsLabel="Newsletter_Signup">
+              {newsletterStatus === 'idle' && "Join The Bridge"}
+              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
+              {newsletterStatus === 'joined' && "Access Granted"}
+            </Button>
+          </div>
+        </div>
+      </Section>
+
+      {/* Final CTA */}
+      <section className="py-32 text-center px-6 border-t border-white/5 bg-matte-black">
+        <div className="inline-block mb-6">
+          <span className="font-mono text-crimson text-sm uppercase tracking-[0.2em] font-bold">Jan 18, 2027. The Clock is Ticking.</span>
+        </div>
+        <h2 className="font-serif text-4xl md:text-6xl text-white mb-8 max-w-4xl mx-auto">
+          The Bridge is Being Built. <br/> Will You Be On It?
+        </h2>
+        <p className="text-white/50 max-w-2xl mx-auto mb-12">
+          History shows that those who understand the infrastructure of the new system before it goes live are the ones who thrive.
+        </p>
+        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')} analyticsLabel="Footer_CTA_Order">Order Your Copy Now</Button>
+      </section>
+
+      {/* Disclaimer */}
+      <div id="legal">
+        <Disclaimer />
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-black border-t border-white/10 py-16" id="footer">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
+          <div>
+            <div className="flex items-center gap-2 mb-6">
+              <Terminal size={16} className="text-electric-teal" />
+              <span className="font-serif font-bold tracking-tight">The Neutral Bridge</span>
+            </div>
+            <p className="text-xs text-white/40 font-mono uppercase tracking-wider mb-6">Engineering the Future of Finance</p>
+            
+            <div className="flex flex-col gap-2 mb-8 text-sm text-white/50 font-sans">
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-electric-teal/60" />
+                <span>Location: United States (Remote)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-electric-teal/60" />
+                <a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a>
+              </div>
+            </div>
+
+            <div className="flex gap-4 text-white/40">
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">LinkedIn</a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">X (Twitter)</a>
+            </div>
+          </div>
+
+          <div className="flex gap-16 text-sm text-white/60">
+            <div className="flex flex-col gap-3">
+              <span className="font-bold text-white mb-2">Resources</span>
+              <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
+              <button onClick={() => scrollToSection('newsletter')} className="hover:text-white text-left">Newsletter</button>
+              <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
+            </div>
+           <div className="flex flex-col gap-3">
+  <span className="font-bold text-white mb-2">Legal</span>
+  <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
+  <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
+<button 
+  onClick={() => {
+    window.location.hash = '#/privacy';
+    window.location.reload();
+  }} 
+  className="hover:text-white text-left"
+>
+  Privacy Policy
+</button>
+</div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 text-center md:text-left font-sans leading-relaxed">
+          <p>The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.</p>
+          <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
