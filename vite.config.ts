@@ -12,6 +12,8 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
+        // Use environment variable if available, otherwise fallback to empty string.
+        // The code will then likely rely on the index.html polyfill if this is empty.
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || '')
       },
@@ -24,6 +26,27 @@ export default defineConfig(({ mode }) => {
         outDir: 'dist',
         assetsDir: 'assets',
         sourcemap: false,
+        rollupOptions: {
+          // Externalize dependencies that are loaded via CDN (importmap)
+          external: [
+            'react',
+            'react-dom',
+            'lucide-react',
+            '@google/genai',
+            '@google/generative-ai',
+            'three',
+            'three/examples/jsm/loaders/GLTFLoader'
+          ],
+          output: {
+            globals: {
+              react: 'React',
+              'react-dom': 'ReactDOM',
+              'lucide-react': 'lucide',
+              '@google/genai': 'googleGenai',
+              'three': 'THREE'
+            }
+          }
+        }
       }
     };
 });
