@@ -29,7 +29,6 @@ import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 import { b64ToUint8Array, decodeAudioData } from './utils/audio';
 
 // FORENSIC SCRIPTS FOR EXHIBITS (Text-to-Speech)
