@@ -913,16 +913,12 @@ const handleVoiceUplink = async (query: string) => {
   <span className="font-bold text-white mb-2">Legal</span>
   <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
   <button onClick={() => openLegal('refund')} className="hover:text-white text-left">Refund & Shipping</button>
-  <button 
-  onClick={() => {
-    setCurrentPath('#/privacy');
-    window.location.hash = '/privacy';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }} 
-  className="hover:text-white text-left"
+<a 
+  href="#/privacy"
+  className="hover:text-white text-left block"
 >
   Privacy Policy
-</button>
+</a>
 </div>
           </div>
         </div>
