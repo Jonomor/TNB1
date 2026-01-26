@@ -174,7 +174,7 @@ const SYSTEM_INSTRUCTION = `
     
     try {
       // REPLACE THE URL BELOW with your actual Vercel deployment URL
-      const response = await fetch('https://your-vercel-project.vercel.app/api/uplink', {
+      const response = await fetch('https://https://tnb-1.vercel.app/api/uplink', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: payload }),
