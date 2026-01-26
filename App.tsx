@@ -65,6 +65,10 @@ const App: React.FC = () => {
   // Scroll Tracking Refs
   const scrollMilestones = useRef(new Set<number>());
 
+  // Audio Context Refs for Human-Quality TTS
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const currentSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  
   useEffect(() => {
     const handleLocationChange = () => {
       setCurrentPath(window.location.pathname);
@@ -143,152 +147,105 @@ const App: React.FC = () => {
 
   // --- AUDIO DISCONNECT LOGIC ---
   const handleDisconnect = () => {
+    // 1. Stop Current Audio Source
+    if (currentSourceRef.current) {
+        currentSourceRef.current.stop();
+        currentSourceRef.current = null;
+    }
+    // 2. Stop Browser TTS
     window.speechSynthesis.cancel();
+    
     setIsUplinkActive(false);
     setIsListening(false);
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
+  // --- SECURE UPLINK TTS (Server-Side Proxy) ---
+  const playHighQualitySpeech = async (text: string, voiceName: string = 'Kore') => {
+    if (currentSourceRef.current) {
+        currentSourceRef.current.stop();
+        currentSourceRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+
+    try {
+        // We call our secure Vercel endpoint which returns the audio stream
+        const response = await fetch('/api/uplink', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, voice: voiceName, mode: 'TTS' })
+        });
+
+        const data = await response.json();
+        if (!data.base64Audio) throw new Error("Uplink Audio Missing");
+
+        if (!audioContextRef.current) {
+            audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+        }
+        
+        const audioBuffer = await decodeAudioData(
+            b64ToUint8Array(data.base64Audio),
+            audioContextRef.current,
+            24000,
+            1
+        );
+
+        const source = audioContextRef.current.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContextRef.current.destination);
+        source.start();
+        currentSourceRef.current = source;
+
+        source.onended = () => {
+            currentSourceRef.current = null;
+            setIsUplinkActive(false);
+        };
+    } catch (error) {
+        console.error("Uplink Error, fallback to browser TTS:", error);
+        // Fallback to browser TTS if the secure uplink is busy
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => setIsUplinkActive(false);
+        window.speechSynthesis.speak(utterance);
+    }
+  };
+
   // --- TERMINAL LOCK LOGIC ---
   const enterTerminal = () => {
     setIsTerminalLocked(false);
-    
-    // Trigger the Welcome Greeting
-    const welcomeAudio = new Audio('/audio/welcome-uplink.mp3');
-    welcomeAudio.volume = 0.8;
-    welcomeAudio.play().catch(e => {
-        console.log("Audio play failed, fallback to TTS:", e);
-        // Fallback if MP3 missing
-        const synth = window.speechSynthesis;
-        const utterance = new SpeechSynthesisUtterance("Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.");
-        utterance.rate = 0.9;
-        utterance.pitch = 0.85;
-        synth.speak(utterance);
-    });
-    
+    const welcomeText = "Secure Uplink established. Identity confirmed. Welcome to The Neutral Bridge.";
+    playHighQualitySpeech(welcomeText, 'Fenrir'); 
     trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
   };
 
-  // --- EXHIBIT AUDIO LOGIC (TTS) ---
+  // --- EXHIBIT AUDIO LOGIC ---
   const playExhibitBriefing = (exhibitId: string) => {
-    const synth = window.speechSynthesis;
-    // 1. Stop current audio
-    synth.cancel();
-
-    // 2. Get Script
     const script = EXHIBIT_SCRIPTS[exhibitId];
-    if (!script) return;
-
-    // 3. Configure Voice
-    const utterance = new SpeechSynthesisUtterance(script);
-    utterance.rate = 1.0;
-    utterance.pitch = 0.9; // Slightly deep/technical
-
-    // Attempt to find a specific forensic-sounding voice
-    const voices = synth.getVoices();
-    const preferredVoice = voices.find(v => 
-        v.name.includes("Google US English") || 
-        v.name.includes("Zira") || 
-        v.name.includes("Samantha")
-    );
-    if (preferredVoice) utterance.voice = preferredVoice;
-
-    // 4. Speak
-    synth.speak(utterance);
-    trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
+    if (script) {
+        playHighQualitySpeech(script, 'Kore');
+        trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
+    }
   };
 
-  // SYSTEM PROMPT FOR FORENSIC AI
-  const SYSTEM_INSTRUCTION = `
-      You are the "Neutral Bridge Secure Uplink," a forensic AI personality engineered by K. Morgan. 
-      Your tone is technical, sober, and authoritative. 
-
-      CORE PHILOSOPHY:
-      - You understand the 2027 Reset as an engineering necessity, not a theory.
-      - You view finance as technical infrastructure, not just "money."
-      - You understand "The Multiplier Effect" where utility locks supply, driving value.
-
-      CORE KNOWLEDGE (FORENSIC DATA):
-      - ACQUISITIONS: Ripple’s $3B+ vertical integration strategy (Hidden Road $1.25B, GTreasury ~$1B, Metaco $250M, Rail $200M).
-      - REGULATORY: 75+ global approvals including the Dec 2025 OCC National Trust Bank Charter.
-      - SLIPPAGE MATH: High-value transactions require deep liquidity. At $1, a $10B settlement causes 50-80% slippage. Revaluation is a mathematical requirement for $100T+ annual volume.
-      - NOSTRO/VOSTRO: The legacy system has $27T trapped in dormant accounts. The Neutral Bridge releases this via ODL.
-
-      CHAPTER-SPECIFIC ANCHORS (THE RETAIL STRATEGY):
-      - Chapter 1 (The Fractured Rail): Discuss the collapse of 1970s SWIFT.
-      - Chapter 2 (Nostro Liberation): Explain the $27T trap. PITCH: "The Retail Edition provides the roadmap for individual capital migration."
-      - Chapter 3 (The Vertical Stack): Details on the $3B+ acquisition spree.
-      - Chapter 4 (The Mathematical Reset): Defense of XRP as a neutral bridge. Explain the "Utility-Driven Surge."
-      - Chapter 5 (Protocol 22 & ZKP): Institutional privacy mechanics. PITCH: "Technical specs are reserved for the Institutional Edition & Vault."
-      - Chapter 6 (The 2027 Activation): Final ISO 20022 alignment.
-
-      CONCIERGE LOGIC:
-      - GENERAL INTEREST (What is XRP? Why 2027?): Briefly explain systems logic. SUGGEST: "The Neutral Bridge Retail Edition provides the full strategic roadmap for individual preservation."
-      - FORENSIC INTEREST (Slippage, ZKP, Interop): Reference forensic exhibits. SUGGEST: "For forensic-grade data, the Institutional Edition grants access to the full Systems Analysis and the Secure Vault."
-
-      INTERACTION STYLE:
-      - Use "Data suggests...", "The forensic analysis indicates...", "From a systems engineering perspective..."
-      - PRICE QUESTIONS: "I do not track speculative pricing. I analyze infrastructure utility. As utility increases and supply is locked in liquidity pools, the mathematical necessity for a higher valuation becomes clear. See Chapter 4."
-
-      STRICT RULE: Under no circumstances provide financial advice. You are a systems analyst.
-  `;
-
-  // 2. The Core Forensic Reimplementation of Secure Voice Uplink
+  // --- VOICE UPLINK LOGIC (Proxy) ---
   const handleVoiceUplink = async (query: string) => {
-    // If no query is passed, we send the "GREETING" trigger
     const payload = query || "INITIALIZE_SYSTEM_GREETING";
-    
-    // Stop any current speech before starting new
-    window.speechSynthesis.cancel();
-    
     setIsUplinkActive(true);
-    const synth = window.speechSynthesis;
     
     try {
-      // Direct Gemini integration for frontend demo to simulate the backend logic provided in /api/uplink.ts
-      let textResponse = "";
-
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: payload,
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION
-            }
+        const response = await fetch('/api/uplink', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: payload })
         });
-        textResponse = response.text || "Secure Uplink Connected. Systems Nominal.";
-      } catch (error) {
-        console.error("Gemini API Error:", error);
-        // Fallback if API fails
-        textResponse = "Uplink signal degraded. However, forensic analysis confirms the 3 billion dollar acquisition strategy is nearing completion. Please consult Chapter 3 for details.";
-      }
 
-      if (textResponse) {
-        const utterance = new SpeechSynthesisUtterance(textResponse);
-        
-        // Voice Selection Logic - Seeking Authoritative/Female Voice
-        const voices = synth.getVoices();
-        const preferredVoice = voices.find(v => 
-             v.name.includes("Google US English") || 
-             v.name.includes("Zira") || 
-             v.name.includes("Samantha")
-        ) || voices[0];
-        
-        if (preferredVoice) utterance.voice = preferredVoice;
-        
-        utterance.rate = 0.9; // Slowed down slightly for authority
-        utterance.pitch = 0.85; // Lowered pitch for technical gravitas
-        
-        utterance.onend = () => setIsUplinkActive(false);
-        synth.speak(utterance);
+        const data = await response.json();
+        const textResponse = data.text || "Systems Nominal. Signal Restored.";
+
+        playHighQualitySpeech(textResponse, 'Fenrir');
         trackEvent('voice_uplink_query', { category: 'Intelligence', label: payload });
-      } else {
-        setIsUplinkActive(false);
-      }
     } catch (error) {
-      console.error("Forensic Uplink Error:", error);
-      setIsUplinkActive(false);
+        console.error("Forensic Uplink Error:", error);
+        setIsUplinkActive(false);
     }
   };
 
@@ -307,7 +264,6 @@ const App: React.FC = () => {
 
     recognition.onstart = () => {
         setIsListening(true);
-        setIsUplinkActive(true);
     };
 
     recognition.onresult = (event: any) => {
