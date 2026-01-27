@@ -51,22 +51,17 @@ const App: React.FC = () => {
   const [isVaultOpen, setIsVaultOpen] = useState(false);
   const [isRedemptionOpen, setIsRedemptionOpen] = useState(false);
   
-  // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'joining' | 'joined'>('idle');
 
-  // Secure Uplink & Forensic Viewer State
   const [isUplinkActive, setIsUplinkActive] = useState(false);
   const [isTerminalLocked, setIsTerminalLocked] = useState(true);
   const [activeExhibit, setActiveExhibit] = useState<string | null>(null);
   const [activeScript, setActiveScript] = useState<string>("");
   const [isAudioMuted, setIsAudioMuted] = useState(false);
 
-  // Client-Side Routing
   const [currentPath, setCurrentPath] = useState(window.location.hash);
   const scrollMilestones = useRef(new Set<number>());
-
-  // Audio Engine Refs
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
   const playForensicAudio = (id: string) => {
@@ -77,12 +72,10 @@ const App: React.FC = () => {
       audioPlayerRef.current.currentTime = 0;
     }
 
-    // Handle exhibit- prefix or direct mapping
     const fileName = id.startsWith('exhibit-') ? id : id;
     const audio = new Audio(`/audios/${fileName}.mp3`);
     audioPlayerRef.current = audio;
 
-    // Set Ticker Text
     const scriptKey = id.replace('exhibit-', '');
     setActiveScript(EXHIBIT_SCRIPTS[scriptKey] || EXHIBIT_SCRIPTS['greeting']);
 
@@ -216,7 +209,6 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen font-sans bg-matte-black text-off-white selection:bg-electric-teal selection:text-black pt-12">
       
-      {/* GLOBAL FORENSIC STYLES */}
       <style>{`
         @keyframes osc-pulse {
           0%, 100% { height: 4px; opacity: 0.3; }
@@ -262,7 +254,6 @@ const App: React.FC = () => {
         }
       `}</style>
 
-      {/* FULLSCREEN EXHIBIT VIEWER */}
       {activeExhibit && (
         <div className="fixed inset-0 z-[300] bg-black/98 flex flex-col items-center justify-center p-6 backdrop-blur-3xl">
           <button 
@@ -291,7 +282,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* DATA LOG TICKER */}
       {activeScript && (
         <div className="ticker-wrap">
           <div className="ticker-content">
@@ -300,7 +290,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* TERMINAL LOCK OVERLAY */}
       {isTerminalLocked && (
         <div className="fixed inset-0 z-[100] bg-matte-black flex items-center justify-center p-6 backdrop-blur-xl">
             <div className="max-w-md w-full border border-white/10 bg-black p-10 text-center relative group">
@@ -319,7 +308,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* OVERLAYS */}
       <div className="fixed top-0 left-0 right-0 z-[60]"><DayZeroBar /></div>
       <PreviewReader isOpen={activePreview !== null} edition={activePreview} onClose={() => setActivePreview(null)} onOrder={() => { setActivePreview(null); scrollToSection('pricing'); }} />
       <IntelligenceVault isOpen={isVaultOpen} onClose={() => setIsVaultOpen(false)} />
@@ -327,7 +315,6 @@ const App: React.FC = () => {
       <LegalModal isOpen={legalModalOpen} initialTab={activeLegalTab} onClose={() => setLegalModalOpen(false)} />
       <SocialProof />
 
-      {/* Nav */}
       <nav className="fixed top-8 w-full z-50 bg-matte-black/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth'}); }}>
@@ -354,7 +341,6 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero */}
       <header className="relative pt-32 pb-20 md:pt-48 md:pb-24 overflow-hidden bg-circuit min-h-[90vh] flex flex-col justify-center">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-grey/10 skew-x-12 transform origin-top-right pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
@@ -375,7 +361,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Hero Interface */}
             <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
                 <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl text-center">
@@ -403,11 +388,9 @@ const App: React.FC = () => {
       </header>
 
       <PreOrderBridge />
-
       <ResetCountdown />
       <EngineeringRigor />
       
-      {/* CHAPTER HOVER SYSTEM PILLARS */}
       <section className="bg-charcoal/30 py-20 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
            {[
