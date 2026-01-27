@@ -28,17 +28,21 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
-import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff } from 'lucide-react';
+import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff, Volume2, VolumeX } from 'lucide-react';
 
-// FORENSIC SCRIPTS FOR DATA LOG TICKER
+// FORENSIC SCRIPTS FOR DATA LOG TICKER & INTERCEPTS
 const EXHIBIT_SCRIPTS: Record<string, string> = {
   greeting: "Uplink confirmed. Identity verified. Welcome, Analyst. You are accessing the secure data layer for The Neutral Bridge. Proceed with objectivity. The clock is ticking.",
-  a: "Exhibit Alpha deconstructs the shift from legacy correspondent rails to atomic settlement. By removing the messaging delay, the bridge provides under 3 second finality, rendering the 1970s SWIFT architecture obsolete.",
+  a: "Exhibit Alpha deconstructs the shift from legacy correspondent rails to atomic settlement. By removing the messaging delay, the bridge provides under 3 second finality.",
   b: "Exhibit Beta visualizes the 27 trillion dollar liquidity trap. This pre-funded capital sits dormant in global accounts to facilitate trust. The Neutral Bridge releases this capital via On-Demand Liquidity.",
-  c: "Exhibit Gamma detailing the standardized messaging layer. This is the new world mesh. Every packet of data is now rich, structured, and compliant, allowing the bridge to communicate directly with central banks.",
+  c: "Exhibit Gamma detailing the standardized messaging layer. This is the new world mesh. Every packet of data is now rich, structured, and compliant.",
   d: "Forensic analysis of Exhibit Delta confirms system finality. On the Unified Ledger, asset ownership and payment transfer occur simultaneously. This is the end of the settlement risk era.",
-  e: "Exhibit Epsilon. At scale, the XRP Ledger functions as the primary liquidity bridge. Per the slippage mathematics in Chapter 4, infrastructure-grade pricing is required to facilitate 100 trillion dollar volume.",
-  f: "Exhibit Zeta. Accessing Protocol 22 specifications. This layer utilizes Zero-Knowledge Proofs to grant institutions absolute privacy for transactions, while maintaining regulatory view-key access."
+  e: "Exhibit Epsilon. At scale, the XRP Ledger functions as the primary liquidity bridge. Infrastructure-grade pricing is required to facilitate 100 trillion dollar volume.",
+  f: "Exhibit Zeta. Accessing Protocol 22 specifications. This layer utilizes Zero-Knowledge Proofs to grant institutions absolute privacy while maintaining regulatory view-key access.",
+  'Neutral Bridge': "Intercept: Correspondent banking has reached physical limits. We require mathematically neutral settlement rails.",
+  'Value Density': "Logic: To move sovereign-scale volume without market instability, high value density is a functional requirement.",
+  'Protocol 22': "Reasoning: Solving 'Privacy under Supervision' is the evolutionary pressure that legacy finance cannot ignore.",
+  'The Reset Date': "Intercept: Jan 18, 2027. The statutory backstop for the GENIUS Act and the handoff to a vertically integrated system."
 };
 
 const App: React.FC = () => {
@@ -56,6 +60,7 @@ const App: React.FC = () => {
   const [isTerminalLocked, setIsTerminalLocked] = useState(true);
   const [activeExhibit, setActiveExhibit] = useState<string | null>(null);
   const [activeScript, setActiveScript] = useState<string>("");
+  const [isAudioMuted, setIsAudioMuted] = useState(false);
 
   // Client-Side Routing
   const [currentPath, setCurrentPath] = useState(window.location.hash);
@@ -65,12 +70,15 @@ const App: React.FC = () => {
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
 
   const playForensicAudio = (id: string) => {
+    if (isAudioMuted) return;
+    
     if (audioPlayerRef.current) {
       audioPlayerRef.current.pause();
       audioPlayerRef.current.currentTime = 0;
     }
 
-    const fileName = id.startsWith('exhibit-') ? id : (id === 'greeting' ? 'greeting' : id);
+    // Handle exhibit- prefix or direct mapping
+    const fileName = id.startsWith('exhibit-') ? id : id;
     const audio = new Audio(`/audios/${fileName}.mp3`);
     audioPlayerRef.current = audio;
 
@@ -100,19 +108,21 @@ const App: React.FC = () => {
     setIsUplinkActive(false);
     setActiveExhibit(null);
     setActiveScript("");
-    trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
+  };
+
+  const handleReasoningHover = (pillarId: string) => {
+    if (isAudioMuted || isUplinkActive) return; 
+    playForensicAudio(pillarId); 
   };
 
   const enterTerminal = () => {
     setIsTerminalLocked(false);
     playForensicAudio('greeting');
-    trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
   };
 
   const playExhibitBriefing = (exhibitId: string) => {
     setActiveExhibit(exhibitId);
     playForensicAudio(`exhibit-${exhibitId}`);
-    trackEvent('exhibit_briefing_played', { category: 'Forensics', label: exhibitId });
   };
 
   const handleVoiceUplinkToggle = () => {
@@ -230,46 +240,48 @@ const App: React.FC = () => {
         .ticker-wrap {
           width: 100%;
           overflow: hidden;
-          background: rgba(0, 255, 204, 0.05);
-          border-top: 1px solid rgba(0, 255, 204, 0.2);
+          background: rgba(0, 0, 0, 0.9);
+          border-top: 1px solid rgba(0, 255, 204, 0.3);
           position: fixed;
           bottom: 0;
           left: 0;
-          z-index: 210;
-          padding: 10px 0;
+          z-index: 250;
+          padding: 12px 0;
+          backdrop-blur: 10px;
         }
         .ticker-content {
           white-space: nowrap;
           display: inline-block;
-          animation: ticker-scroll 25s linear infinite;
+          animation: ticker-scroll 30s linear infinite;
           font-family: monospace;
           color: #00ffcc;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
-          font-size: 11px;
+          letter-spacing: 0.25em;
+          font-size: 10px;
+          font-weight: bold;
         }
       `}</style>
 
       {/* FULLSCREEN EXHIBIT VIEWER */}
       {activeExhibit && (
-        <div className="fixed inset-0 z-[200] bg-black/98 flex flex-col items-center justify-center p-6 backdrop-blur-2xl">
+        <div className="fixed inset-0 z-[300] bg-black/98 flex flex-col items-center justify-center p-6 backdrop-blur-3xl">
           <button 
             onClick={handleDisconnect} 
-            className="absolute top-8 right-8 text-white/40 hover:text-crimson transition-all border border-white/10 rounded-full p-2 hover:bg-white/5 z-[220]"
+            className="absolute top-8 right-8 text-white/40 hover:text-crimson transition-all border border-white/10 rounded-full p-2 hover:bg-white/5 z-[320]"
           >
-            <X size={40} />
+            <X size={48} />
           </button>
 
           <div className="max-w-6xl w-full flex flex-col items-center gap-6">
             <img 
               src={`exhibit-${activeExhibit}.jpg`} 
               alt="Enlarged Forensic Evidence" 
-              className="w-full h-auto max-h-[70vh] object-contain border border-white/10 shadow-[0_0_80px_rgba(0,255,204,0.15)] rounded-sm"
+              className="w-full h-auto max-h-[75vh] object-contain border border-white/10 shadow-[0_0_100px_rgba(0,255,204,0.2)] rounded-sm"
             />
             
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-1 active-osc h-10">
-                {[...Array(30)].map((_, i) => <div key={i} className="osc-bar" />)}
+                {[...Array(40)].map((_, i) => <div key={i} className="osc-bar" />)}
               </div>
               <p className="font-mono text-[10px] text-electric-teal uppercase tracking-[0.5em] animate-pulse">
                 Transmitting_Forensic_Data_Log: 0{activeExhibit}
@@ -279,11 +291,11 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* DATA LOG TICKER (Only shows when script is active) */}
+      {/* DATA LOG TICKER */}
       {activeScript && (
         <div className="ticker-wrap">
           <div className="ticker-content">
-            {activeScript} • SYSTEM_STATUS: SECURE • DATA_VELOCITY: 4.2GB/S • {activeScript}
+            {activeScript} • SYSTEM_STATUS: SECURE • DATA_VELOCITY: 4.2GB/S • UPLINK_STRENGTH: 98% • {activeScript}
           </div>
         </div>
       )}
@@ -326,9 +338,16 @@ const App: React.FC = () => {
              </div>
           </a>
           <div className="hidden md:flex items-center gap-8">
+            <button 
+              onClick={() => setIsAudioMuted(!isAudioMuted)} 
+              className="text-white/40 hover:text-white transition-colors flex items-center gap-2"
+              title={isAudioMuted ? "Unmute Feed" : "Mute Feed"}
+            >
+              {isAudioMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
+            </button>
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
-            <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
           <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
@@ -359,9 +378,9 @@ const App: React.FC = () => {
             {/* Hero Interface */}
             <div className="flex-1 w-full max-w-md lg:max-w-lg relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-electric-teal/20 to-transparent blur-xl opacity-20"></div>
-                <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl">
+                <div className="relative bg-black/40 border border-white/10 p-8 backdrop-blur-sm shadow-2xl text-center">
                     <button onClick={handleDisconnect} className="absolute top-4 right-4 text-white/20 hover:text-crimson transition-colors p-1" title="Disconnect Uplink"><PowerOff size={14} /></button>
-                    <div className="flex flex-col items-center text-center space-y-6">
+                    <div className="flex flex-col items-center space-y-6">
                         <button onClick={handleVoiceUplinkToggle} className={`w-24 h-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10 relative transition-all duration-300 group/mic ${isUplinkActive ? 'scale-110 border-electric-teal shadow-[0_0_30px_rgba(56,189,248,0.4)]' : 'hover:scale-105 hover:border-white/30'}`}>
                              <div className={`absolute inset-0 border border-electric-teal/30 rounded-full ${isUplinkActive ? 'animate-ping opacity-60' : 'opacity-0'}`}></div>
                              {isUplinkActive ? <Activity size={32} className="text-electric-teal animate-bounce" /> : <Mic size={32} className="text-electric-teal group-hover/mic:scale-110" />}
@@ -385,21 +404,35 @@ const App: React.FC = () => {
 
       <PreOrderBridge />
 
-      <div className="bg-charcoal border-y border-white/10 py-4 relative z-20">
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-2 text-[10px] md:text-xs font-mono uppercase tracking-widest text-white/60">
-          <div className="flex items-center gap-2"><Check size={12} className="text-electric-teal" /> Rated #1 Financial Manuscript 2026</div>
-          <span className="hidden md:inline text-white/20">—</span>
-          <div className="flex items-center gap-2"><Check size={12} className="text-electric-teal" /> Engineering-Grade Systems Analysis</div>
-          <span className="hidden md:inline text-white/20">—</span>
-          <div className="flex items-center gap-2"><Check size={12} className="text-electric-teal" /> Secure & Encrypted Checkout</div>
-        </div>
-      </div>
-
       <ResetCountdown />
       <EngineeringRigor />
+      
+      {/* CHAPTER HOVER SYSTEM PILLARS */}
+      <section className="bg-charcoal/30 py-20 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+           {[
+             { id: 'Neutral Bridge', title: "Systemic Clarity", desc: "We move past the headlines to look at the plumbing of the IMF, BIS, and Central Banks." },
+             { id: 'Value Density', title: "Engineering Logic", desc: "No market hype. Only a structural analysis of why the system requires a 'Neutral Bridge'." },
+             { id: 'The Reset Date', title: "The 2027 Roadmap", desc: "A technical timeline based on ISO 20022 implementation and global liquidity cycles." },
+             { id: 'Protocol 22', title: "Risk Mitigation", desc: "Understand the transition phase of the Global Reset to protect and position your capital." }
+           ].map((item) => (
+             <div 
+               key={item.id} 
+               className="bg-matte-black p-8 border border-white/5 hover:border-electric-teal/50 transition-all cursor-help relative group"
+               onMouseEnter={() => handleReasoningHover(item.id)}
+             >
+               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Activity size={12} className="text-electric-teal animate-pulse" />
+               </div>
+               <h3 className="font-serif text-xl mb-4 text-white">{item.title}</h3>
+               <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
+             </div>
+           ))}
+        </div>
+      </section>
+
       <TechnicalDefense onOrder={() => scrollToSection('pricing')} onRead={() => setActivePreview('institutional')} />
 
-      {/* Author Section */}
       <Section id="about" className="bg-charcoal border-b border-white/5">
         <div className="flex flex-col md:flex-row items-center gap-16">
           <div className="flex-1 w-full flex justify-center">
@@ -412,7 +445,7 @@ const App: React.FC = () => {
              </div>
           </div>
           <div className="flex-1">
-            <h2 className="font-serif text-4xl mb-6">Behind the Analysis</h2>
+            <h2 className="font-serif text-4xl mb-6 text-white">Behind the Analysis</h2>
             <div className="prose prose-invert prose-lg text-white/70 font-light leading-relaxed">
               <p className="mb-6">As an engineer and systems analyst, I view the global financial system not as a series of political events, but as a technical infrastructure nearing its limit.</p>
               <p className="mb-6">My work focuses on the mechanics of liquidity, the transition from legacy rails to digital assets, and the <strong className="text-white">mathematical necessity of a neutral bridge</strong>.</p>
@@ -424,7 +457,6 @@ const App: React.FC = () => {
 
       <StrategicDialogue />
 
-      {/* Gallery */}
       <Section id="intelligence-gallery" label="Intelligence Exhibits // Forensic Series">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {['a', 'b', 'c', 'd', 'e', 'f'].map((ex) => (
@@ -442,22 +474,21 @@ const App: React.FC = () => {
       <SystemArchitecture />
       <SovereignMap />
 
-      {/* Editions */}
       <Section id="editions" label="Choose Your Perspective">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           <div className="bg-gradient-to-br from-matte-black to-slate-grey border border-electric-teal/30 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px]">
-            <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1">
+            <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1 text-left">
               <div><span className="font-mono text-xs text-electric-teal uppercase tracking-widest mb-2 block">Retail Edition</span><h3 className="font-serif text-3xl text-white mb-2 leading-tight">Ripple, XRP, and the <br/>Engineered Reset</h3></div>
-              <Button variant="ghost" className="pl-0 border-b border-electric-teal rounded-none px-0 py-2 h-auto" onClick={() => setActivePreview('retail')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
+              <Button variant="ghost" className="pl-0 border-b border-electric-teal rounded-none px-0 py-2 h-auto text-left" onClick={() => setActivePreview('retail')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
             </div>
             <div className="w-full md:w-40 shrink-0 relative flex items-center justify-center order-1 md:order-2">
                 <img src={`${assetBase}retailedition.jpg`} alt="Retail" className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl" />
             </div>
           </div>
           <div className="bg-slate-grey border border-white/10 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px]">
-            <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1">
+            <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1 text-left">
               <div><span className="font-mono text-xs text-white/40 uppercase tracking-widest mb-2 block">Institutional Edition</span><h3 className="font-serif text-3xl text-white mb-2">A Systems Analysis of the <br/>2027 Global Financial Reset</h3></div>
-              <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto justify-start pl-0 hover:bg-transparent" onClick={() => setActivePreview('institutional')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
+              <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto text-left hover:bg-transparent" onClick={() => setActivePreview('institutional')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
             </div>
             <div className="w-full md:w-40 shrink-0 relative flex items-center justify-center order-1 md:order-2">
                 <img src={`${assetBase}institutionedition.jpg`} alt="Institutional" className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl" />
@@ -472,34 +503,8 @@ const App: React.FC = () => {
       </Section>
 
       <IntelligenceTiers />
-
-      <Section id="readiness-check" className="bg-matte-black border-y border-white/5 pb-0 pt-0">
-        <ReadinessQuiz />
-      </Section>
-
-      <Section id="why" className="bg-charcoal/50">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="font-serif text-4xl mb-4">Precise. Objective. Necessary.</h2>
-          <p className="text-white/60">Understanding the reset isn't about hope; it's about engineering logic.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-           {[
-             { title: "Systemic Clarity", desc: "We move past the headlines to look at the plumbing of the IMF, BIS, and Central Banks." },
-             { title: "Engineering Logic", desc: "No market hype. Only a structural analysis of why the current system requires a 'Neutral Bridge'." },
-             { title: "The 2027 Roadmap", desc: "A technical timeline based on ISO 20022 implementation and global liquidity cycles." },
-             { title: "Risk Mitigation", desc: "Understand the transition phase of the Global Reset to protect and position your capital." }
-           ].map((item, i) => (
-             <div key={i} className="bg-matte-black p-8 border border-white/5 hover:border-electric-teal/30 transition-colors">
-               <h3 className="font-serif text-xl mb-4 text-white">{item.title}</h3>
-               <p className="text-sm text-white/50 leading-relaxed">{item.desc}</p>
-             </div>
-           ))}
-        </div>
-      </Section>
-      
-      <Section id="calculator" className="pb-0">
-         <BridgeCalculator />
-      </Section>
+      <ReadinessQuiz />
+      <BridgeCalculator />
 
       <Section id="pricing" label="Secure Your Intelligence">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
@@ -526,52 +531,23 @@ const App: React.FC = () => {
         </div>
       </Section>
 
-      <Section id="newsletter" className="py-20 bg-gradient-to-b from-matte-black to-slate-grey border-t border-white/10">
-        <div className="max-w-xl mx-auto text-center px-6">
-          <h2 className="font-serif text-3xl mb-2">Stay Ahead of the Reset</h2>
-          <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <input 
-              type="email" 
-              placeholder="Enter your email" 
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
-            />
-            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'}>
-              {newsletterStatus === 'idle' && "Join The Bridge"}
-              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
-              {newsletterStatus === 'joined' && "Access Granted"}
-            </Button>
-          </div>
-        </div>
-      </Section>
-
-      <section className="py-32 text-center px-6 border-t border-white/5 bg-matte-black">
-        <div className="inline-block mb-6"><span className="font-mono text-crimson text-sm uppercase tracking-[0.2em] font-bold">Jan 18, 2027. The Clock is Ticking.</span></div>
-        <h2 className="font-serif text-4xl md:text-6xl text-white mb-8 max-w-4xl mx-auto">The Bridge is Being Built. <br/> Will You Be On It?</h2>
-        <Button variant="primary" className="mx-auto min-w-[250px] text-sm" onClick={() => scrollToSection('pricing')}>Order Now</Button>
-      </section>
-
-      <div id="legal"><Disclaimer /></div>
-
-      <footer className="bg-black border-t border-white/10 py-16" id="footer">
+      <footer className="bg-black border-t border-white/10 py-24 mb-16" id="footer">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
           <div>
-            <div className="flex items-center gap-2 mb-6"><Terminal size={16} className="text-electric-teal" /><span className="font-serif font-bold tracking-tight">The Neutral Bridge</span></div>
-            <div className="flex flex-col gap-2 mb-8 text-sm text-white/50">
-              <div className="flex items-center gap-2"><MapPin size={14} className="text-electric-teal/60" /><span>United States (Remote)</span></div>
-              <div className="flex items-center gap-2"><Mail size={14} className="text-electric-teal/60" /><a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a></div>
+            <div className="flex items-center gap-2 mb-6"><Terminal size={16} className="text-electric-teal" /><span className="font-serif font-bold tracking-tight text-white text-xl">The Neutral Bridge</span></div>
+            <div className="flex flex-col gap-2 text-sm text-white/50">
+              <div className="flex items-center gap-2"><span>Location: United States (Remote)</span></div>
+              <div className="flex items-center gap-2"><a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a></div>
             </div>
           </div>
           <div className="flex gap-16 text-sm text-white/60">
             <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2">Resources</span>
+              <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Resources</span>
               <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
               <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
             </div>
             <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2">Legal</span>
+              <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Legal</span>
               <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
               <button onClick={() => { window.location.hash = '#/privacy'; window.location.reload(); }} className="hover:text-white text-left">Privacy Policy</button>
             </div>
