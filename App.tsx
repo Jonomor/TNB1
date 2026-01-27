@@ -39,10 +39,10 @@ const EXHIBIT_SCRIPTS: Record<string, string> = {
   d: "Forensic analysis of Exhibit Delta confirms system finality. On the Unified Ledger, asset ownership and payment transfer occur simultaneously. This is the end of the settlement risk era.",
   e: "Exhibit Epsilon. At scale, the XRP Ledger functions as the primary liquidity bridge. Infrastructure-grade pricing is required to facilitate 100 trillion dollar volume.",
   f: "Exhibit Zeta. Accessing Protocol 22 specifications. This layer utilizes Zero-Knowledge Proofs to grant institutions absolute privacy while maintaining regulatory view-key access.",
-  Neutral_Bridge: "Intercept: Correspondent banking has reached physical limits. We require mathematically neutral settlement rails.",
-  Value_Density: "Logic: To move sovereign-scale volume without market instability, high value density is a functional requirement.",
-  Protocol_22: "Reasoning: Solving 'Privacy under Supervision' is the evolutionary pressure that legacy finance cannot ignore.",
-  The_Reset_Date: "Intercept: Jan 18, 2027. The statutory backstop for the GENIUS Act and the handoff to a vertically integrated system."
+  'Neutral Bridge': "Intercept: Correspondent banking has reached physical limits. We require mathematically neutral settlement rails.",
+  'Value Density': "Logic: To move sovereign-scale volume without market instability, high value density is a functional requirement.",
+  'Protocol 22': "Reasoning: Solving 'Privacy under Supervision' is the evolutionary pressure that legacy finance cannot ignore.",
+  'The Reset Date': "Intercept: Jan 18, 2027. The statutory backstop for the GENIUS Act and the handoff to a vertically integrated system."
 };
 
 const App: React.FC = () => {
