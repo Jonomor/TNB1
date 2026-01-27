@@ -72,8 +72,12 @@ const App: React.FC = () => {
       audioPlayerRef.current.currentTime = 0;
     }
 
-    const fileName = id.startsWith('exhibit-') ? id : id;
-    const audio = new Audio(`/audios/${fileName}.mp3`);
+    // Surgical path detection
+    const path = id.includes('exhibit-') || id === 'greeting' 
+      ? `/audios/${id}.mp3` 
+      : `/audios/${id}.mp3`;
+
+    const audio = new Audio(path);
     audioPlayerRef.current = audio;
 
     const scriptKey = id.replace('exhibit-', '');
@@ -153,15 +157,6 @@ const App: React.FC = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     scrollToSection(id);
-  };
-
-  const handleJoinNewsletter = () => {
-    setNewsletterStatus('joining');
-    setTimeout(() => {
-      setNewsletterStatus('joined');
-      setNewsletterEmail('');
-      setTimeout(() => setNewsletterStatus('idle'), 3000);
-    }, 1500);
   };
 
   const pricingTiers: PricingTier[] = [
