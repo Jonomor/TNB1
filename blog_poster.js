@@ -1,5 +1,5 @@
 // blog_poster.js - Automated blog content management
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -12,7 +12,8 @@ const config = {
 async function generateBlogPost() {
   console.log('📝 Generating blog post with Gemini AI...');
   
-  const ai = new GoogleGenAI({ apiKey: config.apiKey });
+  const genAI = new GoogleGenerativeAI(config.apiKey);
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
   
   const prompt = `You are K. Morgan, a Systems Engineer analyzing global financial infrastructure.
 
@@ -40,12 +41,9 @@ Format as JSON:
   "content": "..." (full markdown content with ## headers)
 }`;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash-exp',
-    contents: prompt
-  });
+  const response = await model.generateContent(prompt);
   
-  const text = response.text.replace(/```json|```/g, '').trim();
+  const text = response.response.text().replace(/```json|```/g, '').trim();
   const post = JSON.parse(text);
   
   // Add metadata
