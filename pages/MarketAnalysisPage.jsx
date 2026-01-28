@@ -4,7 +4,7 @@ import {
   Activity, BarChart3, Newspaper, Globe, ChevronRight,
   AlertCircle, Info
 } from 'lucide-react';
-import xrpMarketService from './xrpMarketService';
+import xrpMarketService from '../services/xrpMarketService';
 
 const MarketAnalysisPage = () => {
   const [data, setData] = useState(null);
