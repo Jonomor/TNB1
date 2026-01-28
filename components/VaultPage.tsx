@@ -33,7 +33,7 @@ const handleLogout = () => {
         {/* Terminal Header */}
         <div className="flex items-center justify-between border-b border-sky-400/30 bg-sky-400/5 px-6 py-3">
           <div className="flex items-center gap-3">
-            <img src="/bridge_logo.png" alt="The Neutral Bridge" className="w-6 h-6" />
+            <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
             <span className="text-sm font-bold uppercase tracking-widest text-sky-400">Secure Uplink // Authorized Access</span>
           </div>
           <button 
