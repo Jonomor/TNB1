@@ -1,4 +1,4 @@
-mport React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
 import { Button } from './components/Button';
