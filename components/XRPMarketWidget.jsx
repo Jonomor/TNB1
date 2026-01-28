@@ -200,7 +200,7 @@ const XRPMarketWidget = () => {
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-semibold text-gray-300">Recent News</h4>
               <a 
-                href="/market-analysis" 
+                href="#/market-analysis" 
                 className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
               >
                 View All <ExternalLink size={12} />
