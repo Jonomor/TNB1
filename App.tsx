@@ -327,7 +327,7 @@ const App: React.FC = () => {
       <nav className="fixed top-8 w-full z-50 bg-matte-black/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth'}); }}>
-             <img src="/bridge_logo.png" alt="The Neutral Bridge" className="w-10 h-10 rounded-sm" />
+             <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-10 h-10 rounded-sm" />
              <div>
                 <span className="font-serif font-bold text-lg text-white block leading-none">The Neutral Bridge</span>
                 <span className="font-mono text-[9px] text-electric-teal block mt-1 uppercase tracking-wider">Launch: Feb 18, 2026</span>
