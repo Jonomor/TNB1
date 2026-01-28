@@ -553,7 +553,7 @@ const App: React.FC = () => {
       {/* Editions */}
       <Section id="editions" label="Choose Your Perspective">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 text-left">
-          <div className="bg-gradient-to-br from-matte-black to-slate-grey border border-electric-teal/30 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px]">
+          <div className="bg-gradient-to-br from-matte-black to-slate-grey border border-electric-teal/30 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px] rounded-lg">
             <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1">
               <div><span className="font-mono text-xs text-electric-teal uppercase tracking-widest mb-2 block">Retail Edition</span><h3 className="font-serif text-3xl text-white mb-2 leading-tight">Ripple, XRP, and the <br/>Engineered Reset</h3></div>
               <Button variant="ghost" className="pl-0 border-b border-electric-teal rounded-none px-0 py-2 h-auto text-left" onClick={() => setActivePreview('retail')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
@@ -562,7 +562,7 @@ const App: React.FC = () => {
                 <img src={`${assetBase}retailedition.jpg`} alt="Retail" className="w-full h-full object-cover rounded-sm border border-white/10 shadow-2xl" />
             </div>
           </div>
-          <div className="bg-slate-grey border border-white/10 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px]">
+          <div className="bg-slate-grey border border-white/10 p-8 flex flex-col md:flex-row gap-6 relative overflow-hidden group min-h-[300px] rounded-lg">
             <div className="flex-1 flex flex-col justify-between z-10 order-2 md:order-1">
               <div><span className="font-mono text-xs text-white/40 uppercase tracking-widest mb-2 block">Institutional Edition</span><h3 className="font-serif text-3xl text-white mb-2 leading-tight">A Systems Analysis of the <br/>2027 Global Financial Reset</h3></div>
               <Button variant="outline" className="border-0 border-b border-white/30 rounded-none px-0 py-2 h-auto text-left hover:bg-transparent" onClick={() => setActivePreview('institutional')}>View Details <ArrowRight size={14} className="ml-2"/></Button>
