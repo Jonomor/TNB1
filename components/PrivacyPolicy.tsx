@@ -45,7 +45,6 @@ export default function PrivacyPolicy() {
         </div>
 
         <div style={{ padding: '40px' }}>
-          {/* Content sections */}
           <div style={{ marginBottom: '40px', paddingBottom: '30px', borderBottom: '1px solid #1f1f1f' }}>
             <h2 style={{ color: '#22d3ee', fontSize: '1.8em', marginBottom: '20px' }}>1. Introduction</h2>
             <p style={{ color: '#d1d5db', lineHeight: 1.7 }}>
@@ -86,7 +85,6 @@ export default function PrivacyPolicy() {
             </ul>
           </div>
 
-          {/* Highlighted section */}
           <div style={{
             background: 'linear-gradient(135deg, rgba(34, 211, 238, 0.05) 0%, rgba(34, 211, 238, 0.02) 100%)',
             borderLeft: '3px solid #22d3ee',
@@ -127,8 +125,11 @@ export default function PrivacyPolicy() {
         <p style={{ color: '#9ca3af', marginBottom: '25px' }}>
           <strong>Acknowledgment:</strong> By utilizing The Neutral Bridge, you acknowledge and accept this forensic Privacy Policy.
         </p>
-        <a
-          href="https://theneutralbridge.com"
+        <button
+          onClick={() => {
+            localStorage.setItem('tnb_entered', 'true');
+            window.location.href = '/';
+          }}
           style={{
             display: 'inline-block',
             background: '#22d3ee',
@@ -139,11 +140,13 @@ export default function PrivacyPolicy() {
             textDecoration: 'none',
             textTransform: 'uppercase',
             letterSpacing: '1px',
-            fontSize: '0.9em'
+            fontSize: '0.9em',
+            border: 'none',
+            cursor: 'pointer'
           }}
         >
           ← Return to The Neutral Bridge
-        </a>
+        </button>
       </div>
     </div>
   );
