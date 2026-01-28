@@ -1,4 +1,3 @@
-
 // XRP Market Analysis Service
 // Multi-source aggregation for institutional-grade market intelligence
 
@@ -39,12 +38,12 @@ class XRPMarketService {
   }
 
   async fetchCoinGecko() {
-  const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
-  const url = apiKey 
-    ? `https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=${apiKey}`
-    : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
-  
-  const response = await fetch(url);
+    const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
+    const url = apiKey 
+      ? `https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=${apiKey}`
+      : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
+    
+    const response = await fetch(url);
     const data = await response.json();
     
     return {
@@ -105,22 +104,32 @@ class XRPMarketService {
     }
   }
 
- async fetchCryptoNews() {
-  const token = import.meta.env.VITE_CRYPTOPANIC_API_KEY || 'YOUR_TOKEN';
-  const response = await fetch(
-    `https://cryptopanic.com/api/v1/posts/?auth_token=${token}&currencies=XRP&public=true`
-  );
-    const data = await response.json();
-    
-    return data.results.map(item => ({
-      title: item.title,
-      url: item.url,
-      source: item.source.title,
-      publishedAt: item.published_at,
-      sentiment: this.analyzeSentiment(item.title),
-      votes: item.votes,
-      relevanceScore: this.calculateRelevance(item)
-    }));
+  async fetchCryptoNews() {
+    try {
+      const token = import.meta.env.VITE_CRYPTOPANIC_API_KEY;
+      if (!token) {
+        console.warn('CryptoPanic API key not set, using mock news');
+        return this.getMockNews();
+      }
+      
+      const response = await fetch(
+        `https://cryptopanic.com/api/v1/posts/?auth_token=${token}&currencies=XRP&public=true`
+      );
+      const data = await response.json();
+      
+      return data.results.map(item => ({
+        title: item.title,
+        url: item.url,
+        source: item.source.title,
+        publishedAt: item.published_at,
+        sentiment: this.analyzeSentiment(item.title),
+        votes: item.votes,
+        relevanceScore: this.calculateNewsRelevance(item)
+      }));
+    } catch (error) {
+      console.error('CryptoPanic fetch failed:', error);
+      return this.getMockNews();
+    }
   }
 
   async fetchRSSFeeds() {
@@ -234,17 +243,22 @@ class XRPMarketService {
       const total = Object.values(sentimentCounts).reduce((a, b) => a + b, 0);
       
       return {
-        score: ((sentimentCounts.positive - sentimentCounts.negative) / total) * 100,
+        score: total > 0 ? ((sentimentCounts.positive - sentimentCounts.negative) / total) * 100 : 0,
         breakdown: sentimentCounts,
         interpretation: this.interpretSentiment(sentimentCounts, total)
       };
     } catch (error) {
       console.error('Sentiment calculation failed:', error);
-      return null;
+      return {
+        score: 0,
+        breakdown: { positive: 0, neutral: 0, negative: 0 },
+        interpretation: 'Neutral'
+      };
     }
   }
 
   interpretSentiment(counts, total) {
+    if (total === 0) return 'Neutral';
     const positiveRatio = counts.positive / total;
     if (positiveRatio > 0.6) return 'Strong Bullish';
     if (positiveRatio > 0.4) return 'Moderately Bullish';
@@ -316,9 +330,43 @@ class XRPMarketService {
       totalSupply: 99988000000,
       maxSupply: 100000000000,
       marketCapRank: 3,
+      ath: 3.84,
+      athDate: '2018-01-07',
+      atl: 0.002802,
+      atlDate: '2014-07-07',
+      fullyDilutedValuation: 245000000000,
       dataSource: 'Mock',
       timestamp: Date.now()
     };
+  }
+
+  getMockNews() {
+    return [
+      {
+        title: 'XRP Ledger Sees Increased Institutional Activity',
+        url: '#',
+        source: 'Crypto News',
+        publishedAt: new Date().toISOString(),
+        sentiment: 'positive',
+        votes: { positive: 10, negative: 2 }
+      },
+      {
+        title: 'Ripple Partners with Major Financial Institution',
+        url: '#',
+        source: 'Finance Today',
+        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+        sentiment: 'positive',
+        votes: { positive: 15, negative: 1 }
+      },
+      {
+        title: 'XRP Network Upgrade Enhances Transaction Speed',
+        url: '#',
+        source: 'Blockchain Today',
+        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+        sentiment: 'positive',
+        votes: { positive: 8, negative: 1 }
+      }
+    ];
   }
 
   // Start auto-updating
