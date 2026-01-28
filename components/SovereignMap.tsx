@@ -30,7 +30,7 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
       className="bg-charcoal border-y border-white/5"
     >
       <p className="text-center text-white/60 mb-12 max-w-3xl mx-auto">
-        Real-time schematic of the "Neutral Bridge" intersections with major Central Bank Digital Currencies (CBDCs).
+        Real-time schematic of the "Neutral Bridge" intersections with major (CBDCs).
       </p>
 
       {!isUnlocked && (
@@ -68,13 +68,13 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
       {isUnlocked && (
         <div className="space-y-8">
           {/* Live Network Visualization */}
-          <div className="border border-electric-teal/30 bg-matte-black rounded-lg p-8 relative overflow-hidden aspect-video">
+          <div className="border border-electric-teal/30 bg-matte-black rounded-lg p-4 md:p-8 relative overflow-hidden min-h-[300px] h-[400px] md:h-[500px]">
             {/* Pulsing XRP Center */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="w-24 h-24 rounded-full bg-electric-teal/20 border-2 border-electric-teal flex items-center justify-center">
+              <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-electric-teal/20 border-2 border-electric-teal flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-electric-teal font-bold text-xl">XRP</div>
-                  <div className="text-electric-teal/60 text-xs">Ledger</div>
+                  <div className="text-electric-teal font-bold text-sm md:text-xl">XRP</div>
+                  <div className="text-electric-teal/60 text-[8px] md:text-xs">Ledger</div>
                 </div>
               </div>
               <div className="absolute inset-0 rounded-full border-2 border-electric-teal/50 animate-ping"></div>
@@ -93,13 +93,13 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
               { name: 'AUD', angle: 270 },
               { name: 'CAD', angle: 315 }
             ].map((node) => {
-              const radius = 35;
+              const radius = 35; // percentage
               const x = 50 + radius * Math.cos((node.angle * Math.PI) / 180);
               const y = 50 + radius * Math.sin((node.angle * Math.PI) / 180);
               
               return (
                 <div key={node.name}>
-                  <svg className="absolute inset-0 pointer-events-none">
+                  <svg className="absolute inset-0 pointer-events-none w-full h-full">
                     <line
                       x1="50%"
                       y1="50%"
@@ -114,11 +114,11 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
                   </svg>
                   
                   <div
-                    className="absolute w-16 h-16 -translate-x-1/2 -translate-y-1/2"
+                    className="absolute w-12 h-12 md:w-16 md:h-16 -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${x}%`, top: `${y}%` }}
                   >
                     <div className="w-full h-full rounded-full border-2 border-sky-400 bg-sky-400/10 flex items-center justify-center">
-                      <div className="text-sky-400 font-bold text-sm">{node.name}</div>
+                      <div className="text-sky-400 font-bold text-[10px] md:text-sm">{node.name}</div>
                     </div>
                     <div className="absolute inset-0 rounded-full border border-sky-400 animate-ping opacity-50"></div>
                   </div>
@@ -127,16 +127,16 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
             })}
 
             {/* Status Overlay */}
-            <div className="absolute top-4 right-4 bg-black/80 border border-electric-teal/30 px-4 py-2 rounded-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-electric-teal animate-pulse"></div>
-                <span className="text-[10px] text-electric-teal font-mono uppercase">Network Active</span>
+            <div className="absolute top-2 right-2 md:top-4 md:right-4 bg-black/80 border border-electric-teal/30 px-2 py-1 md:px-4 md:py-2 rounded-sm">
+              <div className="flex items-center gap-1 md:gap-2">
+                <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-electric-teal animate-pulse"></div>
+                <span className="text-[8px] md:text-[10px] text-electric-teal font-mono uppercase">Network Active</span>
               </div>
             </div>
           </div>
 
           {/* Settlement Statistics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {[
               { currency: 'USD', volume: '$2.4T', time: '2.8s' },
               { currency: 'EUR', volume: '$1.8T', time: '3.1s' },
@@ -147,18 +147,18 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
               { currency: 'AUD', volume: '$234B', time: '3.0s' },
               { currency: 'CAD', volume: '$389B', time: '2.9s' }
             ].map((stat) => (
-              <div key={stat.currency} className="bg-white/5 border border-white/10 p-4 rounded-sm">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="text-electric-teal font-mono font-bold text-lg">{stat.currency}</div>
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+              <div key={stat.currency} className="bg-white/5 border border-white/10 p-3 md:p-4 rounded-sm">
+                <div className="flex items-center justify-between mb-1 md:mb-2">
+                  <div className="text-electric-teal font-mono font-bold text-base md:text-lg">{stat.currency}</div>
+                  <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-green-400 animate-pulse"></div>
                 </div>
-                <div className="space-y-1 text-[10px]">
+                <div className="space-y-0.5 md:space-y-1 text-[9px] md:text-[10px]">
                   <div className="flex justify-between text-white/40">
-                    <span>24h Volume:</span>
+                    <span>Volume:</span>
                     <span className="text-white/80 font-mono">{stat.volume}</span>
                   </div>
                   <div className="flex justify-between text-white/40">
-                    <span>Settlement:</span>
+                    <span>Time:</span>
                     <span className="text-electric-teal font-mono">{stat.time}</span>
                   </div>
                 </div>
@@ -167,37 +167,37 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
           </div>
 
           {/* Network Metrics */}
-          <div className="bg-white/5 border border-white/10 p-6 rounded-sm">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+          <div className="bg-white/5 border border-white/10 p-4 md:p-6 rounded-sm">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
               <div>
-                <div className="text-electric-teal font-mono text-2xl font-bold">8</div>
-                <div className="text-white/60 text-xs uppercase">Active Nodes</div>
+                <div className="text-electric-teal font-mono text-xl md:text-2xl font-bold">8</div>
+                <div className="text-white/60 text-[10px] md:text-xs uppercase">Nodes</div>
               </div>
               <div>
-                <div className="text-electric-teal font-mono text-2xl font-bold">2.9s</div>
-                <div className="text-white/60 text-xs uppercase">Avg Settlement</div>
+                <div className="text-electric-teal font-mono text-xl md:text-2xl font-bold">2.9s</div>
+                <div className="text-white/60 text-[10px] md:text-xs uppercase">Settlement</div>
               </div>
               <div>
-                <div className="text-electric-teal font-mono text-2xl font-bold">$10.4T</div>
-                <div className="text-white/60 text-xs uppercase">24h Volume</div>
+                <div className="text-electric-teal font-mono text-xl md:text-2xl font-bold">$10.4T</div>
+                <div className="text-white/60 text-[10px] md:text-xs uppercase">Volume</div>
               </div>
               <div>
-                <div className="text-green-400 font-mono text-2xl font-bold">99.97%</div>
-                <div className="text-white/60 text-xs uppercase">Uptime</div>
+                <div className="text-green-400 font-mono text-xl md:text-2xl font-bold">99.97%</div>
+                <div className="text-white/60 text-[10px] md:text-xs uppercase">Uptime</div>
               </div>
             </div>
           </div>
 
           {/* ISO 20022 Specs */}
-          <div className="bg-gradient-to-r from-electric-teal/5 to-transparent border border-electric-teal/20 p-6 rounded-sm">
-            <h4 className="text-electric-teal font-mono text-sm uppercase tracking-wider mb-4">ISO 20022 Message Specifications</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-[10px]">
-              <div className="space-y-2">
-                <div className="text-white/60">Message Type: <span className="text-white">pacs.008.001.08</span></div>
+          <div className="bg-gradient-to-r from-electric-teal/5 to-transparent border border-electric-teal/20 p-4 md:p-6 rounded-sm">
+            <h4 className="text-electric-teal font-mono text-xs md:text-sm uppercase tracking-wider mb-3 md:mb-4">ISO 20022 Specifications</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 font-mono text-[9px] md:text-[10px]">
+              <div className="space-y-1.5 md:space-y-2">
+                <div className="text-white/60">Message: <span className="text-white">pacs.008.001.08</span></div>
                 <div className="text-white/60">Settlement: <span className="text-electric-teal">RTGS</span></div>
                 <div className="text-white/60">System: <span className="text-white">XRPL</span></div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5 md:space-y-2">
                 <div className="text-white/60">Protocol: <span className="text-white">RippleNet</span></div>
                 <div className="text-white/60">Finality: <span className="text-electric-teal">Atomic</span></div>
                 <div className="text-white/60">Privacy: <span className="text-white">Protocol 22</span></div>
