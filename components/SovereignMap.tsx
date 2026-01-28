@@ -3,10 +3,11 @@ import { Section } from './Section';
 
 interface SovereignMapProps {
   onRequestAccess?: () => void;
+  testMode?: boolean; // Set to true to preview the map
 }
 
-export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess }) => {
-  const [isUnlocked, setIsUnlocked] = useState(false);
+export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, testMode = false }) => {
+  const [isUnlocked, setIsUnlocked] = useState(testMode); // Start unlocked if testMode
 
   const handleUnlock = () => {
     // Check if user has institutional access
