@@ -24,7 +24,6 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
-import { BlogPage } from './components/BlogPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
@@ -58,10 +57,7 @@ const App: React.FC = () => {
 
   // Secure Uplink & Forensic Viewer State
   const [isUplinkActive, setIsUplinkActive] = useState(false);
-  const [isTerminalLocked, setIsTerminalLocked] = useState(() => {
-    // Check if user already entered in this session
-    return localStorage.getItem('tnb_entered') !== 'true';
-  });
+  const [isTerminalLocked, setIsTerminalLocked] = useState(true);
   const [activeExhibit, setActiveExhibit] = useState<string | null>(null);
   const [activeScript, setActiveScript] = useState<string>("");
   const [isAudioMuted, setIsAudioMuted] = useState(false);
@@ -115,14 +111,7 @@ const App: React.FC = () => {
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
-  const goToHome = () => {
-    setIsTerminalLocked(false); // Bypass lock screen
-    window.location.hash = '';
-    window.location.reload();
-  };
-
   const enterTerminal = () => {
-    localStorage.setItem('tnb_entered', 'true'); // Remember they entered
     setIsTerminalLocked(false);
     playForensicAudio('greeting');
     trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
@@ -151,7 +140,6 @@ const App: React.FC = () => {
 
   if (currentPath.includes('#/vault')) return <VaultPage />;
   if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
-  if (currentPath.includes('#/blog')) return <BlogPage />;
 
   const assetBase = getAssetBase();
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -173,41 +161,13 @@ const App: React.FC = () => {
     scrollToSection(id);
   };
 
-  const handleJoinNewsletter = async () => {
-    if (!newsletterEmail || !newsletterEmail.includes('@')) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    
+  const handleJoinNewsletter = () => {
     setNewsletterStatus('joining');
-    
-    try {
-      // Send to Formspree (replace with your Formspree form ID)
-      const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: newsletterEmail,
-          _subject: 'New Newsletter Signup - The Neutral Bridge',
-          source: 'theneutralbridge.com'
-        })
-      });
-      
-      if (response.ok) {
-        setNewsletterStatus('joined');
-        setNewsletterEmail('');
-        trackEvent('newsletter_signup', { category: 'Engagement', label: newsletterEmail });
-        setTimeout(() => setNewsletterStatus('idle'), 3000);
-      } else {
-        throw new Error('Failed to submit');
-      }
-    } catch (error) {
-      console.error('Newsletter signup error:', error);
-      alert('Something went wrong. Please try again.');
-      setNewsletterStatus('idle');
-    }
+    setTimeout(() => {
+      setNewsletterStatus('joined');
+      setNewsletterEmail('');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    }, 1500);
   };
 
   const pricingTiers: PricingTier[] = [
@@ -394,7 +354,6 @@ const App: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
             </button>
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
-            <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
@@ -609,25 +568,20 @@ const App: React.FC = () => {
         <div className="max-w-xl mx-auto text-center px-6">
           <h2 className="font-serif text-3xl mb-2 text-white">Stay Ahead of the Reset</h2>
           <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
-          <form 
-            action="https://formspree.io/f/YOUR_FORM_ID"
-            method="POST"
-            className="flex flex-col sm:flex-row gap-4"
-          >
+          <div className="flex flex-col sm:flex-row gap-4">
             <input 
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              required
+              type="email" 
+              placeholder="Enter your email" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
             />
-            <button 
-              type="submit"
-              className="bg-electric-teal text-black font-bold px-8 py-3 rounded-sm hover:bg-white transition-all uppercase tracking-wider text-sm"
-            >
-              Join The Bridge
-            </button>
-          </form>
+            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'}>
+              {newsletterStatus === 'idle' && "Join The Bridge"}
+              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
+              {newsletterStatus === 'joined' && "Access Granted"}
+            </Button>
+          </div>
         </div>
       </Section>
 
