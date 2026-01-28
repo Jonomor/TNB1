@@ -305,7 +305,7 @@ const App: React.FC = () => {
             <div className="max-w-md w-full border border-white/10 bg-black p-10 text-center relative group">
                 <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-electric-teal"></div>
                 <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-electric-teal"></div>
-                <Terminal className="mx-auto text-electric-teal mb-6 animate-pulse" size={48} />
+                <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-24 h-24 mx-auto mb-6 animate-pulse" />
                 <h1 className="font-serif text-3xl text-white mb-2 leading-none">The Neutral Bridge</h1>
                 <h2 className="font-mono text-[10px] text-electric-teal mb-8 uppercase tracking-[0.3em]">Identity Verification Required</h2>
                 <button onClick={enterTerminal} className="w-full bg-electric-teal text-black font-mono font-bold py-4 px-8 rounded-sm hover:bg-white transition-all uppercase tracking-widest text-xs">
@@ -327,7 +327,19 @@ const App: React.FC = () => {
       <nav className="fixed top-8 w-full z-50 bg-matte-black/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 cursor-pointer" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth'}); }}>
-             <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-10 h-10 rounded-sm" />
+             <img 
+               src="/bridge_LOGO_3.png" 
+               alt="The Neutral Bridge" 
+               className="w-10 h-10 rounded-sm object-contain"
+               onError={(e) => {
+                 // Fallback to terminal icon if logo fails to load
+                 e.currentTarget.style.display = 'none';
+                 const fallback = document.createElement('div');
+                 fallback.className = 'w-8 h-8 bg-electric-teal flex items-center justify-center rounded-sm';
+                 fallback.innerHTML = '<svg class="w-[18px] h-[18px] text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="14" x="3" y="4" rx="2" ry="2"/><path d="m7 15 4-4-4-4m5 8h4"/></svg>';
+                 e.currentTarget.parentElement?.insertBefore(fallback, e.currentTarget);
+               }}
+             />
              <div>
                 <span className="font-serif font-bold text-lg text-white block leading-none">The Neutral Bridge</span>
                 <span className="font-mono text-[9px] text-electric-teal block mt-1 uppercase tracking-wider">Launch: Feb 18, 2026</span>
