@@ -1,8 +1,28 @@
 import React, { useState } from 'react';
 import { Section } from './Section';
 
-export const SovereignMap: React.FC = () => {
+interface SovereignMapProps {
+  onRequestAccess?: () => void;
+}
+
+export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
+
+  const handleUnlock = () => {
+    // Check if user has institutional access
+    const hasInstitutionalAccess = localStorage.getItem('institutional_verified') === 'true';
+    
+    if (hasInstitutionalAccess) {
+      setIsUnlocked(true);
+    } else {
+      // Redirect to vault registration
+      if (onRequestAccess) {
+        onRequestAccess();
+      } else {
+        window.location.hash = '#/vault';
+      }
+    }
+  };
 
   return (
     <Section 
@@ -31,7 +51,7 @@ export const SovereignMap: React.FC = () => {
             </p>
             
             <button
-              onClick={() => setIsUnlocked(true)}
+              onClick={handleUnlock}
               className="bg-electric-teal text-black font-bold px-8 py-4 rounded-sm hover:bg-white transition-all uppercase tracking-wider text-sm mx-auto"
             >
               UNLOCK FULL MAP & DATA
