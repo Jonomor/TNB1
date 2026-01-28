@@ -26,10 +26,13 @@ import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
 import { BlogPage } from './components/BlogPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import XRPMarketWidget from './components/XRPMarketWidget';
+import MarketAnalysisPage from './pages/MarketAnalysisPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
 import { trackEvent } from './utils/analytics';
 import { ArrowRight, Terminal, Menu, X, MapPin, Mail, BookOpen, Check, Mic, Activity, Loader2, PowerOff, Volume2, VolumeX } from 'lucide-react';
+
 
 // FORENSIC SCRIPTS FOR DATA LOG TICKER
 const EXHIBIT_SCRIPTS: Record<string, string> = {
@@ -155,6 +158,8 @@ const App: React.FC = () => {
   if (currentPath.includes('#/vault')) return <VaultPage />;
   if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
   if (currentPath.includes('#/blog')) return <BlogPage />;
+
+  <Route path="/market-analysis" element={<MarketAnalysisPage />}
   
   // Handle retail and institutional routes by scrolling to editions
   if (currentPath.includes('#/retail') || currentPath.includes('#/institutional')) {
@@ -402,6 +407,9 @@ const App: React.FC = () => {
             >
               {isAudioMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
+              <Link to="/market-analysis" className="nav-link">
+                 Market Analysis
+              </Link>
             </button>
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
