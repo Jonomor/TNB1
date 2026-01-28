@@ -401,15 +401,12 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
           </a>
           <div className="hidden md:flex items-center gap-8">
             <button 
-              onClick={() => setIsAudioMuted(!isAudioMuted)} 
-              className="text-white/40 hover:text-white transition-colors flex items-center gap-2"
-            >
-              {isAudioMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
-              <Link to="/market-analysis" className="nav-link">
-                 Market Analysis
-              </Link>
-            </button>
+  onClick={() => setIsAudioMuted(!isAudioMuted)} 
+  className="text-white/40 hover:text-white transition-colors flex items-center gap-2"
+>
+  {isAudioMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+  <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
+</button>
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
@@ -483,16 +480,12 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
 
       <PreOrderBridge />
 
-      <PreOrderBridge />
-
       {/* XRP Market Analysis Widget */}
       <section className="py-12 px-6 bg-matte-black border-b border-white/5">
         <div className="max-w-6xl mx-auto">
           <XRPMarketWidget />
         </div>
       </section>
-
-      <div className="bg-charcoal border-y border-white/10 py-4 relative z-20">
       
       <div className="bg-charcoal border-y border-white/10 py-4 relative z-20">
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-2 text-[10px] md:text-xs font-mono uppercase tracking-widest text-white/60">
