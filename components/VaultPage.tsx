@@ -5,24 +5,24 @@ export const VaultPage: React.FC = () => {
   // If you pass 'setView' as a prop to VaultPage:
 const handleLogout = () => {
   trackEvent('vault_logout', { category: 'Auth', label: 'Manual Logout' });
-  window.location.href = '/TNB1/'; // This forces a reload of the main site
+  window.location.href = '/'; // This forces a reload of the main site
 };
 
   const downloads = [
     { 
       title: "Q1 2026 Institutional Intelligence Briefing", 
       desc: "Includes the 2027 Activation Roadmap & Multiplier Logic (Page 8).",
-      path: "/TNB1/vault-files/NB-Institutional-Intelligence-Briefing.pdf"
+      path: "/vault-files/NB-Institutional-Intelligence-Briefing.pdf"
     },
     { 
       title: "Forensic Verification Kit (Technical Appendix)", 
       desc: "Includes Protocol 22 Tech Specs (Page 5) and Infrastructure Logs.",
-      path: "/TNB1/vault-files/NB-Verification-Kit.pdf"
+      path: "/vault-files/NB-Verification-Kit.pdf"
     },
     { 
       title: "Excel-Based Liquidity Model (V1.4)", 
       desc: "Institutional calculator for atomic settlement velocity.",
-      path: "/TNB1/vault-files/NB-Liquidity-Model.xlsx"
+      path: "/vault-files/NB-Liquidity-Model.xlsx"
     }
   ];
 
@@ -36,18 +36,17 @@ const handleLogout = () => {
             <Terminal size={18} />
             <span className="text-sm font-bold uppercase tracking-widest">Secure Uplink // Authorized Access</span>
           </div>
-          // Inside your VaultPage component
-<button 
-  onClick={() => {
-    // 1. Clear the hash from the URL
-    window.location.hash = ''; 
-    // 2. Force a reload to the landing page
-    window.location.href = 'https://jonomor.github.io/TNB1/'; 
-  }}
-  className="..." 
->
-  [ TERMINATE_SESSION ]
-</button>
+          <button 
+            onClick={() => {
+              // 1. Clear the hash from the URL
+              window.location.hash = ''; 
+              // 2. Force a reload to the landing page
+              window.location.href = 'https://theneutralbridge.com/'; 
+            }}
+            className="text-sky-400 hover:text-white transition-colors text-xs font-mono uppercase flex items-center gap-2"
+          >
+            [ TERMINATE_SESSION ] <LogOut size={14} />
+          </button>
         </div>
 
         <div className="p-6 md:p-12 space-y-12">
@@ -74,7 +73,11 @@ const handleLogout = () => {
                       <p className="text-xs text-white/50 mt-1">{item.desc}</p>
                     </div>
                   </div>
-                  <a href={item.path} download className="mt-4 md:mt-0 bg-transparent border border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-black text-[10px] font-bold py-2 px-6 transition-all uppercase text-center">
+                  <a 
+                    href={item.path} 
+                    download 
+                    className="mt-4 md:mt-0 bg-transparent border border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-black text-[10px] font-bold py-2 px-6 transition-all uppercase text-center"
+                  >
                     Download
                   </a>
                 </div>
