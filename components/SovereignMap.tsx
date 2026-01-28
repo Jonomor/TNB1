@@ -32,7 +32,7 @@ export const SovereignMap: React.FC<SovereignMapProps> = ({ onRequestAccess, tes
       className="bg-charcoal border-y border-white/5"
     >
       <p className="text-center text-white/60 mb-12 max-w-3xl mx-auto">
-        Real-time schematic of the "Neutral Bridge" intersections with major Central Bank Digital Currencies (CBDCs).
+        Real-time schematic of the "Neutral Bridge" intersections with major (CBDCs).
       </p>
 
       {/* Preview Mode - Locked */}
