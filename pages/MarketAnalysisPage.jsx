@@ -11,7 +11,6 @@ const MarketAnalysisPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [selectedTimeframe, setSelectedTimeframe] = useState('24h');
 
   useEffect(() => {
     loadData();
