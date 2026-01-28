@@ -193,8 +193,7 @@ const App: React.FC = () => {
     setNewsletterStatus('joining');
     
     try {
-      // Send to Formspree (replace with your Formspree form ID)
-      const response = await fetch('https://formspree.io/f/xqeqorqy, {
+      const response = await fetch('https://formspree.io/f/xqeqorqy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
