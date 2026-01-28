@@ -34,7 +34,7 @@ const handleLogout = () => {
         <div className="flex items-center justify-between border-b border-sky-400/30 bg-sky-400/5 px-6 py-3">
           <div className="flex items-center gap-3">
             <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
-            <span className="text-sm font-bold uppercase tracking-widest text-sky-400">Authorized Access</span>
+            <span className="text-sm font-bold uppercase tracking-widest text-sky-400">Authorized</span>
           </div>
           <button 
             onClick={() => {
@@ -61,7 +61,7 @@ const handleLogout = () => {
           {/* Download Grid */}
           <section>
             <h2 className="text-sky-400 text-sm font-bold mb-6 uppercase tracking-widest border-b border-sky-400/20 pb-2 w-fit flex items-center gap-2">
-              <Download size={16} /> 1. Institutional Suite Assets
+              <Download size={16} /> Institutional Suite
             </h2>
             <div className="grid gap-4">
               {downloads.map((item, i) => (
