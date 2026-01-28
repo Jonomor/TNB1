@@ -155,14 +155,13 @@ const App: React.FC = () => {
     }
   }, []);
 
-  if (currentPath.includes('#/vault')) return <VaultPage />;
-  if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
-  if (currentPath.includes('#/blog')) return <BlogPage />;
-
-  <Route path="/market-analysis" element={<MarketAnalysisPage />}
+if (currentPath.includes('#/vault')) return <VaultPage />;
+if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
+if (currentPath.includes('#/blog')) return <BlogPage />;
+if (currentPath.includes('#/market-analysis')) return <MarketAnalysisPage />;
   
-  // Handle retail and institutional routes by scrolling to editions
-  if (currentPath.includes('#/retail') || currentPath.includes('#/institutional')) {
+// Handle retail and institutional routes by scrolling to editions
+if (currentPath.includes('#/retail') || currentPath.includes('#/institutional')) {
     setTimeout(() => {
       const editionsSection = document.getElementById('editions');
       if (editionsSection) editionsSection.scrollIntoView({ behavior: 'smooth' });
@@ -415,6 +414,7 @@ const App: React.FC = () => {
             <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
+            <a href="#/market-analysis" onClick={(e) => { e.preventDefault(); window.location.hash = '#/market-analysis'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Market Analysis</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
           <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
@@ -483,6 +483,17 @@ const App: React.FC = () => {
 
       <PreOrderBridge />
 
+      <PreOrderBridge />
+
+      {/* XRP Market Analysis Widget */}
+      <section className="py-12 px-6 bg-matte-black border-b border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <XRPMarketWidget />
+        </div>
+      </section>
+
+      <div className="bg-charcoal border-y border-white/10 py-4 relative z-20">
+      
       <div className="bg-charcoal border-y border-white/10 py-4 relative z-20">
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-2 text-[10px] md:text-xs font-mono uppercase tracking-widest text-white/60">
           <div className="flex items-center gap-2"><Check size={12} className="text-electric-teal" /> Rated #1 Financial Manuscript 2026</div>
