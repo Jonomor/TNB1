@@ -556,7 +556,7 @@ const App: React.FC = () => {
       </Section>
 
       <SystemArchitecture />
-      <SovereignMap />
+      <SovereignMap testMode={true} />
 
       {/* Editions */}
       <Section id="editions" label="Choose Your Perspective">
