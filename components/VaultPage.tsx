@@ -38,9 +38,9 @@ const handleLogout = () => {
           </div>
           <button 
             onClick={() => {
-              // 1. Clear the hash from the URL
+              // Mark as already entered so terminal lock doesn't show
+              localStorage.setItem('tnb_entered', 'true');
               window.location.hash = ''; 
-              // 2. Force a reload to the landing page
               window.location.href = 'https://theneutralbridge.com/'; 
             }}
             className="text-sky-400 hover:text-white transition-colors text-xs font-mono uppercase flex items-center gap-2"
