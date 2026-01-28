@@ -45,7 +45,7 @@ const handleLogout = () => {
             }}
             className="text-sky-400 hover:text-white transition-colors text-xs font-mono uppercase flex items-center gap-2"
           >
-            [ TERMINATE_SESSION ] <LogOut size={14} />
+            [TERMINATE_SESSION] <LogOut size={14} />
           </button>
         </div>
 
