@@ -39,9 +39,12 @@ class XRPMarketService {
   }
 
   async fetchCoinGecko() {
-    const response = await fetch(
-      'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false'
-    );
+  const apiKey = import.meta.env.VITE_COINGECKO_API_KEY;
+  const url = apiKey 
+    ? `https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=${apiKey}`
+    : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
+  
+  const response = await fetch(url);
     const data = await response.json();
     
     return {
@@ -102,11 +105,11 @@ class XRPMarketService {
     }
   }
 
-  async fetchCryptoNews() {
-    // Using CryptoPanic API (free tier available)
-    const response = await fetch(
-      'https://cryptopanic.com/api/v1/posts/?auth_token=YOUR_TOKEN&currencies=XRP&public=true'
-    );
+ async fetchCryptoNews() {
+  const token = import.meta.env.VITE_CRYPTOPANIC_API_KEY || 'YOUR_TOKEN';
+  const response = await fetch(
+    `https://cryptopanic.com/api/v1/posts/?auth_token=${token}&currencies=XRP&public=true`
+  );
     const data = await response.json();
     
     return data.results.map(item => ({
