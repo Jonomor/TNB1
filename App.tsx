@@ -58,7 +58,10 @@ const App: React.FC = () => {
 
   // Secure Uplink & Forensic Viewer State
   const [isUplinkActive, setIsUplinkActive] = useState(false);
-  const [isTerminalLocked, setIsTerminalLocked] = useState(true);
+  const [isTerminalLocked, setIsTerminalLocked] = useState(() => {
+    // Check if user already entered in this session
+    return localStorage.getItem('tnb_entered') !== 'true';
+  });
   const [activeExhibit, setActiveExhibit] = useState<string | null>(null);
   const [activeScript, setActiveScript] = useState<string>("");
   const [isAudioMuted, setIsAudioMuted] = useState(false);
@@ -112,7 +115,14 @@ const App: React.FC = () => {
     trackEvent('uplink_disconnect', { category: 'System', label: 'Manual Kill Switch' });
   };
 
+  const goToHome = () => {
+    setIsTerminalLocked(false); // Bypass lock screen
+    window.location.hash = '';
+    window.location.reload();
+  };
+
   const enterTerminal = () => {
+    localStorage.setItem('tnb_entered', 'true'); // Remember they entered
     setIsTerminalLocked(false);
     playForensicAudio('greeting');
     trackEvent('terminal_entry', { category: 'System', label: 'Uplink Authorized' });
@@ -599,20 +609,25 @@ const App: React.FC = () => {
         <div className="max-w-xl mx-auto text-center px-6">
           <h2 className="font-serif text-3xl mb-2 text-white">Stay Ahead of the Reset</h2>
           <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <form 
+            action="https://formspree.io/f/YOUR_FORM_ID"
+            method="POST"
+            className="flex flex-col sm:flex-row gap-4"
+          >
             <input 
-              type="email" 
-              placeholder="Enter your email" 
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              required
               className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
             />
-            <Button variant="primary" onClick={handleJoinNewsletter} disabled={newsletterStatus !== 'idle'}>
-              {newsletterStatus === 'idle' && "Join The Bridge"}
-              {newsletterStatus === 'joining' && <Loader2 size={16} className="animate-spin" />}
-              {newsletterStatus === 'joined' && "Access Granted"}
-            </Button>
-          </div>
+            <button 
+              type="submit"
+              className="bg-electric-teal text-black font-bold px-8 py-3 rounded-sm hover:bg-white transition-all uppercase tracking-wider text-sm"
+            >
+              Join The Bridge
+            </button>
+          </form>
         </div>
       </Section>
 
