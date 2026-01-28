@@ -24,6 +24,7 @@ import { FAQ } from './components/FAQ';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { VaultRegistrationModal } from './components/VaultRegistrationModal';
 import { VaultPage } from './components/VaultPage';
+import { BlogPage } from './components/BlogPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
@@ -140,6 +141,7 @@ const App: React.FC = () => {
 
   if (currentPath.includes('#/vault')) return <VaultPage />;
   if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
+  if (currentPath.includes('#/blog')) return <BlogPage />;
 
   const assetBase = getAssetBase();
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -161,13 +163,41 @@ const App: React.FC = () => {
     scrollToSection(id);
   };
 
-  const handleJoinNewsletter = () => {
+  const handleJoinNewsletter = async () => {
+    if (!newsletterEmail || !newsletterEmail.includes('@')) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
     setNewsletterStatus('joining');
-    setTimeout(() => {
-      setNewsletterStatus('joined');
-      setNewsletterEmail('');
-      setTimeout(() => setNewsletterStatus('idle'), 3000);
-    }, 1500);
+    
+    try {
+      // Send to Formspree (replace with your Formspree form ID)
+      const response = await fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: newsletterEmail,
+          _subject: 'New Newsletter Signup - The Neutral Bridge',
+          source: 'theneutralbridge.com'
+        })
+      });
+      
+      if (response.ok) {
+        setNewsletterStatus('joined');
+        setNewsletterEmail('');
+        trackEvent('newsletter_signup', { category: 'Engagement', label: newsletterEmail });
+        setTimeout(() => setNewsletterStatus('idle'), 3000);
+      } else {
+        throw new Error('Failed to submit');
+      }
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
+      alert('Something went wrong. Please try again.');
+      setNewsletterStatus('idle');
+    }
   };
 
   const pricingTiers: PricingTier[] = [
@@ -354,6 +384,7 @@ const App: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-widest">{isAudioMuted ? 'Muted' : 'Live Feed'}</span>
             </button>
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
+            <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
