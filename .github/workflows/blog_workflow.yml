@@ -1,0 +1,44 @@
+name: Automated Blog Posting
+
+on:
+  schedule:
+    # Post 2x per week: Monday and Thursday at 9am EST
+    - cron: '0 14 * * 1'  # Monday 9am EST (2pm UTC)
+    - cron: '0 14 * * 4'  # Thursday 9am EST (2pm UTC)
+  
+  workflow_dispatch:  # Manual trigger
+    inputs:
+      topic:
+        description: 'Blog post topic (optional)'
+        required: false
+        type: string
+
+jobs:
+  post-blog:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install @google/genai
+      
+      - name: Generate and publish blog post
+        run: npx tsx blog_poster.js
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BLOG_TOPIC: ${{ inputs.topic || secrets.BLOG_TOPIC || 'XRP and the 2027 Financial Reset' }}
+      
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add blog-posts.json src/components/BlogPage.tsx
+          git commit -m "🤖 Auto-published blog post: $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push
