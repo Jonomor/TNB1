@@ -155,6 +155,14 @@ const App: React.FC = () => {
   if (currentPath.includes('#/vault')) return <VaultPage />;
   if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
   if (currentPath.includes('#/blog')) return <BlogPage />;
+  
+  // Handle retail and institutional routes by scrolling to editions
+  if (currentPath.includes('#/retail') || currentPath.includes('#/institutional')) {
+    setTimeout(() => {
+      const editionsSection = document.getElementById('editions');
+      if (editionsSection) editionsSection.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
 
   const assetBase = getAssetBase();
   const [legalModalOpen, setLegalModalOpen] = useState(false);
