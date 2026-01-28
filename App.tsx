@@ -585,7 +585,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <img src="/bridge_logo.png" alt="The Neutral Bridge" className="w-6 h-6" />
+              <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
               <span className="font-serif font-bold tracking-tight text-white text-xl">The Neutral Bridge</span>
             </div>
             <div className="flex flex-col gap-2 text-sm text-white/50">
