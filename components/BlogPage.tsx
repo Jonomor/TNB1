@@ -57,7 +57,10 @@ export const BlogPage: React.FC = () => {
       <div className="bg-black border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <button 
-            onClick={() => window.location.href = '/'} 
+            onClick={() => {
+              localStorage.setItem('tnb_entered', 'true');
+              window.location.href = '/';
+            }} 
             className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
           >
             <ArrowLeft size={18} />
@@ -140,7 +143,7 @@ export const BlogPage: React.FC = () => {
           <h2 className="font-serif text-3xl mb-4 text-white">Stay Ahead of the Reset</h2>
           <p className="text-white/60 mb-8">Get weekly forensic analysis delivered to your inbox.</p>
           <form 
-            action="https://formspree.io/f/xqeqorqy" 
+            action="https://formspree.io/f/YOUR_FORM_ID" 
             method="POST"
             className="flex flex-col sm:flex-row gap-4"
           >
