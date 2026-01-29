@@ -75,7 +75,7 @@ const XRPMarketWidget = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800 rounded-lg shadow-xl">
+    <div className="bg-gradient-to-br from-matte-black to-charcoal border border-white/10 rounded-lg shadow-xl">
       {/* Compact View */}
       <div 
         className="p-6 cursor-pointer hover:bg-gray-800/30 transition-colors"
@@ -83,8 +83,9 @@ const XRPMarketWidget = () => {
       >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center">
-              <Activity className="text-white" size={20} />
+            <div className="w-10 h-10 bg-gradient-to-br from-electric-teal to-white/80 rounded-full flex items-center justify-center">
+              <Activity className="text-black" size={20} />
+              
             </div>
             <div>
               <h3 className="text-lg font-semibold text-white">XRP Live Analysis</h3>
@@ -201,7 +202,7 @@ const XRPMarketWidget = () => {
               <h4 className="text-sm font-semibold text-gray-300">Recent News</h4>
               <a 
                 href="#/market-analysis" 
-                className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                className="text-xs text-electric-teal hover:text-white flex items-center gap-1"
               >
                 View All <ExternalLink size={12} />
               </a>
@@ -217,7 +218,7 @@ const XRPMarketWidget = () => {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <p className="text-sm text-white group-hover:text-blue-400 transition-colors line-clamp-2">
+                      <p className="text-sm text-white group-hover:text-electric-teal transition-colors line-clamp-2">
                         {item.title}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
@@ -231,7 +232,7 @@ const XRPMarketWidget = () => {
                         </span>
                       </div>
                     </div>
-                    <ExternalLink size={14} className="text-gray-600 group-hover:text-blue-400 flex-shrink-0" />
+                    <ExternalLink size={14} className="text-gray-600 group-hover:text-electric-teal flex-shrink-0" />
                   </div>
                 </a>
               ))}
@@ -239,7 +240,7 @@ const XRPMarketWidget = () => {
           </div>
 
           {/* Last Update */}
-          <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-800">
+          <div className="text-xs text-electric-teal hover:text-white flex items-center gap-1"
             Last updated: {new Date(data?.metadata.lastUpdate).toLocaleTimeString()}
           </div>
         </div>
