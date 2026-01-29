@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, ChevronDown, ChevronUp, ExternalLink, Activity } from 'lucide-react';
-import xrpMarketService from '../src/services/xrpMarketService.js';
+import xrpMarketService from './xrpMarketService.js';
 
 const XRPMarketWidget = () => {
   const [data, setData] = useState(null);
