@@ -22,9 +22,8 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
-          CRYPTOPANIC_API_KEY: ${{ secrets.CRYPTOPANIC_API_KEY }}
         run: |
-          cat > generate-post.js << 'SCRIPT_EOF'
+          cat > generate-post.cjs << 'SCRIPT_EOF'
           const https = require('https');
           const fs = require('fs');
 
@@ -60,7 +59,7 @@ jobs:
             try {
               const coingeckoKey = process.env.COINGECKO_API_KEY || '';
               const priceUrl = coingeckoKey 
-                ? `https://api.coingecko.com/api/v3/coins/ripple?x_cg_demo_api_key=${coingeckoKey}`
+                ? 'https://api.coingecko.com/api/v3/coins/ripple?x_cg_demo_api_key=' + coingeckoKey
                 : 'https://api.coingecko.com/api/v3/coins/ripple';
               
               const priceData = await fetch(priceUrl);
@@ -69,7 +68,7 @@ jobs:
               const marketCap = priceData.market_data.market_cap.usd;
               const volume = priceData.market_data.total_volume.usd;
 
-             const prompt = 'CURRENT MARKET DATA:\n' +
+              const prompt = 'CURRENT MARKET DATA:\n' +
                 'XRP Price: $' + price.toFixed(4) + '\n' +
                 '24h Change: ' + (change24h > 0 ? '+' : '') + change24h.toFixed(2) + '%\n' +
                 'Market Cap: $' + (marketCap / 1e9).toFixed(2) + 'B\n' +
@@ -77,7 +76,7 @@ jobs:
                 'Write a 600-800 word technical analysis for The Neutral Bridge blog. Focus on XRP Ledger infrastructure and systemic implications. Maintain forensic, engineering tone. Avoid price predictions. Include concrete technical details.';
 
               const geminiResponse = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
                 {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -113,7 +112,7 @@ jobs:
           generatePost();
           SCRIPT_EOF
 
-          node generate-post.js
+          node generate-post.cjs
 
       - name: Commit and Push
         run: |
