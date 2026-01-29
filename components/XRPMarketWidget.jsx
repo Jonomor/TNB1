@@ -240,7 +240,7 @@ const XRPMarketWidget = () => {
           </div>
 
           {/* Last Update */}
-          <div className="text-xs text-electric-teal hover:text-white flex items-center gap-1"
+          <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-800">
             Last updated: {new Date(data?.metadata.lastUpdate).toLocaleTimeString()}
           </div>
         </div>
