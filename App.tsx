@@ -138,10 +138,13 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    const handleLocationChange = () => setCurrentPath(window.location.hash);
-    window.addEventListener('hashchange', handleLocationChange);
-    return () => window.removeEventListener('hashchange', handleLocationChange);
-  }, []);
+  const handleLocationChange = () => {
+    setCurrentPath(window.location.hash);
+    window.scrollTo(0, 0); // Scroll to top on route change
+  };
+  window.addEventListener('hashchange', handleLocationChange);
+  return () => window.removeEventListener('hashchange', handleLocationChange);
+}, []);
 
   // Check if user is returning from vault/blog/privacy (but not on true first visit)
   useEffect(() => {
@@ -410,8 +413,8 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
-            <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; window.location.reload(); }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
-            <a href="#/market-analysis" onClick={(e) => { e.preventDefault(); window.location.hash = '#/market-analysis'; window.location.reload(); }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Market Analysis</a>
+            <a href="#/blog" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
+            <a href="#/market-analysis" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Market Analysis</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
           <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
