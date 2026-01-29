@@ -35,15 +35,11 @@ jobs:
           async function getMarketContext() {
             try {
               // Get price data from CoinGecko
-              const priceResponse = await fetch(
-                'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false'
-              );
+              const priceResponse = await fetch('https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=${{ secrets.COINGECKO_API_KEY }}');
               const priceData = await priceResponse.json();
               
               // Get news data (simplified - in production, aggregate from multiple sources)
-              const newsResponse = await fetch(
-                'https://cryptopanic.com/api/v1/posts/?auth_token=YOUR_TOKEN&currencies=XRP&public=true'
-              );
+              const newsResponse = await fetch('https://cryptopanic.com/api/v1/posts/?auth_token=${{ secrets.CRYPTOPANIC_API_KEY }}&currencies=XRP&public=true');
               const newsData = await newsResponse.json();
               
               // Calculate sentiment
