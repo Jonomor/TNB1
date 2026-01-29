@@ -44,7 +44,7 @@ jobs:
                   try {
                     resolve(JSON.parse(data));
                   } catch (e) {
-                    resolve(data);
+                    reject(new Error('Failed to parse JSON: ' + data.substring(0, 200)));
                   }
                 });
               });
@@ -57,16 +57,28 @@ jobs:
 
           async function generatePost() {
             try {
+              console.log('Fetching market data...');
               const coingeckoKey = process.env.COINGECKO_API_KEY || '';
               const priceUrl = coingeckoKey 
-                ? 'https://api.coingecko.com/api/v3/coins/ripple?x_cg_demo_api_key=' + coingeckoKey
-                : 'https://api.coingecko.com/api/v3/coins/ripple';
+                ? 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=' + coingeckoKey
+                : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
+              
+              console.log('API URL:', priceUrl.replace(coingeckoKey, 'HIDDEN'));
               
               const priceData = await fetch(priceUrl);
+              console.log('Received data, checking structure...');
+              
+              if (!priceData || !priceData.market_data) {
+                throw new Error('Invalid API response structure. Response: ' + JSON.stringify(priceData).substring(0, 500));
+              }
+
               const price = priceData.market_data.current_price.usd;
               const change24h = priceData.market_data.price_change_percentage_24h;
               const marketCap = priceData.market_data.market_cap.usd;
               const volume = priceData.market_data.total_volume.usd;
+
+              console.log('Market data retrieved successfully');
+              console.log('Price:', price, 'Change:', change24h);
 
               const prompt = 'CURRENT MARKET DATA:\n' +
                 'XRP Price: $' + price.toFixed(4) + '\n' +
@@ -75,6 +87,8 @@ jobs:
                 'Volume: $' + (volume / 1e9).toFixed(2) + 'B\n\n' +
                 'Write a 600-800 word technical analysis for The Neutral Bridge blog. Focus on XRP Ledger infrastructure and systemic implications. Maintain forensic, engineering tone. Avoid price predictions. Include concrete technical details.';
 
+              console.log('Calling Gemini API...');
+              
               const geminiResponse = await fetch(
                 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
                 {
@@ -86,6 +100,10 @@ jobs:
                   })
                 }
               );
+
+              if (!geminiResponse || !geminiResponse.candidates || !geminiResponse.candidates[0]) {
+                throw new Error('Invalid Gemini API response');
+              }
 
               const content = geminiResponse.candidates[0].content.parts[0].text;
               const date = new Date().toISOString().split('T')[0];
@@ -102,9 +120,10 @@ jobs:
               const dir = './blog_posts';
               if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
               fs.writeFileSync(dir + '/market-analysis-' + date + '.md', post);
-              console.log('Post generated successfully');
+              console.log('Post generated successfully at:', dir + '/market-analysis-' + date + '.md');
             } catch (error) {
-              console.error('Error:', error);
+              console.error('Error details:', error.message);
+              console.error('Stack:', error.stack);
               process.exit(1);
             }
           }
