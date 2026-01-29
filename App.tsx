@@ -422,7 +422,7 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
         
         {/* MOBILE DROPDOWN */}
         {mobileMenuOpen && (
-          {mobileMenuOpen && (
+          
   <div className="md:hidden bg-black border-t border-white/10 p-6 flex flex-col gap-6 animate-in slide-in-from-top duration-300">
     <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-lg font-serif text-white/80">The Architect</a>
     <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; window.location.reload(); setMobileMenuOpen(false); }} className="text-lg font-serif text-white/80">Blog</a>
