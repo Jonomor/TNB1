@@ -2,9 +2,8 @@ name: Generate Blog Post with Market Context
 
 on:
   schedule:
-    # Run three times per week: Monday, Wednesday, Friday at 10 AM UTC
     - cron: '0 10 * * 1,3,5'
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
   generate-and-post:
@@ -19,180 +18,107 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Fetch Market Data and Generate Post
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+          CRYPTOPANIC_API_KEY: ${{ secrets.CRYPTOPANIC_API_KEY }}
         run: |
-          npm install
-          # If not using package.json, install specific dependencies:
-          # npm install node-fetch
+          cat > generate-post.js << 'SCRIPT_EOF'
+          const https = require('https');
+          const fs = require('fs');
 
-      - name: Fetch Market Context
-        id: market-context
-        run: |
-          node << 'EOF'
-          const fetch = require('node-fetch');
-          
-          // Fetch live XRP market data
-          async function getMarketContext() {
+          function fetch(url, options = {}) {
+            return new Promise((resolve, reject) => {
+              const urlObj = new URL(url);
+              const requestOptions = {
+                hostname: urlObj.hostname,
+                path: urlObj.pathname + urlObj.search,
+                method: options.method || 'GET',
+                headers: options.headers || {}
+              };
+
+              const req = https.request(requestOptions, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                  try {
+                    resolve(JSON.parse(data));
+                  } catch (e) {
+                    resolve(data);
+                  }
+                });
+              });
+
+              req.on('error', reject);
+              if (options.body) req.write(options.body);
+              req.end();
+            });
+          }
+
+          async function generatePost() {
             try {
-              // Get price data from CoinGecko
-              const priceResponse = await fetch('https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=${{ secrets.COINGECKO_API_KEY }}');
-              const priceData = await priceResponse.json();
+              const coingeckoKey = process.env.COINGECKO_API_KEY || '';
+              const priceUrl = coingeckoKey 
+                ? `https://api.coingecko.com/api/v3/coins/ripple?x_cg_demo_api_key=${coingeckoKey}`
+                : 'https://api.coingecko.com/api/v3/coins/ripple';
               
-              // Get news data (simplified - in production, aggregate from multiple sources)
-              const newsResponse = await fetch('https://cryptopanic.com/api/v1/posts/?auth_token=${{ secrets.CRYPTOPANIC_API_KEY }}&currencies=XRP&public=true');
-              const newsData = await newsResponse.json();
-              
-              // Calculate sentiment
-              const positive = newsData.results.filter(n => 
-                n.votes.positive > n.votes.negative
-              ).length;
-              const negative = newsData.results.filter(n => 
-                n.votes.negative > n.votes.positive
-              ).length;
-              const sentimentScore = ((positive - negative) / newsData.results.length) * 100;
-              
-              // Build context
+              const priceData = await fetch(priceUrl);
               const price = priceData.market_data.current_price.usd;
               const change24h = priceData.market_data.price_change_percentage_24h;
               const marketCap = priceData.market_data.market_cap.usd;
               const volume = priceData.market_data.total_volume.usd;
-              const rank = priceData.market_cap_rank;
-              
-              const sentimentLabel = sentimentScore > 20 ? 'Bullish' : 
-                                    sentimentScore < -20 ? 'Bearish' : 'Neutral';
-              
-              // Create prompt context
-              const promptContext = `CURRENT MARKET CONTEXT (${new Date().toLocaleDateString()}):
-XRP is trading at $${price.toFixed(4)}, ${change24h > 0 ? 'up' : 'down'} ${Math.abs(change24h).toFixed(2)}% in the last 24 hours.
-Market cap: $${(marketCap / 1e9).toFixed(2)}B (Rank #${rank}).
-24h volume: $${(volume / 1e9).toFixed(2)}B.
-Market sentiment: ${sentimentLabel} (based on recent news analysis).
 
-When incorporating this data into your engineering analysis, maintain The Neutral Bridge's forensic tone. Reference specific metrics when relevant to technical infrastructure discussions. Avoid speculative price predictions; focus on systemic implications.`;
+             const prompt = 'CURRENT MARKET DATA:\n' +
+                'XRP Price: $' + price.toFixed(4) + '\n' +
+                '24h Change: ' + (change24h > 0 ? '+' : '') + change24h.toFixed(2) + '%\n' +
+                'Market Cap: $' + (marketCap / 1e9).toFixed(2) + 'B\n' +
+                'Volume: $' + (volume / 1e9).toFixed(2) + 'B\n\n' +
+                'Write a 600-800 word technical analysis for The Neutral Bridge blog. Focus on XRP Ledger infrastructure and systemic implications. Maintain forensic, engineering tone. Avoid price predictions. Include concrete technical details.';
 
-              // Output environment variables for next steps
-              console.log(`MARKET_CONTEXT<<EOF`);
-              console.log(promptContext);
-              console.log('EOF');
-              console.log(`XRP_PRICE=${price.toFixed(4)}`);
-              console.log(`XRP_CHANGE=${change24h.toFixed(2)}`);
-              console.log(`MARKET_CAP=${(marketCap / 1e9).toFixed(2)}`);
-              console.log(`SENTIMENT=${sentimentLabel}`);
+              const geminiResponse = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+                  })
+                }
+              );
+
+              const content = geminiResponse.candidates[0].content.parts[0].text;
+              const date = new Date().toISOString().split('T')[0];
               
+              const post = '---\n' +
+                'title: "XRP Market Analysis - ' + date + '"\n' +
+                'date: ' + date + '\n' +
+                'author: "The Neutral Bridge"\n' +
+                'tags: ["XRP", "Market Analysis"]\n' +
+                '---\n\n' +
+                content +
+                '\n';
+
+              const dir = './blog_posts';
+              if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+              fs.writeFileSync(dir + '/market-analysis-' + date + '.md', post);
+              console.log('Post generated successfully');
             } catch (error) {
-              console.error('Failed to fetch market data:', error);
-              // Fallback context
-              console.log(`MARKET_CONTEXT=CURRENT MARKET CONTEXT: Live data temporarily unavailable. Focus on fundamental infrastructure analysis.`);
-              console.log(`XRP_PRICE=N/A`);
-              console.log(`DATA_QUALITY=Low`);
+              console.error('Error:', error);
+              process.exit(1);
             }
           }
-          
-          getMarketContext();
-          EOF
 
-      - name: Generate Blog Post with Gemini
-        id: generate-post
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          node << 'EOF'
-          const fetch = require('node-fetch');
-          
-          async function generatePost() {
-            const marketContext = process.env.MARKET_CONTEXT || '';
-            
-            // Engineering-focused prompts that rotate
-            const prompts = [
-              `${marketContext}
-
-Analyze a specific technical aspect of XRP Ledger's consensus mechanism or cross-border settlement infrastructure. Focus on engineering design decisions, not price speculation. Include concrete examples and technical metrics where relevant. Write in The Neutral Bridge's forensic style—precise, measured, institutional. 600-800 words.`,
-
-              `${marketContext}
-
-Examine Ripple's technology partnerships or infrastructure integrations from an engineering perspective. Discuss technical challenges, solutions, and systemic implications. Avoid marketing language; maintain analytical distance. Include architectural considerations. 600-800 words.`,
-
-              `${marketContext}
-
-Explore the technical economics of XRP as a bridge asset in payment corridors. Analyze liquidity mechanics, settlement speeds, fee structures from an engineering standpoint. Reference current metrics where relevant but avoid price predictions. 600-800 words.`
-            ];
-            
-            // Rotate through prompts based on day of year
-            const promptIndex = Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % prompts.length;
-            const selectedPrompt = prompts[promptIndex];
-            
-            // Call Gemini API
-            const response = await fetch(
-              'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents: [{
-                    parts: [{ text: selectedPrompt }]
-                  }],
-                  generationConfig: {
-                    temperature: 0.7,
-                    topK: 40,
-                    topP: 0.95,
-                    maxOutputTokens: 1024,
-                  }
-                })
-              }
-            );
-            
-            const data = await response.json();
-            const generatedText = data.candidates[0].content.parts[0].text;
-            
-            // Create filename with date
-            const date = new Date().toISOString().split('T')[0];
-            const filename = `blog-post-${date}.md`;
-            
-            // Write to file
-            const fs = require('fs');
-            const blogDir = './src/blog/posts';
-            if (!fs.existsSync(blogDir)) {
-              fs.mkdirSync(blogDir, { recursive: true });
-            }
-            
-            const frontmatter = `---
-title: "Technical Analysis - ${date}"
-date: ${date}
-author: "The Neutral Bridge Analysis Team"
-tags: ["XRP", "Technical Analysis", "Infrastructure"]
-marketContext:
-  price: "${process.env.XRP_PRICE}"
-  change24h: "${process.env.XRP_CHANGE}"
-  sentiment: "${process.env.SENTIMENT}"
----
-
-`;
-            
-            fs.writeFileSync(`${blogDir}/${filename}`, frontmatter + generatedText);
-            
-            console.log(`POST_FILENAME=${filename}`);
-            console.log(`POST_CREATED=true`);
-          }
-          
           generatePost();
-          EOF
+          SCRIPT_EOF
+
+          node generate-post.js
 
       - name: Commit and Push
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Auto-generate blog post with market context [$(date +'%Y-%m-%d')]" || echo "No changes to commit"
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add blog_posts/
+          git commit -m "Auto-generate market analysis [$(date +'%Y-%m-%d')]" || echo "No changes"
           git push
-
-      - name: Create Summary
-        run: |
-          echo "## Blog Post Generated 🚀" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Market Context:**" >> $GITHUB_STEP_SUMMARY
-          echo "- XRP Price: \$${{ env.XRP_PRICE }}" >> $GITHUB_STEP_SUMMARY
-          echo "- 24h Change: ${{ env.XRP_CHANGE }}%" >> $GITHUB_STEP_SUMMARY
-          echo "- Market Cap: \$${{ env.MARKET_CAP }}B" >> $GITHUB_STEP_SUMMARY
-          echo "- Sentiment: ${{ env.SENTIMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Post committed to repository." >> $GITHUB_STEP_SUMMARY
