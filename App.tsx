@@ -146,18 +146,22 @@ const App: React.FC = () => {
   return () => window.removeEventListener('hashchange', handleLocationChange);
 }, []);
 
-  // Check if user is returning from vault/blog/privacy (but not on true first visit)
-  useEffect(() => {
-    // Only bypass terminal if explicitly set AND page was just loaded (not refreshed)
-    if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_NAVIGATE) {
-      // This is a true first page load - show terminal
-      localStorage.removeItem('tnb_entered');
-    } else if (localStorage.getItem('tnb_entered') === 'true') {
-      // User navigated back from another page
-      setIsTerminalLocked(false);
-    }
-  }, []);
-
+ useEffect(() => {
+  // Check if user has already entered before
+  const hasEntered = localStorage.getItem('tnb_entered') === 'true';
+  
+  // Only show terminal on TRUE first visit (never been to site before)
+  if (hasEntered) {
+    setIsTerminalLocked(false);
+  }
+  
+  // If coming from hash route, don't show terminal
+  if (window.location.hash) {
+    localStorage.setItem('tnb_entered', 'true');
+    setIsTerminalLocked(false);
+  }
+}, []);
+  
 if (currentPath.includes('#/vault')) return <VaultPage />;
 if (currentPath.includes('#/privacy')) return <PrivacyPolicy />;
 if (currentPath.includes('#/blog')) return <BlogPage />;
