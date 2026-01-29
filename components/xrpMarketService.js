@@ -135,9 +135,11 @@ class XRPMarketService {
   async fetchRSSFeeds() {
     // Aggregate from multiple RSS feeds
     const feeds = [
-      'https://u.today/rss/xrp',
-      // Add more XRP-focused RSS feeds
-    ];
+  'https://u.today/rss/xrp',
+  'https://cointelegraph.com/rss/tag/ripple',
+  'https://cryptoslate.com/coins/xrp/feed/',
+  'https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml&_website=coindesk'
+];
 
     const allItems = [];
     
