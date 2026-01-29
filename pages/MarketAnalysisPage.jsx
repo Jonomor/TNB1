@@ -115,9 +115,15 @@ const MarketAnalysisPage = () => {
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">XRP Market Analysis</h1>
-              <p className="text-gray-400">Real-time institutional-grade market intelligence</p>
-            </div>
+  <button 
+    onClick={() => window.location.hash = '#'}
+    className="text-sm text-electric-teal hover:text-white mb-3 flex items-center gap-2"
+  >
+    ← Back to Home
+  </button>
+  <h1 className="text-3xl font-bold mb-2">XRP Market Analysis</h1>
+  <p className="text-gray-400">Real-time institutional-grade market intelligence</p>
+</div>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setAutoRefresh(!autoRefresh)}
