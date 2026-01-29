@@ -413,8 +413,8 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
             <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">The Architect</a>
             <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Analysis</a>
             <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Pricing</a>
-            <a href="#/blog" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
-            <a href="#/market-analysis" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Market Analysis</a>
+            <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; window.location.reload(); }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Blog</a>
+            <a href="#/market-analysis" onClick={(e) => { e.preventDefault(); window.location.hash = '#/market-analysis'; window.location.reload(); }} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Market Analysis</a>
             <Button variant="primary" className="h-10 px-6 text-xs" onClick={() => scrollToSection('pricing')}>Order Now</Button>
           </div>
           <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
@@ -422,11 +422,14 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
         
         {/* MOBILE DROPDOWN */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-black border-t border-white/10 p-6 flex flex-col gap-6 animate-in slide-in-from-top duration-300">
-            <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-lg font-serif text-white/80">The Architect</a>
-            <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-lg font-serif text-white/80">Analysis</a>
-            <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-lg font-serif text-white/80">Pricing</a>
-            <Button variant="primary" onClick={() => scrollToSection('pricing')}>Order Now</Button>
+          {mobileMenuOpen && (
+  <div className="md:hidden bg-black border-t border-white/10 p-6 flex flex-col gap-6 animate-in slide-in-from-top duration-300">
+    <a href="#about" onClick={(e) => handleNavClick(e, 'about')} className="text-lg font-serif text-white/80">The Architect</a>
+    <a href="#/blog" onClick={(e) => { e.preventDefault(); window.location.hash = '#/blog'; window.location.reload(); setMobileMenuOpen(false); }} className="text-lg font-serif text-white/80">Blog</a>
+    <a href="#/market-analysis" onClick={(e) => { e.preventDefault(); window.location.hash = '#/market-analysis'; window.location.reload(); setMobileMenuOpen(false); }} className="text-lg font-serif text-white/80">Market Analysis</a>
+    <a href="#editions" onClick={(e) => handleNavClick(e, 'editions')} className="text-lg font-serif text-white/80">Analysis</a>
+    <a href="#pricing" onClick={(e) => handleNavClick(e, 'pricing')} className="text-lg font-serif text-white/80">Pricing</a>
+    <Button variant="primary" onClick={() => scrollToSection('pricing')}>Order Now</Button>
             <button onClick={() => setIsAudioMuted(!isAudioMuted)} className="text-white/40 flex items-center gap-2 font-mono text-xs uppercase pt-4 border-t border-white/5">
                {isAudioMuted ? <VolumeX size={16} /> : <Volume2 size={16} />} Audio Feed: {isAudioMuted ? 'OFF' : 'ON'}
             </button>
