@@ -42,7 +42,13 @@ jobs:
                 res.on('data', chunk => { data += chunk; });
                 res.on('end', () => {
                   try {
-                    resolve(JSON.parse(data));
+                    const parsed = JSON.parse(data);
+                    // Check for API-level errors (like 404 or 400)
+                    if (res.statusCode >= 400) {
+                      reject(new Error(`API Error (${res.statusCode}): ${JSON.stringify(parsed)}`));
+                    } else {
+                      resolve(parsed);
+                    }
                   } catch (e) {
                     reject(new Error('Parse error: ' + data.substring(0, 200)));
                   }
@@ -74,41 +80,47 @@ jobs:
 
               console.log('Data received. Price:', p);
 
-              const promptText = 'Current XRP market data: Price $' + p.toFixed(4) + ', 24h change ' + c.toFixed(2) + '%, Market cap $' + (m/1e9).toFixed(2) + 'B, Volume $' + (v/1e9).toFixed(2) + 'B. Write a 600-800 word technical analysis for The Neutral Bridge blog focusing on XRP infrastructure and systemic implications. Use forensic, engineering tone. Avoid price predictions.';
+              const promptText = `Current XRP market data: Price $${p.toFixed(4)}, 24h change ${c.toFixed(2)}%, Market cap $${(m/1e9).toFixed(2)}B, Volume $${(v/1e9).toFixed(2)}B. Write a technical analysis focusing on XRP infrastructure and systemic implications. Focus on the XRPL ledger mechanics.`;
 
-              console.log('Calling Gemini...');
-              console.log('API Key present:', process.env.GEMINI_API_KEY ? 'YES' : 'NO');
+              console.log('Calling Gemini v1beta...');
               
-              const geminiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=' + process.env.GEMINI_API_KEY;
+              // Using v1beta and the versioned model name for stability
+              const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
+              
               const geminiData = await httpsRequest(geminiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                  system_instruction: {
+                    parts: [{ text: "You are a senior systems engineer and financial forensic analyst for 'The Neutral Bridge'. Your tone is clinical, technical, and objective. Avoid hype, marketing adjectives, or price predictions. Focus on architectural throughput and ledger health." }]
+                  },
                   contents: [{ parts: [{ text: promptText }] }],
-                  generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+                  generationConfig: { 
+                    temperature: 0.4, 
+                    maxOutputTokens: 2048 
+                  }
                 })
               });
 
               if (!geminiData.candidates || !geminiData.candidates[0]) {
-                console.error('Gemini response:', JSON.stringify(geminiData));
-                throw new Error('Invalid Gemini response');
+                throw new Error('Gemini failed to generate content. Check logs.');
               }
 
               const content = geminiData.candidates[0].content.parts[0].text;
               const today = new Date().toISOString().split('T')[0];
               
-              const markdown = '---\ntitle: "XRP Market Analysis - ' + today + '"\ndate: ' + today + '\nauthor: "The Neutral Bridge"\ntags: ["XRP", "Market Analysis"]\n---\n\n' + content + '\n';
+              const markdown = `---\ntitle: "XRP Systemic Analysis - ${today}"\ndate: ${today}\nauthor: "The Neutral Bridge"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n${content}\n`;
 
               const folder = './blog_posts';
               if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, { recursive: true });
               }
               
-              fs.writeFileSync(folder + '/market-analysis-' + today + '.md', markdown);
+              fs.writeFileSync(`${folder}/market-analysis-${today}.md`, markdown);
               console.log('Success! File created.');
               
             } catch (err) {
-              console.error('Error:', err.message);
+              console.error('Error Details:', err.message);
               process.exit(1);
             }
           }
