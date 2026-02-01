@@ -82,10 +82,10 @@ jobs:
 
               const promptText = `Current XRP market data: Price $${p.toFixed(4)}, 24h change ${c.toFixed(2)}%, Market cap $${(m/1e9).toFixed(2)}B, Volume $${(v/1e9).toFixed(2)}B. Write a technical analysis focusing on XRP infrastructure and systemic implications. Focus on the XRPL ledger mechanics.`;
 
-              console.log('Calling Gemini v1beta...');
+              console.log('Calling Gemini 2.5 Flash...');
               
-              // Using v1beta and the versioned model name for stability
-              const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
+              
+              const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
               
               const geminiData = await httpsRequest(geminiUrl, {
                 method: 'POST',
@@ -94,7 +94,9 @@ jobs:
                   system_instruction: {
                     parts: [{ text: "You are a senior systems engineer and financial forensic analyst for 'The Neutral Bridge'. Your tone is clinical, technical, and objective. Avoid hype, marketing adjectives, or price predictions. Focus on architectural throughput and ledger health." }]
                   },
-                  contents: [{ parts: [{ text: promptText }] }],
+                  contents: [{ 
+                  role: "user",
+                  parts: [{ text: promptText }] }],
                   generationConfig: { 
                     temperature: 0.4, 
                     maxOutputTokens: 2048 
