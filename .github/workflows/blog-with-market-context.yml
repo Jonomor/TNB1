@@ -45,7 +45,6 @@ jobs:
                 res.on('end', () => {
                   try {
                     const parsed = JSON.parse(data);
-                    // Check for API-level errors (like 404 or 400)
                     if (res.statusCode >= 400) {
                       reject(new Error(`API Error (${res.statusCode}): ${JSON.stringify(parsed)}`));
                     } else {
@@ -77,15 +76,71 @@ jobs:
 
               const p = coinData.market_data.current_price.usd;
               const c = coinData.market_data.price_change_percentage_24h;
+              const c7d = coinData.market_data.price_change_percentage_7d;
               const m = coinData.market_data.market_cap.usd;
               const v = coinData.market_data.total_volume.usd;
+              const rank = coinData.market_cap_rank;
 
               console.log('Data received. Price:', p);
 
-              const promptText = `Current XRP market data: Price $${p.toFixed(4)}, 24h change ${c.toFixed(2)}%, Market cap $${(m/1e9).toFixed(2)}B, Volume $${(v/1e9).toFixed(2)}B. Write a technical analysis focusing on XRP infrastructure and systemic implications. Focus on the XRPL ledger mechanics.`;
+              const promptText = `You are writing for The Neutral Bridge, an institutional-grade financial analysis publication. Generate a forensic analysis post with SEO optimization.
+
+CURRENT MARKET DATA:
+- XRP Price: $${p.toFixed(4)}
+- 24h Change: ${c.toFixed(2)}%
+- 7d Change: ${c7d.toFixed(2)}%
+- Market Cap: $${(m/1e9).toFixed(2)}B (Rank #${rank})
+- 24h Volume: $${(v/1e9).toFixed(2)}B
+
+REQUIRED STRUCTURE (use exact markdown headers):
+
+## Executive Summary
+[150 words max. Answer-first format for AI snippet extraction. Structure: Problem → Current Reality → Market Impact. Zero speculation. Clinical tone.]
+
+## Macro Context: Global Payment Infrastructure
+[300 words. Connect price movement to broader financial system developments:
+- ISO 20022 migration timeline
+- Central bank digital currency pilots
+- Cross-border payment modernization
+- Traditional correspondent banking limitations
+Frame XRP within larger infrastructure transformation.]
+
+## Technical Analysis: XRPL Mechanics
+[400 words. Forensic deep dive:
+- Current ledger throughput (transactions per second)
+- Validator consensus health metrics
+- On-chain settlement finality vs traditional T+2
+- DEX liquidity depth and market microstructure
+- Network fee dynamics
+Use precise technical specifications. Reference actual XRPL documentation.]
+
+## Institutional Consideration: Treasury Perspective
+[250 words. Position XRP as infrastructure tool:
+- Settlement efficiency: 3-5 seconds vs 3-5 days
+- Regulatory clarity (SEC litigation status, international frameworks)
+- Enterprise adoption signals (RippleNet activity, payment corridor depth)
+- Risk management for corporate treasury operations
+- Volatility management in cross-border flows]
+
+## Forward Outlook: 30-90 Day Infrastructure Roadmap
+[100 words. Evidence-based analysis:
+- Scheduled XRPL protocol upgrades
+- Regulatory calendar events (court decisions, policy announcements)
+- Payment corridor expansion timelines
+- Market structure evolution
+NO price predictions. Focus on infrastructure readiness and systemic catalysts.]
+
+---
+
+CRITICAL REQUIREMENTS:
+- Tone: Bloomberg Terminal meets Systems Engineering whitepaper
+- NO marketing language, NO hype, NO price targets
+- Use entity linking: "XRP Ledger (XRPL)", "Ripple Labs", "ISO 20022 standard"
+- Include specific metrics, ledger statistics, protocol specifications
+- Write for institutional risk committees and sovereign wealth funds
+- Target 1200-1400 words total`;
 
               console.log('Calling Gemini 2.5 Flash...');
-              
               
               const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
               
@@ -94,14 +149,16 @@ jobs:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   system_instruction: {
-                    parts: [{ text: "You are a senior systems engineer and financial forensic analyst for 'The Neutral Bridge'. Your tone is clinical, technical, and objective. Avoid hype, marketing adjectives, or price predictions. Focus on architectural throughput and ledger health." }]
+                    parts: [{ text: "You are K. Morgan, systems analyst and author of The Neutral Bridge. You analyze XRP and Ripple infrastructure with forensic precision for institutional audiences. Your analysis is authoritative, data-driven, and devoid of speculation. You position XRP as financial plumbing infrastructure, not a speculative asset. Write for institutional risk committees, sovereign wealth funds, and treasury operations teams." }]
                   },
                   contents: [{ 
                   role: "user",
                   parts: [{ text: promptText }] }],
                   generationConfig: { 
-                    temperature: 0.4, 
-                    maxOutputTokens: 2048 
+                    temperature: 0.3, 
+                    maxOutputTokens: 3000,
+                    topP: 0.8,
+                    topK: 40
                   }
                 })
               });
@@ -113,15 +170,26 @@ jobs:
               const content = geminiData.candidates[0].content.parts[0].text;
               const today = new Date().toISOString().split('T')[0];
               
-              const markdown = `---\ntitle: "XRP Systemic Analysis - ${today}"\ndate: ${today}\nauthor: "The Neutral Bridge"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n${content}\n`;
+              const frontmatter = `---
+title: "XRP Infrastructure Analysis – ${today}"
+date: ${today}
+author: "K. Morgan"
+category: "XRPL Technical Analysis"
+tags: ["XRP", "XRPL", "Payment Infrastructure", "ISO 20022", "Cross-Border Settlement"]
+excerpt: "Forensic analysis of XRP Ledger mechanics, institutional settlement implications, and payment infrastructure evolution."
+---
+
+`;
+              
+              const markdown = frontmatter + content + '\n';
 
               const folder = './blog_posts';
               if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, { recursive: true });
               }
               
-              fs.writeFileSync(`${folder}/market-analysis-${today}.md`, markdown);
-              console.log('Success! File created.');
+              fs.writeFileSync(`${folder}/xrpl-analysis-${today}.md`, markdown);
+              console.log('Success! SEO-optimized forensic analysis created.');
               
             } catch (err) {
               console.error('Error Details:', err.message);
@@ -143,5 +211,5 @@ jobs:
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add blog_posts/
-          git commit -m "Auto-generate blog post $(date +'%Y-%m-%d')" || echo "No changes"
+          git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')" || echo "No changes"
           git push
