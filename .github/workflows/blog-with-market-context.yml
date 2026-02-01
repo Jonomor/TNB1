@@ -77,6 +77,7 @@ jobs:
               const promptText = 'Current XRP market data: Price $' + p.toFixed(4) + ', 24h change ' + c.toFixed(2) + '%, Market cap $' + (m/1e9).toFixed(2) + 'B, Volume $' + (v/1e9).toFixed(2) + 'B. Write a 600-800 word technical analysis for The Neutral Bridge blog focusing on XRP infrastructure and systemic implications. Use forensic, engineering tone. Avoid price predictions.';
 
               console.log('Calling Gemini...');
+              console.log('API Key present:', process.env.GEMINI_API_KEY ? 'YES' : 'NO');
               
               const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY;
               const geminiData = await httpsRequest(geminiUrl, {
