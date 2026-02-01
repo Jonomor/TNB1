@@ -18,16 +18,13 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Fetch Market Data and Generate Post
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+      - name: Create Script File
         run: |
-          cat > generate-post.cjs << 'SCRIPT_EOF'
+          cat > generate-post.cjs << 'ENDOFSCRIPT'
           const https = require('https');
           const fs = require('fs');
 
-          function fetch(url, options = {}) {
+          function httpsRequest(url, options = {}) {
             return new Promise((resolve, reject) => {
               const urlObj = new URL(url);
               const requestOptions = {
@@ -35,19 +32,19 @@ jobs:
                 path: urlObj.pathname + urlObj.search,
                 method: options.method || 'GET',
                 headers: {
-                  'User-Agent': 'The-Neutral-Bridge-Blog-Generator/1.0',
-                  ...options.headers
+                  'User-Agent': 'The-Neutral-Bridge-Blog/1.0',
+                  ...(options.headers || {})
                 }
               };
 
               const req = https.request(requestOptions, (res) => {
                 let data = '';
-                res.on('data', chunk => data += chunk);
+                res.on('data', chunk => { data += chunk; });
                 res.on('end', () => {
                   try {
                     resolve(JSON.parse(data));
                   } catch (e) {
-                    reject(new Error('Failed to parse JSON: ' + data.substring(0, 200)));
+                    reject(new Error('Parse error: ' + data.substring(0, 200)));
                   }
                 });
               });
@@ -58,86 +55,76 @@ jobs:
             });
           }
 
-          async function generatePost() {
+          async function run() {
             try {
-              console.log('Fetching market data...');
-              const coingeckoKey = process.env.COINGECKO_API_KEY || '';
-              const priceUrl = coingeckoKey 
-                ? 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=' + coingeckoKey
-                : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
+              console.log('Fetching XRP data...');
+              const apiKey = process.env.COINGECKO_API_KEY || '';
+              const apiUrl = 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false' + (apiKey ? '&x_cg_demo_api_key=' + apiKey : '');
               
-              const priceData = await fetch(priceUrl);
-              console.log('Received data, checking structure...');
+              const coinData = await httpsRequest(apiUrl);
               
-              if (!priceData || !priceData.market_data) {
-                throw new Error('Invalid API response structure. Response: ' + JSON.stringify(priceData).substring(0, 500));
+              if (!coinData.market_data) {
+                throw new Error('No market data in response');
               }
 
-              const price = priceData.market_data.current_price.usd;
-              const change24h = priceData.market_data.price_change_percentage_24h;
-              const marketCap = priceData.market_data.market_cap.usd;
-              const volume = priceData.market_data.total_volume.usd;
+              const p = coinData.market_data.current_price.usd;
+              const c = coinData.market_data.price_change_percentage_24h;
+              const m = coinData.market_data.market_cap.usd;
+              const v = coinData.market_data.total_volume.usd;
 
-              console.log('Market data retrieved successfully');
-              console.log('Price:', price, 'Change:', change24h);
+              console.log('Data received. Price:', p);
 
-              const prompt = 'CURRENT MARKET DATA:\n' +
-                'XRP Price: $' + price.toFixed(4) + '\n' +
-                '24h Change: ' + (change24h > 0 ? '+' : '') + change24h.toFixed(2) + '%\n' +
-                'Market Cap: $' + (marketCap / 1e9).toFixed(2) + 'B\n' +
-                'Volume: $' + (volume / 1e9).toFixed(2) + 'B\n\n' +
-                'Write a 600-800 word technical analysis for The Neutral Bridge blog. Focus on XRP Ledger infrastructure and systemic implications. Maintain forensic, engineering tone. Avoid price predictions. Include concrete technical details.';
+              const promptText = 'Current XRP market data: Price $' + p.toFixed(4) + ', 24h change ' + c.toFixed(2) + '%, Market cap $' + (m/1e9).toFixed(2) + 'B, Volume $' + (v/1e9).toFixed(2) + 'B. Write a 600-800 word technical analysis for The Neutral Bridge blog focusing on XRP infrastructure and systemic implications. Use forensic, engineering tone. Avoid price predictions.';
 
-              console.log('Calling Gemini API...');
+              console.log('Calling Gemini...');
               
-              const geminiResponse = await fetch(
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
-                  })
-                }
-              );
+              const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY;
+              const geminiData = await httpsRequest(geminiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: promptText }] }],
+                  generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+                })
+              });
 
-              if (!geminiResponse || !geminiResponse.candidates || !geminiResponse.candidates[0]) {
-                throw new Error('Invalid Gemini API response');
+              if (!geminiData.candidates || !geminiData.candidates[0]) {
+                console.error('Gemini response:', JSON.stringify(geminiData));
+                throw new Error('Invalid Gemini response');
               }
 
-              const content = geminiResponse.candidates[0].content.parts[0].text;
-              const date = new Date().toISOString().split('T')[0];
+              const content = geminiData.candidates[0].content.parts[0].text;
+              const today = new Date().toISOString().split('T')[0];
               
-              const post = '---\n' +
-                'title: "XRP Market Analysis - ' + date + '"\n' +
-                'date: ' + date + '\n' +
-                'author: "The Neutral Bridge"\n' +
-                'tags: ["XRP", "Market Analysis"]\n' +
-                '---\n\n' +
-                content +
-                '\n';
+              const markdown = '---\ntitle: "XRP Market Analysis - ' + today + '"\ndate: ' + today + '\nauthor: "The Neutral Bridge"\ntags: ["XRP", "Market Analysis"]\n---\n\n' + content + '\n';
 
-              const dir = './blog_posts';
-              if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-              fs.writeFileSync(dir + '/market-analysis-' + date + '.md', post);
-              console.log('Post generated successfully at:', dir + '/market-analysis-' + date + '.md');
-            } catch (error) {
-              console.error('Error details:', error.message);
-              console.error('Stack:', error.stack);
+              const folder = './blog_posts';
+              if (!fs.existsSync(folder)) {
+                fs.mkdirSync(folder, { recursive: true });
+              }
+              
+              fs.writeFileSync(folder + '/market-analysis-' + today + '.md', markdown);
+              console.log('Success! File created.');
+              
+            } catch (err) {
+              console.error('Error:', err.message);
               process.exit(1);
             }
           }
 
-          generatePost();
-          SCRIPT_EOF
+          run();
+          ENDOFSCRIPT
 
-          node generate-post.cjs
+      - name: Run Script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+        run: node generate-post.cjs
 
       - name: Commit and Push
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add blog_posts/
-          git commit -m "Auto-generate market analysis [$(date +'%Y-%m-%d')]" || echo "No changes"
+          git commit -m "Auto-generate blog post $(date +'%Y-%m-%d')" || echo "No changes"
           git push
