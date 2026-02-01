@@ -34,7 +34,10 @@ jobs:
                 hostname: urlObj.hostname,
                 path: urlObj.pathname + urlObj.search,
                 method: options.method || 'GET',
-                headers: options.headers || {}
+                headers: {
+                  'User-Agent': 'The-Neutral-Bridge-Blog-Generator/1.0',
+                  ...options.headers
+                }
               };
 
               const req = https.request(requestOptions, (res) => {
@@ -62,8 +65,6 @@ jobs:
               const priceUrl = coingeckoKey 
                 ? 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false&x_cg_demo_api_key=' + coingeckoKey
                 : 'https://api.coingecko.com/api/v3/coins/ripple?localization=false&tickers=false&community_data=false&developer_data=false';
-              
-              console.log('API URL:', priceUrl.replace(coingeckoKey, 'HIDDEN'));
               
               const priceData = await fetch(priceUrl);
               console.log('Received data, checking structure...');
