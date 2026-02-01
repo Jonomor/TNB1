@@ -79,7 +79,7 @@ jobs:
               console.log('Calling Gemini...');
               console.log('API Key present:', process.env.GEMINI_API_KEY ? 'YES' : 'NO');
               
-              const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
+              const geminiUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
               const geminiData = await httpsRequest(geminiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
