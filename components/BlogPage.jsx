@@ -1,6 +1,3 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, ArrowLeft, Terminal, X } from 'lucide-react';
-
 interface BlogPost {
   id: string;
   title: string;
@@ -14,8 +11,6 @@ interface BlogPost {
 
 export const BlogPage: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-
-  const posts: BlogPost[] = [
     {
       id: '1',
       title: 'The 2027 Timeline: Why January 18th Matters',
@@ -326,3 +321,5 @@ For bridge currencies handling sovereign flows, value density becomes operationa
     </div>
   );
 };
+
+export default BlogPage;
