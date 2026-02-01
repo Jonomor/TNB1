@@ -45,6 +45,7 @@ jobs:
                 res.on('end', () => {
                   try {
                     const parsed = JSON.parse(data);
+                    // Check for API-level errors (like 404 or 400)
                     if (res.statusCode >= 400) {
                       reject(new Error(`API Error (${res.statusCode}): ${JSON.stringify(parsed)}`));
                     } else {
@@ -130,7 +131,6 @@ Use precise technical specifications. Reference actual XRPL documentation.]
 - Market structure evolution
 NO price predictions. Focus on infrastructure readiness and systemic catalysts.]
 
----
 
 CRITICAL REQUIREMENTS:
 - Tone: Bloomberg Terminal meets Systems Engineering whitepaper
@@ -140,7 +140,8 @@ CRITICAL REQUIREMENTS:
 - Write for institutional risk committees and sovereign wealth funds
 - Target 1200-1400 words total`;
 
-              console.log('Calling Gemini 2.5 Flash...');
+          console.log('Calling Gemini 2.5 Flash...');
+              
               
               const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
               
@@ -149,16 +150,14 @@ CRITICAL REQUIREMENTS:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   system_instruction: {
-                    parts: [{ text: "You are K. Morgan, systems analyst and author of The Neutral Bridge. You analyze XRP and Ripple infrastructure with forensic precision for institutional audiences. Your analysis is authoritative, data-driven, and devoid of speculation. You position XRP as financial plumbing infrastructure, not a speculative asset. Write for institutional risk committees, sovereign wealth funds, and treasury operations teams." }]
+                    parts: [{ text: "You are a senior systems engineer and financial forensic analyst for 'The Neutral Bridge'. Your tone is clinical, technical, and objective. Avoid hype, marketing adjectives, or price predictions. Focus on architectural throughput and ledger health." }]
                   },
                   contents: [{ 
                   role: "user",
                   parts: [{ text: promptText }] }],
                   generationConfig: { 
-                    temperature: 0.3, 
-                    maxOutputTokens: 3000,
-                    topP: 0.8,
-                    topK: 40
+                    temperature: 0.4, 
+                    maxOutputTokens: 2048 
                   }
                 })
               });
@@ -170,26 +169,15 @@ CRITICAL REQUIREMENTS:
               const content = geminiData.candidates[0].content.parts[0].text;
               const today = new Date().toISOString().split('T')[0];
               
-              const frontmatter = `---
-title: "XRP Infrastructure Analysis – ${today}"
-date: ${today}
-author: "K. Morgan"
-category: "XRPL Technical Analysis"
-tags: ["XRP", "XRPL", "Payment Infrastructure", "ISO 20022", "Cross-Border Settlement"]
-excerpt: "Forensic analysis of XRP Ledger mechanics, institutional settlement implications, and payment infrastructure evolution."
----
-
-`;
-              
-              const markdown = frontmatter + content + '\n';
+              const markdown = `---\ntitle: "XRP Systemic Analysis - ${today}"\ndate: ${today}\nauthor: "The Neutral Bridge"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n${content}\n`;
 
               const folder = './blog_posts';
               if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, { recursive: true });
               }
               
-              fs.writeFileSync(`${folder}/xrpl-analysis-${today}.md`, markdown);
-              console.log('Success! SEO-optimized forensic analysis created.');
+              fs.writeFileSync(`${folder}/market-analysis-${today}.md`, markdown);
+              console.log('Success! File created.');
               
             } catch (err) {
               console.error('Error Details:', err.message);
@@ -211,5 +199,5 @@ excerpt: "Forensic analysis of XRP Ledger mechanics, institutional settlement im
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add blog_posts/
-          git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')" || echo "No changes"
+          git commit -m "Auto-generate blog post $(date +'%Y-%m-%d')" || echo "No changes"
           git push
