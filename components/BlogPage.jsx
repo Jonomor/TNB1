@@ -1,16 +1,10 @@
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  date: string;
-  readTime: string;
-  category: string;
-  slug: string;
-}
+import React, { useState } from 'react';
+import { Calendar, Clock, ArrowLeft, Terminal, X } from 'lucide-react';
 
-export const BlogPage: React.FC = () => {
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+export const BlogPage = () => {
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  const posts = [
     {
       id: '1',
       title: 'The 2027 Timeline: Why January 18th Matters',
