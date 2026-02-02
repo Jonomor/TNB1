@@ -157,7 +157,7 @@ jobs:
                   parts: [{ text: promptText }] }],
                   generationConfig: { 
                     temperature: 0.3, 
-                    maxOutputTokens: 3000 
+                    maxOutputTokens: 4096 
                   }
                 })
               });
