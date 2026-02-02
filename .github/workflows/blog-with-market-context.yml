@@ -179,7 +179,7 @@ jobs:
               console.log('Markdown file created.');
               
               // Update blog_posts.json
-              const indexPath = './blog_posts.json';
+              const indexPath = './public/blog_posts.json';
               let blogData = { posts: [] };
               
               if (fs.existsSync(indexPath)) {
@@ -242,7 +242,7 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-          git add -A
+          git add blog_posts/ public/blog_posts.json
           git diff --staged --quiet || git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')"
           git pull origin main --rebase --strategy-option=ours || true
           git push || (git pull origin main --rebase --strategy-option=ours && git push)
