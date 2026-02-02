@@ -45,7 +45,6 @@ jobs:
                 res.on('end', () => {
                   try {
                     const parsed = JSON.parse(data);
-                    // Check for API-level errors (like 404 or 400)
                     if (res.statusCode >= 400) {
                       reject(new Error(`API Error (${res.statusCode}): ${JSON.stringify(parsed)}`));
                     } else {
@@ -144,7 +143,6 @@ jobs:
 
           console.log('Calling Gemini 2.5 Flash...');
               
-              
               const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
               
               const geminiData = await httpsRequest(geminiUrl, {
@@ -152,36 +150,81 @@ jobs:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   system_instruction: {
-                    parts: [{ text: "You are a senior systems engineer and financial forensic analyst for 'The Neutral Bridge'. Your tone is clinical, technical, and objective. Avoid hype, marketing adjectives, or price predictions. Focus on architectural throughput and ledger health." }]
+                    parts: [{ text: "You are K. Morgan, systems analyst and author of The Neutral Bridge. You analyze XRP with forensic precision for institutional audiences. Your analysis is authoritative, data-driven, devoid of speculation. You position XRP as financial infrastructure, not speculation." }]
                   },
                   contents: [{ 
                   role: "user",
                   parts: [{ text: promptText }] }],
                   generationConfig: { 
-                    temperature: 0.4, 
-                    maxOutputTokens: 2048 
+                    temperature: 0.3, 
+                    maxOutputTokens: 3000 
                   }
                 })
               });
 
               if (!geminiData.candidates || !geminiData.candidates[0]) {
-                throw new Error('Gemini failed to generate content. Check logs.');
+                throw new Error('Gemini failed to generate content.');
               }
 
               const content = geminiData.candidates[0].content.parts[0].text;
               
-              const markdown = `---\ntitle: "XRP Systemic Analysis - ${today}"\ndate: ${today}\nauthor: "The Neutral Bridge"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n${content}\n`;
+              const markdown = '---\ntitle: "XRP Infrastructure Analysis - ' + today + '"\ndate: ' + today + '\nauthor: "K. Morgan"\ncategory: "Market Analysis"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n' + content + '\n';
 
               const folder = './blog_posts';
               if (!fs.existsSync(folder)) {
                 fs.mkdirSync(folder, { recursive: true });
               }
               
-              fs.writeFileSync(`${folder}/market-analysis-${today}.md`, markdown);
-              console.log('Success! File created.');
+              fs.writeFileSync(folder + '/market-analysis-' + today + '.md', markdown);
+              console.log('Markdown file created.');
+              
+              // Update blog_posts.json
+              const indexPath = './blog_posts.json';
+              let blogData = { posts: [] };
+              
+              if (fs.existsSync(indexPath)) {
+                try {
+                  blogData = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+                } catch (e) {
+                  console.log('Creating new blog index');
+                  blogData = { posts: [] };
+                }
+              }
+              
+              // Extract excerpt from content
+              const abstractStart = content.indexOf('Forensic Abstract');
+              const excerptText = abstractStart >= 0 
+                ? content.substring(abstractStart + 18, abstractStart + 200).trim().replace(/\n/g, ' ')
+                : content.substring(0, 200).trim();
+              
+              // Format date nicely
+              const dateObj = new Date(today);
+              const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+              const formattedDate = months[dateObj.getMonth()] + ' ' + dateObj.getDate() + ', ' + dateObj.getFullYear();
+              
+              // Create new post entry
+              const newPost = {
+                id: 'post-' + today,
+                title: 'XRP Infrastructure Analysis - ' + formattedDate,
+                excerpt: excerptText + '...',
+                content: content,
+                date: formattedDate,
+                readTime: Math.ceil(content.split(' ').length / 200) + ' min',
+                category: 'Market Analysis',
+                slug: 'market-analysis-' + today
+              };
+              
+              // Add to beginning of posts array
+              blogData.posts.unshift(newPost);
+              
+              // Keep only last 20 posts
+              blogData.posts = blogData.posts.slice(0, 20);
+              
+              fs.writeFileSync(indexPath, JSON.stringify(blogData, null, 2));
+              console.log('Blog index updated successfully!');
               
             } catch (err) {
-              console.error('Error Details:', err.message);
+              console.error('Error:', err.message);
               process.exit(1);
             }
           }
@@ -199,6 +242,7 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-          git add blog_posts/
-          git commit -m "Auto-generate blog post $(date +'%Y-%m-%d')" || echo "No changes"
+          git pull origin main --rebase
+          git add blog_posts/ blog_posts.json
+          git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')" || echo "No changes"
           git push
