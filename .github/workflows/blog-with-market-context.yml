@@ -242,7 +242,7 @@ jobs:
         run: |
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
-          git add blog_posts/ blog_posts.json
-          git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')" || echo "No changes"
-          git pull origin main --rebase || true
-          git push
+          git add -A
+          git diff --staged --quiet || git commit -m "Auto-generate forensic analysis $(date +'%Y-%m-%d')"
+          git pull origin main --rebase --strategy-option=ours || true
+          git push || (git pull origin main --rebase --strategy-option=ours && git push)
