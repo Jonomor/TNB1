@@ -175,7 +175,6 @@ jobs:
               }
 
               const content = geminiData.candidates[0].content.parts[0].text;
-              const today = new Date().toISOString().split('T')[0];
               
               const markdown = `---\ntitle: "XRP Systemic Analysis - ${today}"\ndate: ${today}\nauthor: "The Neutral Bridge"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n${content}\n`;
 
