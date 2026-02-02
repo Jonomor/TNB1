@@ -642,7 +642,7 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
           <h2 className="font-serif text-3xl mb-2 text-white">Stay Ahead of the Reset</h2>
           <p className="text-white/60 mb-8">Join the briefing list for launch updates.</p>
           <form 
-            action="https://formspree.io/f/YOUR_FORM_ID"
+            action="https://formspree.io/f/xqeqorqy"
             method="POST"
             className="flex flex-col sm:flex-row gap-4"
           >
