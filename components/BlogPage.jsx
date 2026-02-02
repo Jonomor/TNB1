@@ -1,134 +1,32 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, ArrowLeft, Terminal, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Clock, ArrowLeft, Terminal } from 'lucide-react';
 
 export const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const posts = [
-    {
-      id: '1',
-      title: 'The 2027 Timeline: Why January 18th Matters',
-      excerpt: 'A forensic breakdown of the GENIUS Act deadline and its implications for global liquidity infrastructure.',
-      content: `The January 18, 2027 date represents more than a legislative deadline—it marks a systemic pressure point in global financial infrastructure.
+  useEffect(() => {
+    // Fetch posts from blog_posts.json
+    fetch('/blog_posts.json')
+      .then(res => res.json())
+      .then(data => {
+        setPosts(data.posts || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load blog posts:', err);
+        setLoading(false);
+      });
+  }, []);
 
-## The GENIUS Act Context
-
-The Government Efficiency and National Innovation in Unified Systems Act establishes technical parameters for cross-border payment modernization. While marketed as regulatory reform, the engineering implications point toward mandatory infrastructure upgrades.
-
-## Technical Dependencies
-
-Current correspondent banking operates on 1970s-era SWIFT messaging. The 2027 deadline creates forcing functions for:
-
-- ISO 20022 message format adoption
-- Real-time settlement capability
-- Atomic transaction finality
-- Regulatory reporting automation
-
-## Bridge Currency Requirements
-
-Moving from T+2 settlement to atomic finality requires neutral liquidity providers. Traditional pre-funded nostro accounts cannot scale to 24/7 operations across all currency pairs.
-
-The mathematics demand high-value density assets capable of absorbing sovereign-scale flows without material slippage.`,
-      date: 'Jan 27, 2026',
-      readTime: '8 min',
-      category: 'Timeline Analysis',
-      slug: '2027-timeline-january-18'
-    },
-    {
-      id: '2',
-      title: 'ISO 20022 Migration: The Data Layer of the Reset',
-      excerpt: 'How the new messaging standard creates the technical foundation for atomic settlement and bridge currencies.',
-      content: `ISO 20022 represents a fundamental reimagining of financial message architecture. Unlike legacy formats, it provides structured, machine-readable data that enables automated compliance and real-time settlement.
-
-## From Messaging to Data
-
-Traditional SWIFT messages carry payment instructions. ISO 20022 messages carry structured financial data with embedded metadata for:
-
-- Automated sanctions screening
-- Real-time FX calculation
-- Regulatory reporting
-- Atomic settlement coordination
-
-## The Bridge Requirement
-
-When payment messages contain complete transaction context, settlement can occur simultaneously with instruction. This eliminates counterparty risk but requires instant liquidity across currency pairs.
-
-Pre-funded accounts cannot provide 24/7 coverage. Mathematical necessity dictates neutral bridge assets with global liquidity depth.`,
-      date: 'Jan 24, 2026',
-      readTime: '12 min',
-      category: 'Technical Analysis',
-      slug: 'iso-20022-migration'
-    },
-    {
-      id: '3',
-      title: 'Protocol 22: Privacy Under Supervision',
-      excerpt: 'Zero-Knowledge Proofs and the engineering solution to regulatory compliance without sacrificing transaction privacy.',
-      content: `The privacy versus compliance dilemma has constrained digital payment systems since inception. Protocol 22 represents an engineering solution using cryptographic proofs.
-
-## The Technical Challenge
-
-Financial institutions require transaction privacy for competitive reasons. Regulators require transaction visibility for enforcement. These appear mutually exclusive.
-
-## Zero-Knowledge Architecture
-
-ZK-proofs enable verification of transaction validity without revealing transaction details. A regulator can verify:
-
-- Transaction occurred
-- Parties are authorized
-- Amount is within limits
-- Sanctions screening passed
-
-Without learning specific values or counterparties unless investigation warranted.
-
-## Implementation Requirements
-
-This architecture requires public ledger infrastructure with:
-
-- Cryptographic proof generation
-- Selective disclosure mechanisms
-- Regulatory view keys
-- Immutable audit trails
-
-The technical specifications point toward specific infrastructure providers.`,
-      date: 'Jan 20, 2026',
-      readTime: '15 min',
-      category: 'Privacy & Security',
-      slug: 'protocol-22-privacy'
-    },
-    {
-      id: '4',
-      title: 'The Math of Necessity: Why High Value Density is Required',
-      excerpt: 'Slippage mathematics and the economic impossibility of moving sovereign-scale volume with low-priced assets.',
-      content: `Market depth determines practical transaction size. When moving large values through thin order books, price slippage makes transactions economically nonviable.
-
-## The Slippage Problem
-
-Consider moving $1B through a market with $100M daily volume. The mathematical impact:
-
-- Order book depth exhaustion
-- 5-15% price movement
-- Execution across multiple price levels
-- Unacceptable transaction costs
-
-## Value Density Solution
-
-Higher per-unit price reduces required transaction volume. Moving $1B requires:
-
-- At $0.50/unit: 2 billion units
-- At $5.00/unit: 200 million units  
-- At $50.00/unit: 20 million units
-
-Each 10x increase in value density reduces volume by 10x, exponentially reducing market impact.
-
-## Infrastructure-Grade Pricing
-
-For bridge currencies handling sovereign flows, value density becomes operational necessity rather than speculation.`,
-      date: 'Jan 15, 2026',
-      readTime: '10 min',
-      category: 'Economic Analysis',
-      slug: 'math-of-necessity'
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-matte-black text-white flex items-center justify-center">
+        <p className="text-white/60 font-mono text-sm">Loading forensic analysis...</p>
+      </div>
+    );
+  }
 
   if (selectedPost) {
     return (
@@ -171,6 +69,12 @@ For bridge currencies handling sovereign flows, value density becomes operationa
             {selectedPost.content.split('\n\n').map((paragraph, idx) => {
               if (paragraph.startsWith('## ')) {
                 return <h2 key={idx} className="text-2xl font-serif text-white mt-12 mb-4">{paragraph.replace('## ', '')}</h2>;
+              }
+              if (paragraph.startsWith('### ')) {
+                return <h3 key={idx} className="text-xl font-serif text-white mt-8 mb-3">{paragraph.replace('### ', '')}</h3>;
+              }
+              if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                return <h4 key={idx} className="text-lg font-bold text-electric-teal mt-6 mb-2">{paragraph.replace(/\*\*/g, '')}</h4>;
               }
               if (paragraph.startsWith('- ')) {
                 const items = paragraph.split('\n').filter(line => line.startsWith('- '));
@@ -227,50 +131,56 @@ For bridge currencies handling sovereign flows, value density becomes operationa
       {/* Posts Grid */}
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="grid grid-cols-1 gap-8">
-            {posts.map((post) => (
-              <article 
-                key={post.id}
-                className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
-                    {post.category}
-                  </span>
-                  <div className="flex items-center gap-4 text-xs text-white/40">
-                    <div className="flex items-center gap-1">
-                      <Calendar size={12} />
-                      <span>{post.date}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock size={12} />
-                      <span>{post.readTime} read</span>
+          {posts.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-white/40 text-lg">No analysis published yet. Check back soon.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-8">
+              {posts.map((post) => (
+                <article 
+                  key={post.id}
+                  className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
+                      {post.category}
+                    </span>
+                    <div className="flex items-center gap-4 text-xs text-white/40">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={12} />
+                        <span>{post.date}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock size={12} />
+                        <span>{post.readTime} read</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <h2 className="font-serif text-2xl text-white mb-3 group-hover:text-electric-teal transition-colors">
-                  {post.title}
-                </h2>
-                
-                <p className="text-white/60 leading-relaxed mb-4">
-                  {post.excerpt}
-                </p>
-                
-                <button
-                  onClick={() => setSelectedPost(post)}
-                  className="inline-flex items-center gap-2 text-electric-teal hover:text-white transition-colors"
-                >
-                  Read Analysis →
-                </button>
-              </article>
-            ))}
-          </div>
+                  
+                  <h2 className="font-serif text-2xl text-white mb-3 group-hover:text-electric-teal transition-colors">
+                    {post.title}
+                  </h2>
+                  
+                  <p className="text-white/60 leading-relaxed mb-4">
+                    {post.excerpt}
+                  </p>
+                  
+                  <button
+                    onClick={() => setSelectedPost(post)}
+                    className="inline-flex items-center gap-2 text-electric-teal hover:text-white transition-colors"
+                  >
+                    Read Analysis →
+                  </button>
+                </article>
+              ))}
+            </div>
+          )}
           
           {/* Coming Soon Notice */}
           <div className="mt-12 text-center p-8 border border-white/10 bg-white/5">
             <p className="font-mono text-sm text-white/60 uppercase tracking-widest">
-              📡 New analysis published weekly // Subscribe for updates
+              📡 New analysis published 3x weekly // Subscribe for updates
             </p>
           </div>
         </div>
