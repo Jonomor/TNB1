@@ -8,7 +8,7 @@ export const BlogPage = () => {
 
   useEffect(() => {
     // Fetch posts from blog_posts.json
-    fetch('/blog_posts.json')
+    fetch('/blog_posts.json?t=' + Date.now())
       .then(res => res.json())
       .then(data => {
         setPosts(data.posts || []);
