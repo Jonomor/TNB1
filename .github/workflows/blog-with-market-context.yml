@@ -81,6 +81,7 @@ jobs:
               const m = coinData.market_data.market_cap.usd;
               const v = coinData.market_data.total_volume.usd;
               const rank = coinData.market_cap_rank;
+              const today = new Date().toISOString().split('T')[0];
 
               console.log('Data received. Price:', p);
 
