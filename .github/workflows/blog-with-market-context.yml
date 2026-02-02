@@ -84,85 +84,68 @@ jobs:
 
               console.log('Data received. Price:', p);
 
-              const promptText = `You are K. Morgan writing for The Neutral Bridge. Create a forensic technical analysis matching this EXACT structure:
-
-MARKET DATA (${today}):
-- XRP: $${p.toFixed(4)} (${c > 0 ? '+' : ''}${c.toFixed(2)}% 24h, ${c7d > 0 ? '+' : ''}${c7d.toFixed(2)}% 7d)
-- Market Cap: $${(m/1e9).toFixed(2)}B (Rank #${rank})
-- 24h Volume: $${(v/1e9).toFixed(2)}B
-
-REQUIRED STRUCTURE:
-
-**Forensic Abstract**
-[50 words. Clinical summary: "A technical post-mortem of [specific price level/event]. Dissecting the divergence between [retail behavior] and [institutional utility]. Explore why [current situation] is a structural requirement for [larger thesis]."]
-
-## Executive Summary: [Compelling Title]
-[200 words. Answer-first format:
-- Para 1: Current market dislocation - price vs utility divergence
-- Para 2: Technical breakdown as capitulation event, not failure
-- Para 3: Why XRP remains definitive for global settlement despite volatility]
-
-## Deep Dive: Anatomy of [Current Technical Situation]
-
-### The $X.XX Support Level Explained
-[150 words. Technical precision:
-- What this price level represents structurally
-- RSI, Fibonacci retracement, liquidity analysis
-- Algorithmic trading bot behavior at this level]
-
-### Historical Echo: [Previous Bear Cycle]
-[150 words. Include DIRECT QUOTE from credible source:
-"[Exact quote from CoinMarketCap/CoinDesk/Bloomberg]" - Source Name
-Then analyze what this means for current situation.]
-
-## The Neutral Bridge: Utility in the Face of Volatility
-
-### 1. Settlement Finality vs. Speculation
-[200 words. Contrast:
-- What traders care about vs what institutions care about
-- XRPL ledger close time (3-5 seconds) with absolute finality
-- Lower volatility preferred by ODL partners
-- How price drops lower barrier to entry for institutions]
-
-### 2. The RLUSD Liquidity Injection
-[200 words. Technical infrastructure:
-- AMM environment mechanics
-- Arbitrage opportunities in XRP/RLUSD pools
-- Algorithmic buy pressure from rebalancing
-- Distinction from speculative support]
-
-### 3. Nostro/Vostro Account Elimination
-[150 words. Global capital efficiency:
-- Trillions trapped in pre-funded accounts
-- XRP's deflationary burn mechanics
-- Paradox: lower price = higher volume = faster burn rate]
-
-## Regulatory Clarity and Strategic Integration
-[200 words. Legal moat analysis:
-- Evolution from "regulation by enforcement" to "strategic integration"
-- XRP's unique legal clarity in US
-- Banks execute on certainty, not price action
-- Potential retail shakeout before institutional integration announcements]
-
-## Outlook: The Path Forward
-
-**Scenario A (The Flush):**
-[100 words. Bear case with specific price targets and macro triggers]
-
-**Scenario B (The Reversal):**
-[100 words. Bull case with technical confirmation levels]
-
-## Conclusion
-[75 words. Tie back to Neutral Bridge thesis. "Mathematics and necessity" over hype. Focus on migration to most efficient rail.]
-
-CRITICAL REQUIREMENTS:
-- Temperature: 0.3 (clinical precision)
-- Use exact technical terms: "liquidity wall", "momentum exhaustion", "capitulation event", "structural requirement"
-- Include at least ONE credible quote (attribute to CoinMarketCap, CoinDesk, or Bloomberg analysis)
-- Binary scenario analysis (Scenario A/B)
-- No marketing language - forensic tone throughout
-- Target 1400-1600 words
-- Write for institutional risk committees`;
+              const promptText = 'You are K. Morgan writing for The Neutral Bridge. Create a forensic technical analysis matching this EXACT structure:\n\n' +
+                'MARKET DATA (' + today + '):\n' +
+                '- XRP: $' + p.toFixed(4) + ' (' + (c > 0 ? '+' : '') + c.toFixed(2) + '% 24h, ' + (c7d > 0 ? '+' : '') + c7d.toFixed(2) + '% 7d)\n' +
+                '- Market Cap: $' + (m/1e9).toFixed(2) + 'B (Rank #' + rank + ')\n' +
+                '- 24h Volume: $' + (v/1e9).toFixed(2) + 'B\n\n' +
+                'REQUIRED STRUCTURE:\n\n' +
+                '**Forensic Abstract**\n' +
+                '[50 words. Clinical summary: "A technical post-mortem of [specific price level/event]. Dissecting the divergence between [retail behavior] and [institutional utility]. Explore why [current situation] is a structural requirement for [larger thesis]."]\n\n' +
+                '## Executive Summary: [Compelling Title]\n' +
+                '[200 words. Answer-first format:\n' +
+                '- Para 1: Current market dislocation - price vs utility divergence\n' +
+                '- Para 2: Technical breakdown as capitulation event, not failure\n' +
+                '- Para 3: Why XRP remains definitive for global settlement despite volatility]\n\n' +
+                '## Deep Dive: Anatomy of [Current Technical Situation]\n\n' +
+                '### The $X.XX Support Level Explained\n' +
+                '[150 words. Technical precision:\n' +
+                '- What this price level represents structurally\n' +
+                '- RSI, Fibonacci retracement, liquidity analysis\n' +
+                '- Algorithmic trading bot behavior at this level]\n\n' +
+                '### Historical Echo: [Previous Bear Cycle]\n' +
+                '[150 words. Include DIRECT QUOTE from credible source:\n' +
+                '"[Exact quote from CoinMarketCap/CoinDesk/Bloomberg]" - Source Name\n' +
+                'Then analyze what this means for current situation.]\n\n' +
+                '## The Neutral Bridge: Utility in the Face of Volatility\n\n' +
+                '### 1. Settlement Finality vs. Speculation\n' +
+                '[200 words. Contrast:\n' +
+                '- What traders care about vs what institutions care about\n' +
+                '- XRPL ledger close time (3-5 seconds) with absolute finality\n' +
+                '- Lower volatility preferred by ODL partners\n' +
+                '- How price drops lower barrier to entry for institutions]\n\n' +
+                '### 2. The RLUSD Liquidity Injection\n' +
+                '[200 words. Technical infrastructure:\n' +
+                '- AMM environment mechanics\n' +
+                '- Arbitrage opportunities in XRP/RLUSD pools\n' +
+                '- Algorithmic buy pressure from rebalancing\n' +
+                '- Distinction from speculative support]\n\n' +
+                '### 3. Nostro/Vostro Account Elimination\n' +
+                '[150 words. Global capital efficiency:\n' +
+                '- Trillions trapped in pre-funded accounts\n' +
+                '- XRP deflationary burn mechanics\n' +
+                '- Paradox: lower price = higher volume = faster burn rate]\n\n' +
+                '## Regulatory Clarity and Strategic Integration\n' +
+                '[200 words. Legal moat analysis:\n' +
+                '- Evolution from "regulation by enforcement" to "strategic integration"\n' +
+                '- XRP unique legal clarity in US\n' +
+                '- Banks execute on certainty, not price action\n' +
+                '- Potential retail shakeout before institutional integration announcements]\n\n' +
+                '## Outlook: The Path Forward\n\n' +
+                '**Scenario A (The Flush):**\n' +
+                '[100 words. Bear case with specific price targets and macro triggers]\n\n' +
+                '**Scenario B (The Reversal):**\n' +
+                '[100 words. Bull case with technical confirmation levels]\n\n' +
+                '## Conclusion\n' +
+                '[75 words. Tie back to Neutral Bridge thesis. "Mathematics and necessity" over hype. Focus on migration to most efficient rail.]\n\n' +
+                'CRITICAL REQUIREMENTS:\n' +
+                '- Temperature: 0.3 (clinical precision)\n' +
+                '- Use exact technical terms: "liquidity wall", "momentum exhaustion", "capitulation event", "structural requirement"\n' +
+                '- Include at least ONE credible quote (attribute to CoinMarketCap, CoinDesk, or Bloomberg analysis)\n' +
+                '- Binary scenario analysis (Scenario A/B)\n' +
+                '- No marketing language - forensic tone throughout\n' +
+                '- Target 1400-1600 words\n' +
+                '- Write for institutional risk committees';
 
           console.log('Calling Gemini 2.5 Flash...');
               
