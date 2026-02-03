@@ -115,37 +115,23 @@ const MarketAnalysisPage = () => {
         <div className="max-w-7xl mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
- <button 
-  onClick={() => {
-    localStorage.setItem('tnb_entered', 'true');
-    window.location.href = window.location.origin;
-  }}
-  className="text-sm text-electric-teal hover:text-white mb-3 flex items-center gap-2"
->
-  ← Back to Home
-</button>
-  <h1 className="text-3xl font-bold mb-2">XRP Market Analysis</h1>
-  <p className="text-gray-400">Real-time institutional-grade market intelligence</p>
-</div>
+              <button 
+                onClick={() => {
+                  localStorage.setItem('tnb_entered', 'true');
+                  window.location.href = window.location.origin + window.location.pathname;
+                }}
+                className="text-sm text-electric-teal hover:text-white mb-3 flex items-center gap-2"
+              >
+                ← Back to Home
+              </button>
+              <h1 className="text-3xl font-bold mb-2">XRP Market Analysis</h1>
+              <p className="text-gray-400">Real-time institutional-grade market intelligence</p>
+            </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`px-4 py-2 rounded-lg border transition-colors ${
-                  autoRefresh 
-                    ? 'border-green-600 text-green-400 bg-green-900/20' 
-                    : 'border-gray-700 text-gray-400 hover:bg-gray-800'
-                }`}
-              >
-                <RefreshCw size={16} className={`inline mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-                {autoRefresh ? 'Auto-Refresh On' : 'Auto-Refresh Off'}
-              </button>
-              <button
-                onClick={loadData}
-                className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors"
-              >
-                <RefreshCw size={16} className="inline mr-2" />
-                Refresh Now
-              </button>
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-900/20 border border-green-600 rounded-lg">
+                <RefreshCw size={16} className="text-green-400 animate-spin" />
+                <span className="text-green-400 text-sm">Auto-refreshing every 60s</span>
+              </div>
               <button
                 onClick={exportData}
                 className="px-4 py-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors"
