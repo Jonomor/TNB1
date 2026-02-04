@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, ArrowLeft, Terminal } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Terminal, Share2, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -10,6 +10,7 @@ export const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // Fetch posts from blog_posts.json with cache busting
@@ -20,12 +21,44 @@ export const BlogPage = () => {
         const postsArray = Array.isArray(data) ? data : (data.posts || []);
         setPosts(postsArray);
         setLoading(false);
+
+        // Check if URL has an article slug
+        const hash = window.location.hash;
+        const articleMatch = hash.match(/#\/blog\/(.+)/);
+        if (articleMatch) {
+          const slug = articleMatch[1];
+          const post = postsArray.find(p => p.slug === slug || p.id === slug);
+          if (post) {
+            setSelectedPost(post);
+          }
+        }
       })
       .catch(err => {
         console.error('Failed to load blog posts:', err);
         setLoading(false);
       });
   }, []);
+
+  // Update URL when post is selected
+  const selectPost = (post) => {
+    setSelectedPost(post);
+    window.location.hash = `#/blog/${post.slug || post.id}`;
+  };
+
+  // Clear URL when going back
+  const goBack = () => {
+    setSelectedPost(null);
+    window.location.hash = '#/blog';
+  };
+
+  // Copy article link to clipboard
+  const copyLink = () => {
+    const link = `${window.location.origin}${window.location.pathname}#/blog/${selectedPost.slug || selectedPost.id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   if (loading) {
     return (
@@ -36,17 +69,37 @@ export const BlogPage = () => {
   }
 
   if (selectedPost) {
+    const articleUrl = `${window.location.origin}${window.location.pathname}#/blog/${selectedPost.slug || selectedPost.id}`;
+    
     return (
       <div className="min-h-screen bg-matte-black text-white font-sans">
         {/* Header */}
         <div className="bg-black border-b border-white/10 sticky top-0 z-50">
           <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
             <button 
-              onClick={() => setSelectedPost(null)} 
+              onClick={goBack} 
               className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
             >
               <ArrowLeft size={18} />
               <span className="font-mono text-sm uppercase tracking-wider">Back to Articles</span>
+            </button>
+
+            {/* Share Button */}
+            <button
+              onClick={copyLink}
+              className="flex items-center gap-2 px-3 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-electric-teal/50 transition-all text-sm"
+            >
+              {copied ? (
+                <>
+                  <Check size={16} className="text-electric-teal" />
+                  <span className="text-electric-teal font-mono">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 size={16} />
+                  <span className="font-mono">Share</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -69,6 +122,23 @@ export const BlogPage = () => {
             <div className="flex items-center gap-1">
               <Clock size={14} />
               <span>{selectedPost.readTime} read</span>
+            </div>
+          </div>
+
+          {/* Share Link Display */}
+          <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-sm">
+            <p className="text-xs text-white/40 mb-2 font-mono uppercase tracking-wider">Article Link:</p>
+            <div className="flex items-center gap-2">
+              <code className="flex-1 text-sm text-electric-teal font-mono overflow-x-auto">
+                {articleUrl}
+              </code>
+              <button
+                onClick={copyLink}
+                className="p-2 hover:bg-white/10 rounded transition-colors"
+                title="Copy link"
+              >
+                {copied ? <Check size={16} className="text-electric-teal" /> : <Copy size={16} />}
+              </button>
             </div>
           </div>
 
@@ -249,7 +319,7 @@ export const BlogPage = () => {
                 <article 
                   key={post.id}
                   className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group cursor-pointer"
-                  onClick={() => setSelectedPost(post)}
+                  onClick={() => selectPost(post)}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
