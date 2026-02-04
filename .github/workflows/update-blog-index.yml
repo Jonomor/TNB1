@@ -22,7 +22,7 @@ jobs:
           node-version: '18'
 
       - name: Generate Blog Index
-        run: node generate-blog-index.js
+        run: node generate-blog-index.cjs
 
       - name: Commit Changes
         run: |
