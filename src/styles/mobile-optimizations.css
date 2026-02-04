@@ -679,122 +679,306 @@
 }
 
 /* ============================================
-   IMAGE BACKGROUND FIX
-   Add this to your mobile-optimizations.css file
-   OR create a new file: src/styles/image-fixes.css
+   3D BOOK EFFECT CSS
+   Add to: src/styles/mobile-optimizations.css
+   OR: src/styles/book-3d-effect.css
    ============================================ */
 
-/* ===== BOOK COVER IMAGE FIXES ===== */
+/* ===== 3D BOOK TRANSFORMATION ===== */
 
-/* Remove white backgrounds from book images */
-.flex-1.w-full.flex.justify-center img[src*="edition"],
-img[src*="retailedition"],
-img[src*="institutionedition"],
-img[alt*="Retail"],
-img[alt*="Institutional"] {
-  background: transparent !important;
-  mix-blend-mode: lighten !important;
+/* Edition cards - Apply 3D perspective */
+#editions .order-1.md\:order-2,
+#editions .relative.flex.items-center.justify-center {
+  perspective: 1200px;
+  perspective-origin: center;
 }
 
-/* Alternative: Add dark overlay to image containers */
-.flex.flex-col.md\:flex-row.gap-6 .w-full.md\:w-40,
-.flex-1.w-full.flex.justify-center {
-  background: transparent !important;
-}
-
-/* Remove white box around book images */
-.w-full.md\:w-40 img,
-.max-w-sm.aspect-\[3\/4\] img {
-  background: transparent !important;
-  padding: 0 !important;
-}
-
-/* For the specific edition cards */
-#editions .relative.flex.items-center.justify-center img {
-  background: transparent !important;
-  mix-blend-mode: screen !important;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
-}
-
-/* Remove border from book images */
+/* Book images - 3D effect */
 #editions img[src*="edition"] {
-  border: none !important;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7) !important;
+  transform: 
+    perspective(1200px)
+    rotateY(-15deg)
+    rotateX(2deg)
+    translateZ(20px);
+  
+  transform-style: preserve-3d;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  
+  /* Realistic 3D shadow */
+  box-shadow: 
+    /* Main shadow (right side) */
+    25px 25px 50px rgba(0, 0, 0, 0.9),
+    /* Book spine shadow */
+    -5px 0 15px rgba(0, 0, 0, 0.6),
+    /* Bottom shadow */
+    0 30px 60px rgba(0, 0, 0, 0.7),
+    /* Ambient light */
+    0 0 80px rgba(56, 189, 248, 0.1);
+  
+  /* Subtle glow effect */
+  filter: 
+    drop-shadow(0 0 20px rgba(56, 189, 248, 0.2))
+    brightness(1.05)
+    contrast(1.1);
 }
 
-/* Make book images pop against dark background */
-.order-1.md\:order-2 img {
-  filter: brightness(1.1) contrast(1.1) drop-shadow(0 15px 35px rgba(0, 0, 0, 0.8));
+/* Hover effect - Interactive 3D rotation */
+#editions .group:hover img[src*="edition"],
+#editions img[src*="edition"]:hover {
+  transform: 
+    perspective(1200px)
+    rotateY(-8deg)
+    rotateX(0deg)
+    translateZ(30px)
+    scale(1.02);
+  
+  box-shadow: 
+    30px 30px 70px rgba(0, 0, 0, 1),
+    -8px 0 20px rgba(0, 0, 0, 0.7),
+    0 35px 80px rgba(0, 0, 0, 0.8),
+    0 0 100px rgba(56, 189, 248, 0.15);
+  
+  filter: 
+    drop-shadow(0 0 30px rgba(56, 189, 248, 0.3))
+    brightness(1.08)
+    contrast(1.15);
 }
 
-/* ===== MOBILE SPECIFIC FIXES ===== */
-@media (max-width: 768px) {
-  /* Center and properly size book images on mobile */
-  #editions img[src*="edition"] {
-    max-width: 12rem !important;
-    margin: 0 auto !important;
-    background: transparent !important;
-    mix-blend-mode: lighten !important;
-  }
+/* ===== SPINE EFFECT (Book Thickness) ===== */
 
-  /* Remove white space around images */
-  #editions .w-full.md\:w-40 {
-    background: transparent !important;
-    padding: 1rem 0 !important;
-  }
-
-  /* Better shadow for mobile */
-  #editions img {
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8) !important;
-  }
+/* Create book spine using pseudo-element */
+#editions img[src*="edition"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(20, 20, 30, 0.8) 50%,
+    rgba(40, 40, 50, 0.6) 100%
+  );
+  transform: skewY(-2deg);
+  z-index: -1;
+  border-radius: 2px 0 0 2px;
 }
 
-/* ===== ALTERNATIVE SOLUTION: DARK OVERLAY ===== */
-/* If mix-blend-mode doesn't work well, use this instead */
+/* ===== PAGES EFFECT (Book Thickness) ===== */
 
-/* Add dark gradient behind images */
-.bg-gradient-to-br.from-matte-black.to-slate-grey .order-1.md\:order-2::before,
-.bg-slate-grey .order-1.md\:order-2::before {
+/* Create visible page edges using multiple shadows */
+#editions img[src*="edition"] {
+  position: relative;
+}
+
+#editions img[src*="edition"]::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: -4px;
+  bottom: 4px;
+  width: 4px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(240, 240, 245, 0.8) 50%,
+    rgba(220, 220, 230, 0.7) 100%
+  );
+  border-radius: 0 2px 2px 0;
+  box-shadow: 
+    1px 0 0 rgba(255, 255, 255, 0.6),
+    2px 0 0 rgba(240, 240, 245, 0.4),
+    3px 0 0 rgba(220, 220, 230, 0.2);
+}
+
+/* ===== LIGHTING EFFECT ===== */
+
+/* Add realistic lighting gradient overlay */
+#editions .order-1.md\:order-2::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.6) 100%);
-  z-index: 1;
+  background: radial-gradient(
+    ellipse at 30% 30%,
+    rgba(56, 189, 248, 0.08) 0%,
+    transparent 50%
+  );
   pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: overlay;
 }
 
-.bg-gradient-to-br.from-matte-black.to-slate-grey .order-1.md\:order-2 img,
-.bg-slate-grey .order-1.md\:order-2 img {
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  /* Slightly less dramatic 3D on mobile */
+  #editions img[src*="edition"] {
+    transform: 
+      perspective(1000px)
+      rotateY(-12deg)
+      rotateX(1deg)
+      translateZ(15px);
+    
+    max-width: 14rem !important;
+    margin: 0 auto;
+    
+    box-shadow: 
+      20px 20px 40px rgba(0, 0, 0, 0.9),
+      -4px 0 12px rgba(0, 0, 0, 0.6),
+      0 25px 50px rgba(0, 0, 0, 0.7),
+      0 0 60px rgba(56, 189, 248, 0.1);
+  }
+
+  /* Mobile hover/tap effect */
+  #editions img[src*="edition"]:active {
+    transform: 
+      perspective(1000px)
+      rotateY(-6deg)
+      rotateX(0deg)
+      translateZ(20px)
+      scale(1.01);
+  }
+
+  /* Smaller spine on mobile */
+  #editions img[src*="edition"]::before {
+    left: -6px;
+    width: 6px;
+  }
+
+  #editions img[src*="edition"]::after {
+    width: 3px;
+    right: -3px;
+  }
+}
+
+/* ===== ALTERNATIVE: EVEN MORE DRAMATIC 3D ===== */
+/* Uncomment this section for extreme 3D effect */
+
+/*
+#editions img[src*="edition"] {
+  transform: 
+    perspective(1400px)
+    rotateY(-25deg)
+    rotateX(5deg)
+    translateZ(40px)
+    scale(0.95);
+  
+  box-shadow: 
+    40px 40px 80px rgba(0, 0, 0, 1),
+    -10px 0 30px rgba(0, 0, 0, 0.8),
+    0 50px 100px rgba(0, 0, 0, 0.9),
+    0 0 120px rgba(56, 189, 248, 0.15);
+}
+
+#editions .group:hover img[src*="edition"] {
+  transform: 
+    perspective(1400px)
+    rotateY(-5deg)
+    rotateX(0deg)
+    translateZ(60px)
+    scale(1.05);
+}
+*/
+
+/* ===== FLOATING ANIMATION (OPTIONAL) ===== */
+/* Uncomment for subtle floating effect */
+
+/*
+@keyframes float-book {
+  0%, 100% {
+    transform: 
+      perspective(1200px)
+      rotateY(-15deg)
+      rotateX(2deg)
+      translateZ(20px)
+      translateY(0px);
+  }
+  50% {
+    transform: 
+      perspective(1200px)
+      rotateY(-15deg)
+      rotateX(2deg)
+      translateZ(20px)
+      translateY(-8px);
+  }
+}
+
+#editions img[src*="edition"] {
+  animation: float-book 4s ease-in-out infinite;
+}
+*/
+
+/* ===== GLOW PULSE (OPTIONAL) ===== */
+/* Uncomment for pulsing glow effect */
+
+/*
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: 
+      drop-shadow(0 0 20px rgba(56, 189, 248, 0.2))
+      brightness(1.05);
+  }
+  50% {
+    filter: 
+      drop-shadow(0 0 40px rgba(56, 189, 248, 0.4))
+      brightness(1.08);
+  }
+}
+
+#editions img[src*="edition"] {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+*/
+
+/* ===== CARD CONTAINER ENHANCEMENTS ===== */
+
+/* Make the card background slightly darker to enhance 3D effect */
+#editions .bg-gradient-to-br,
+#editions .bg-slate-grey {
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(30, 41, 59, 0.3) 100%
+    ) !important;
+}
+
+/* Add subtle vignette to card */
+#editions .group {
   position: relative;
-  z-index: 2;
+  overflow: hidden;
 }
 
-/* ===== PNG TRANSPARENCY FIX ===== */
-/* If your book images are PNGs with transparency issues */
-
-img[src$=".jpg"][src*="edition"],
-img[src$=".png"][src*="edition"] {
-  image-rendering: crisp-edges;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+#editions .group::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* ===== AUTHOR IMAGE FIX ===== */
-/* While we're at it, fix the author image too */
+/* Ensure text and buttons are above vignette */
+#editions .z-10 {
+  position: relative;
+  z-index: 10;
+}
 
-#about img[src*="kmorgan"] {
+/* ===== PREMIUM POLISH ===== */
+
+/* Remove any conflicting styles */
+#editions img[src*="edition"] {
+  border: none !important;
+  border-radius: 3px !important;
   background: transparent !important;
   mix-blend-mode: normal !important;
 }
 
-/* ===== EXHIBIT IMAGES ===== */
-/* Make sure gallery images also blend properly */
-
-#intelligence-gallery img {
-  background: transparent !important;
-  transition: all 0.3s ease;
-}
-
-#intelligence-gallery .group:hover img {
-  transform: scale(1.02);
+/* Smooth all transitions */
+#editions * {
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
