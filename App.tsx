@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './styles/mobile-optimizations.css';
+import '/src/styles/mobile-optimizations.css';
 import { Section } from './components/Section';
 import { PricingCard } from './components/PricingCard';
 import { Button } from './components/Button';
