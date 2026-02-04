@@ -6,7 +6,7 @@
     "date": "2026-02-04",
     "readTime": "5 min",
     "category": "Market Analysis",
-    image: "/blog-images/wisdomtree-pivot.jpg",
+    "image: "/blog-images/wisdomtree-pivot.jpg",
     "tags": [
       "Institutional Adoption",
       "WisdomTree",
@@ -26,7 +26,7 @@
     "date": "2026-02-02",
     "readTime": "7 min",
     "category": "Market Analysis",
-    image: "/blog-images/market-analysis-feb2.jpg",
+    "image: "/blog-images/market-analysis-feb2.jpg",
     "tags": [
       "XRP",
       "XRPL",
@@ -43,7 +43,7 @@
     "date": "2026-02-01",
     "readTime": "4 min",
     "category": "XRP",
-    image: "/blog-images/market-analysis-feb1.jpg",
+    "image: "/blog-images/market-analysis-feb1.jpg",
     "tags": [
       "XRP",
       "XRPL",
@@ -60,7 +60,7 @@
     "date": "2026-02-03",
     "readTime": "6 min",
     "category": "XRP",
-    image: "/blog-images/xls-80-cover.jpg",
+    "image: "/blog-images/xls-80-cover.jpg",
     "tags": [
       "XRP",
       "XLS-80",
