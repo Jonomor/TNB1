@@ -1,3 +1,4 @@
+// Updated 2026-02-04
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ArrowLeft, ArrowRight, Search, TrendingUp, BookOpen, Lightbulb, Share2, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
