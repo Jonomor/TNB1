@@ -677,3 +677,124 @@
     padding-bottom: max(3rem, env(safe-area-inset-bottom)) !important;
   }
 }
+
+/* ============================================
+   IMAGE BACKGROUND FIX
+   Add this to your mobile-optimizations.css file
+   OR create a new file: src/styles/image-fixes.css
+   ============================================ */
+
+/* ===== BOOK COVER IMAGE FIXES ===== */
+
+/* Remove white backgrounds from book images */
+.flex-1.w-full.flex.justify-center img[src*="edition"],
+img[src*="retailedition"],
+img[src*="institutionedition"],
+img[alt*="Retail"],
+img[alt*="Institutional"] {
+  background: transparent !important;
+  mix-blend-mode: lighten !important;
+}
+
+/* Alternative: Add dark overlay to image containers */
+.flex.flex-col.md\:flex-row.gap-6 .w-full.md\:w-40,
+.flex-1.w-full.flex.justify-center {
+  background: transparent !important;
+}
+
+/* Remove white box around book images */
+.w-full.md\:w-40 img,
+.max-w-sm.aspect-\[3\/4\] img {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* For the specific edition cards */
+#editions .relative.flex.items-center.justify-center img {
+  background: transparent !important;
+  mix-blend-mode: screen !important;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+/* Remove border from book images */
+#editions img[src*="edition"] {
+  border: none !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Make book images pop against dark background */
+.order-1.md\:order-2 img {
+  filter: brightness(1.1) contrast(1.1) drop-shadow(0 15px 35px rgba(0, 0, 0, 0.8));
+}
+
+/* ===== MOBILE SPECIFIC FIXES ===== */
+@media (max-width: 768px) {
+  /* Center and properly size book images on mobile */
+  #editions img[src*="edition"] {
+    max-width: 12rem !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+    mix-blend-mode: lighten !important;
+  }
+
+  /* Remove white space around images */
+  #editions .w-full.md\:w-40 {
+    background: transparent !important;
+    padding: 1rem 0 !important;
+  }
+
+  /* Better shadow for mobile */
+  #editions img {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8) !important;
+  }
+}
+
+/* ===== ALTERNATIVE SOLUTION: DARK OVERLAY ===== */
+/* If mix-blend-mode doesn't work well, use this instead */
+
+/* Add dark gradient behind images */
+.bg-gradient-to-br.from-matte-black.to-slate-grey .order-1.md\:order-2::before,
+.bg-slate-grey .order-1.md\:order-2::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.bg-gradient-to-br.from-matte-black.to-slate-grey .order-1.md\:order-2 img,
+.bg-slate-grey .order-1.md\:order-2 img {
+  position: relative;
+  z-index: 2;
+}
+
+/* ===== PNG TRANSPARENCY FIX ===== */
+/* If your book images are PNGs with transparency issues */
+
+img[src$=".jpg"][src*="edition"],
+img[src$=".png"][src*="edition"] {
+  image-rendering: crisp-edges;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* ===== AUTHOR IMAGE FIX ===== */
+/* While we're at it, fix the author image too */
+
+#about img[src*="kmorgan"] {
+  background: transparent !important;
+  mix-blend-mode: normal !important;
+}
+
+/* ===== EXHIBIT IMAGES ===== */
+/* Make sure gallery images also blend properly */
+
+#intelligence-gallery img {
+  background: transparent !important;
+  transition: all 0.3s ease;
+}
+
+#intelligence-gallery .group:hover img {
+  transform: scale(1.02);
+}
