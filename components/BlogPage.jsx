@@ -79,10 +79,10 @@ export const BlogPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-matte-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-electric-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-mono text-sm">Loading insights...</p>
+          <p className="text-white/60 font-mono text-sm">Loading insights...</p>
         </div>
       </div>
     );
@@ -91,13 +91,13 @@ export const BlogPage = () => {
   // Article View
   if (selectedPost) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-matte-black text-white">
         {/* Sticky Header */}
-        <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
+        <header className="sticky top-0 bg-black/95 backdrop-blur-sm border-b border-white/10 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <button 
               onClick={goBack}
-              className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+              className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
             >
               <ArrowLeft size={20} />
               <span className="font-medium">Back to Blog</span>
@@ -106,7 +106,7 @@ export const BlogPage = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={copyLink}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-electric-teal/50 transition-all"
               >
                 {copied ? (
                   <>
@@ -124,23 +124,34 @@ export const BlogPage = () => {
           </div>
         </header>
 
+        {/* Featured Image */}
+        {selectedPost.image && (
+          <div className="max-w-5xl mx-auto px-6 pt-12">
+            <img 
+              src={selectedPost.image} 
+              alt={selectedPost.title}
+              className="w-full h-[400px] object-cover rounded-lg"
+            />
+          </div>
+        )}
+
         {/* Article Container */}
         <article className="max-w-4xl mx-auto px-6 py-16">
           {/* Category Badge */}
           <div className="mb-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-electric-teal/10 text-electric-teal font-medium text-sm">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-electric-teal/10 border border-electric-teal/30 text-electric-teal font-medium text-sm">
               {selectedPost.category}
             </span>
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
+          <h1 className="text-5xl font-bold mb-6 leading-tight text-white">
             {selectedPost.title}
           </h1>
 
           {/* Metadata */}
-          <div className="flex items-center gap-6 pb-8 mb-8 border-b border-gray-200">
-            <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-6 pb-8 mb-8 border-b border-white/10">
+            <div className="flex items-center gap-2 text-white/60">
               <Calendar size={18} />
               <span className="font-medium">{new Date(selectedPost.date).toLocaleDateString('en-US', { 
                 month: 'long', 
@@ -148,35 +159,35 @@ export const BlogPage = () => {
                 year: 'numeric'
               })}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-2 text-white/60">
               <Clock size={18} />
               <span className="font-medium">{selectedPost.readTime}</span>
             </div>
           </div>
 
           {/* Content */}
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-invert prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
                 h1: ({ children }) => (
-                  <h1 className="text-4xl font-bold mb-6 mt-12 text-gray-900 border-b border-gray-200 pb-4">
+                  <h1 className="text-4xl font-bold mb-6 mt-12 text-white border-b border-white/10 pb-4">
                     {children}
                   </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 className="text-3xl font-bold mb-4 mt-10 text-gray-900">
+                  <h2 className="text-3xl font-bold mb-4 mt-10 text-white">
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 className="text-2xl font-semibold mb-3 mt-8 text-gray-800">
+                  <h3 className="text-2xl font-semibold mb-3 mt-8 text-white/90">
                     {children}
                   </h3>
                 ),
                 p: ({ children }) => (
-                  <p className="text-gray-700 leading-relaxed mb-6 text-lg">
+                  <p className="text-white/70 leading-relaxed mb-6 text-lg">
                     {children}
                   </p>
                 ),
@@ -191,32 +202,32 @@ export const BlogPage = () => {
                   </ol>
                 ),
                 li: ({ children }) => (
-                  <li className="text-gray-700 leading-relaxed">
+                  <li className="text-white/70 leading-relaxed">
                     {children}
                   </li>
                 ),
                 strong: ({ children }) => (
-                  <strong className="font-semibold text-gray-900">
+                  <strong className="font-semibold text-white">
                     {children}
                   </strong>
                 ),
                 em: ({ children }) => (
-                  <em className="italic text-gray-700">
+                  <em className="italic text-electric-teal/80">
                     {children}
                   </em>
                 ),
                 code: ({ inline, children }) => 
                   inline ? (
-                    <code className="px-2 py-1 rounded bg-gray-100 text-electric-teal text-sm font-mono">
+                    <code className="px-2 py-1 rounded bg-white/10 text-electric-teal text-sm font-mono">
                       {children}
                     </code>
                   ) : (
-                    <code className="block px-6 py-4 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 text-sm font-mono overflow-x-auto my-6">
+                    <code className="block px-6 py-4 rounded-lg bg-black/50 border border-white/10 text-white/80 text-sm font-mono overflow-x-auto my-6">
                       {children}
                     </code>
                   ),
                 blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-electric-teal pl-6 py-2 my-6 italic text-gray-600 bg-gray-50 rounded-r">
+                  <blockquote className="border-l-4 border-electric-teal pl-6 py-2 my-6 italic text-white/60 bg-white/5 rounded-r">
                     {children}
                   </blockquote>
                 ),
@@ -225,28 +236,28 @@ export const BlogPage = () => {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-electric-teal hover:underline"
+                    className="text-electric-teal hover:text-white underline transition-colors"
                   >
                     {children}
                   </a>
                 ),
                 hr: () => (
-                  <hr className="my-12 border-gray-200" />
+                  <hr className="my-12 border-white/10" />
                 ),
                 table: ({ children }) => (
                   <div className="overflow-x-auto my-8">
-                    <table className="w-full border-collapse border border-gray-200">
+                    <table className="w-full border-collapse border border-white/10">
                       {children}
                     </table>
                   </div>
                 ),
                 th: ({ children }) => (
-                  <th className="px-4 py-3 text-left font-semibold bg-gray-50 border-b-2 border-gray-300 text-gray-900">
+                  <th className="px-4 py-3 text-left font-semibold bg-white/5 border-b-2 border-electric-teal text-white">
                     {children}
                   </th>
                 ),
                 td: ({ children }) => (
-                  <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
+                  <td className="px-4 py-3 border-b border-white/10 text-white/70">
                     {children}
                   </td>
                 ),
@@ -258,13 +269,13 @@ export const BlogPage = () => {
 
           {/* Tags */}
           {selectedPost.tags && selectedPost.tags.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Tags</h3>
+            <div className="mt-12 pt-8 border-t border-white/10">
+              <h3 className="text-sm font-semibold text-white/60 mb-4 uppercase tracking-wider">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {selectedPost.tags.map((tag, index) => (
                   <span 
                     key={index}
-                    className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors"
+                    className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 text-sm hover:border-electric-teal/50 transition-colors"
                   >
                     {tag}
                   </span>
@@ -275,15 +286,15 @@ export const BlogPage = () => {
         </article>
 
         {/* Related Articles CTA */}
-        <div className="bg-gray-50 border-t border-gray-200 py-16">
+        <div className="bg-charcoal border-t border-white/10 py-16">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">Explore More Insights</h2>
-            <p className="text-gray-600 mb-8">
+            <h2 className="text-3xl font-bold mb-4 text-white">Explore More Insights</h2>
+            <p className="text-white/60 mb-8">
               Discover more forensic analysis and infrastructure research
             </p>
             <button 
               onClick={goBack}
-              className="px-8 py-4 bg-electric-teal text-white font-semibold rounded-lg hover:bg-opacity-90 transition-all"
+              className="px-8 py-4 bg-electric-teal text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all"
             >
               View All Articles
             </button>
@@ -295,16 +306,16 @@ export const BlogPage = () => {
 
   // Blog List View
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-matte-black text-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-black border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button 
             onClick={() => {
               localStorage.setItem('tnb_entered', 'true');
               window.location.href = window.location.origin + window.location.pathname;
             }}
-            className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
           >
             <ArrowLeft size={20} />
             <span className="font-medium">Home</span>
@@ -317,30 +328,30 @@ export const BlogPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-50 to-white border-b border-gray-200">
+      <section className="bg-gradient-to-br from-charcoal to-matte-black border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-20">
-          <h1 className="text-6xl font-bold mb-6 text-gray-900">
+          <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-electric-teal via-white to-electric-teal bg-clip-text text-transparent">
             Unlock Expert Analyses
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl">
+          <p className="text-xl text-white/60 max-w-2xl">
             Deep-dive forensic analysis on XRP infrastructure, global finance reset, and institutional adoption patterns.
           </p>
         </div>
       </section>
 
       {/* Search and Categories */}
-      <section className="border-b border-gray-200 bg-white sticky top-0 z-40">
+      <section className="border-b border-white/10 bg-black sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           {/* Search Bar */}
           <div className="mb-6">
             <div className="relative max-w-md">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40" size={20} />
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-electric-teal transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-electric-teal transition-colors rounded-lg"
               />
             </div>
           </div>
@@ -353,8 +364,8 @@ export const BlogPage = () => {
                 onClick={() => setSelectedCategory(name)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium whitespace-nowrap transition-all ${
                   selectedCategory === name
-                    ? 'bg-electric-teal text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-electric-teal text-black'
+                    : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
                 <Icon size={18} />
@@ -367,23 +378,23 @@ export const BlogPage = () => {
 
       {/* Featured Post */}
       {selectedCategory === 'All' && featuredPost && (
-        <section className="bg-gradient-to-br from-electric-teal/5 to-transparent border-b border-gray-200">
+        <section className="bg-gradient-to-br from-electric-teal/5 to-transparent border-b border-white/10">
           <div className="max-w-7xl mx-auto px-6 py-16">
             <div 
               onClick={() => selectPost(featuredPost)}
               className="grid md:grid-cols-2 gap-12 items-center cursor-pointer group"
             >
               <div>
-                <span className="inline-block px-3 py-1 rounded-full bg-electric-teal text-white text-sm font-medium mb-4">
+                <span className="inline-block px-3 py-1 rounded-full bg-electric-teal text-black text-sm font-medium mb-4">
                   Featured Article
                 </span>
-                <h2 className="text-4xl font-bold mb-4 text-gray-900 group-hover:text-electric-teal transition-colors">
+                <h2 className="text-4xl font-bold mb-4 text-white group-hover:text-electric-teal transition-colors">
                   {featuredPost.title}
                 </h2>
-                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                <p className="text-white/60 text-lg mb-6 leading-relaxed">
                   {featuredPost.excerpt}
                 </p>
-                <div className="flex items-center gap-6 text-gray-600 mb-6">
+                <div className="flex items-center gap-6 text-white/60 mb-6">
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
                     <span className="text-sm">{featuredPost.date}</span>
@@ -393,13 +404,25 @@ export const BlogPage = () => {
                     <span className="text-sm">{featuredPost.readTime}</span>
                   </div>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-electric-teal text-white font-semibold rounded-lg hover:bg-opacity-90 transition-all">
+                <button className="flex items-center gap-2 px-6 py-3 bg-electric-teal text-black font-semibold rounded-lg hover:bg-opacity-90 transition-all">
                   Read Article
                   <ArrowRight size={18} />
                 </button>
               </div>
-              <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl aspect-video flex items-center justify-center">
-                <BookOpen size={80} className="text-gray-400" />
+              
+              {/* Featured Image or Placeholder */}
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border border-white/10 group-hover:border-electric-teal/50 transition-all">
+                {featuredPost.image ? (
+                  <img 
+                    src={featuredPost.image} 
+                    alt={featuredPost.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookOpen size={80} className="text-white/20 group-hover:text-electric-teal/50 transition-colors" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -414,28 +437,38 @@ export const BlogPage = () => {
               <article
                 key={post.id}
                 onClick={() => selectPost(post)}
-                className="group cursor-pointer bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-electric-teal/50 transition-all"
+                className="group cursor-pointer bg-charcoal border border-white/10 rounded-lg overflow-hidden hover:border-electric-teal/50 transition-all hover:shadow-xl hover:shadow-electric-teal/10"
               >
                 {/* Thumbnail */}
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 aspect-video flex items-center justify-center">
-                  <BookOpen size={48} className="text-gray-400 group-hover:text-electric-teal transition-colors" />
+                <div className="relative aspect-video bg-gradient-to-br from-white/10 to-white/5 overflow-hidden">
+                  {post.image ? (
+                    <img 
+                      src={post.image} 
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <BookOpen size={48} className="text-white/20 group-hover:text-electric-teal/50 transition-colors" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
                 <div className="p-6">
-                  <span className="inline-block px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium mb-3">
+                  <span className="inline-block px-2 py-1 rounded bg-white/5 border border-white/10 text-white/70 text-xs font-medium mb-3">
                     {post.category}
                   </span>
                   
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-electric-teal transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold mb-3 text-white group-hover:text-electric-teal transition-colors line-clamp-2">
                     {post.title}
                   </h3>
                   
-                  <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                  <p className="text-white/60 mb-4 line-clamp-3 leading-relaxed">
                     {post.excerpt}
                   </p>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-4 text-sm text-white/40">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} />
                       <span>{post.date}</span>
@@ -452,18 +485,18 @@ export const BlogPage = () => {
 
           {filteredPosts.length === 0 && (
             <div className="text-center py-20">
-              <Search size={64} className="text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">No articles found matching your criteria</p>
+              <Search size={64} className="text-white/10 mx-auto mb-4" />
+              <p className="text-white/40 text-lg">No articles found matching your criteria</p>
             </div>
           )}
         </div>
       </section>
 
       {/* Newsletter CTA */}
-      <section className="bg-gray-900 text-white py-20">
+      <section className="bg-black border-t border-white/10 py-20">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-4">Stay Informed</h2>
-          <p className="text-gray-400 mb-8 text-lg">
+          <p className="text-white/60 mb-8 text-lg">
             Get weekly forensic analysis and infrastructure insights delivered to your inbox
           </p>
           <form 
@@ -476,11 +509,11 @@ export const BlogPage = () => {
               name="email"
               placeholder="Enter your email" 
               required
-              className="flex-1 px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-electric-teal transition-colors rounded-lg"
+              className="flex-1 px-6 py-4 bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-electric-teal transition-colors rounded-lg"
             />
             <button 
               type="submit"
-              className="px-8 py-4 bg-electric-teal text-white font-bold rounded-lg hover:bg-opacity-90 transition-all whitespace-nowrap"
+              className="px-8 py-4 bg-electric-teal text-black font-bold rounded-lg hover:bg-opacity-90 transition-all whitespace-nowrap"
             >
               Subscribe
             </button>
@@ -489,12 +522,12 @@ export const BlogPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-12">
+      <footer className="bg-black border-t border-white/10 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-gray-600 text-sm">
+          <p className="text-white/40 text-sm">
             The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.
           </p>
-          <p className="text-gray-400 text-sm mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
+          <p className="text-white/20 text-sm mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
         </div>
       </footer>
     </div>
