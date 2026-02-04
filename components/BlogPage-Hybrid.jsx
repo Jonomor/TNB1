@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, ArrowLeft, Terminal } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 export const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -7,11 +12,13 @@ export const BlogPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch posts from blog_posts.json
-    fetch('/blog_posts.json')
+    // Fetch posts from blog_posts.json with cache busting
+    fetch('/blog_posts.json?t=' + Date.now())
       .then(res => res.json())
       .then(data => {
-        setPosts(data.posts || []);
+        // Handle both array format and object format
+        const postsArray = Array.isArray(data) ? data : (data.posts || []);
+        setPosts(postsArray);
         setLoading(false);
       })
       .catch(err => {
@@ -65,27 +72,128 @@ export const BlogPage = () => {
             </div>
           </div>
 
+          {/* Improved Markdown Rendering */}
           <div className="prose prose-invert prose-lg max-w-none">
-            {selectedPost.content.split('\n\n').map((paragraph, idx) => {
-              if (paragraph.startsWith('## ')) {
-                return <h2 key={idx} className="text-2xl font-serif text-white mt-12 mb-4">{paragraph.replace('## ', '')}</h2>;
-              }
-              if (paragraph.startsWith('### ')) {
-                return <h3 key={idx} className="text-xl font-serif text-white mt-8 mb-3">{paragraph.replace('### ', '')}</h3>;
-              }
-              if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-                return <h4 key={idx} className="text-lg font-bold text-electric-teal mt-6 mb-2">{paragraph.replace(/\*\*/g, '')}</h4>;
-              }
-              if (paragraph.startsWith('- ')) {
-                const items = paragraph.split('\n').filter(line => line.startsWith('- '));
-                return (
-                  <ul key={idx} className="list-disc pl-6 space-y-2 text-white/70 my-6">
-                    {items.map((item, i) => <li key={i}>{item.replace('- ', '')}</li>)}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                // Headings
+                h1: ({ children }) => (
+                  <h1 className="font-serif text-4xl mb-6 mt-12 text-white leading-tight border-b border-white/10 pb-4">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="font-serif text-3xl text-white mt-12 mb-4">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="font-serif text-2xl text-white mt-8 mb-3">
+                    {children}
+                  </h3>
+                ),
+                h4: ({ children }) => (
+                  <h4 className="text-lg font-bold text-electric-teal mt-6 mb-2">
+                    {children}
+                  </h4>
+                ),
+                
+                // Paragraphs
+                p: ({ children }) => (
+                  <p className="text-white/70 leading-relaxed mb-6 text-lg">
+                    {children}
+                  </p>
+                ),
+                
+                // Lists
+                ul: ({ children }) => (
+                  <ul className="list-disc pl-6 space-y-2 text-white/70 my-6">
+                    {children}
                   </ul>
-                );
-              }
-              return <p key={idx} className="text-white/70 leading-relaxed mb-6">{paragraph}</p>;
-            })}
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal pl-6 space-y-2 text-white/70 my-6">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-white/70 leading-relaxed">
+                    {children}
+                  </li>
+                ),
+                
+                // Emphasis
+                strong: ({ children }) => (
+                  <strong className="text-white font-semibold">
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => (
+                  <em className="text-electric-teal/80">
+                    {children}
+                  </em>
+                ),
+                
+                // Code
+                code: ({ inline, children }) => 
+                  inline ? (
+                    <code className="px-2 py-1 rounded bg-white/10 text-electric-teal text-sm font-mono">
+                      {children}
+                    </code>
+                  ) : (
+                    <code className="block px-6 py-4 rounded bg-black/50 border border-white/10 text-white/80 text-sm font-mono overflow-x-auto my-6">
+                      {children}
+                    </code>
+                  ),
+                
+                // Blockquotes
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-electric-teal pl-6 py-2 my-6 italic text-white/60 bg-white/5">
+                    {children}
+                  </blockquote>
+                ),
+                
+                // Links
+                a: ({ href, children }) => (
+                  <a 
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-electric-teal hover:text-white underline transition-colors"
+                  >
+                    {children}
+                  </a>
+                ),
+                
+                // Horizontal Rule
+                hr: () => (
+                  <hr className="my-12 border-none h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                ),
+                
+                // Tables
+                table: ({ children }) => (
+                  <div className="overflow-x-auto my-8">
+                    <table className="w-full border-collapse">
+                      {children}
+                    </table>
+                  </div>
+                ),
+                th: ({ children }) => (
+                  <th className="px-4 py-3 text-left font-semibold border-b-2 border-electric-teal bg-white/5 text-white">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-4 py-3 border-b border-white/10 text-white/70">
+                    {children}
+                  </td>
+                ),
+              }}
+            >
+              {selectedPost.content}
+            </ReactMarkdown>
           </div>
         </article>
       </div>
@@ -140,7 +248,8 @@ export const BlogPage = () => {
               {posts.map((post) => (
                 <article 
                   key={post.id}
-                  className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group"
+                  className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group cursor-pointer"
+                  onClick={() => setSelectedPost(post)}
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
@@ -167,7 +276,6 @@ export const BlogPage = () => {
                   </p>
                   
                   <button
-                    onClick={() => setSelectedPost(post)}
                     className="inline-flex items-center gap-2 text-electric-teal hover:text-white transition-colors"
                   >
                     Read Analysis →
