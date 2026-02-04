@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, ArrowLeft, Terminal, Share2, Copy, Check } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ArrowRight, Search, TrendingUp, BookOpen, Lightbulb, Share2, Copy, Check } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -10,14 +10,21 @@ export const BlogPage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
 
+  const categories = [
+    { name: 'All', icon: BookOpen },
+    { name: 'Market Analysis', icon: TrendingUp },
+    { name: 'Infrastructure Analysis', icon: Lightbulb },
+    { name: 'Research', icon: Search }
+  ];
+
   useEffect(() => {
-    // Fetch posts from blog_posts.json with cache busting
     fetch('/blog_posts.json?t=' + Date.now())
       .then(res => res.json())
       .then(data => {
-        // Handle both array format and object format
         const postsArray = Array.isArray(data) ? data : (data.posts || []);
         setPosts(postsArray);
         setLoading(false);
@@ -28,9 +35,7 @@ export const BlogPage = () => {
         if (articleMatch) {
           const slug = articleMatch[1];
           const post = postsArray.find(p => p.slug === slug || p.id === slug);
-          if (post) {
-            setSelectedPost(post);
-          }
+          if (post) setSelectedPost(post);
         }
       })
       .catch(err => {
@@ -39,224 +44,209 @@ export const BlogPage = () => {
       });
   }, []);
 
-  // Update URL when post is selected
   const selectPost = (post) => {
     setSelectedPost(post);
     window.location.hash = `#/blog/${post.slug || post.id}`;
+    window.scrollTo(0, 0);
   };
 
-  // Clear URL when going back
   const goBack = () => {
     setSelectedPost(null);
     window.location.hash = '#/blog';
   };
 
-  // Copy article link to clipboard
   const copyLink = () => {
-    const link = `${window.location.origin}${window.location.pathname}#/blog/${selectedPost.slug || selectedPost.id}`;
+    const link = selectedPost 
+      ? `${window.location.origin}${window.location.pathname}#/blog/${selectedPost.slug || selectedPost.id}`
+      : window.location.href;
     navigator.clipboard.writeText(link).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   };
 
+  // Filter posts
+  const filteredPosts = posts.filter(post => {
+    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Featured post (most recent)
+  const featuredPost = posts[0];
+  const regularPosts = filteredPosts.slice(selectedCategory === 'All' ? 1 : 0);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-matte-black text-white flex items-center justify-center">
-        <p className="text-white/60 font-mono text-sm">Loading forensic analysis...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-electric-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-mono text-sm">Loading insights...</p>
+        </div>
       </div>
     );
   }
 
+  // Article View
   if (selectedPost) {
-    const articleUrl = `${window.location.origin}${window.location.pathname}#/blog/${selectedPost.slug || selectedPost.id}`;
-    
     return (
-      <div className="min-h-screen bg-matte-black text-white font-sans">
-        {/* Header */}
-        <div className="bg-black border-b border-white/10 sticky top-0 z-50">
-          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="min-h-screen bg-white">
+        {/* Sticky Header */}
+        <header className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 z-50">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <button 
-              onClick={goBack} 
-              className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+              onClick={goBack}
+              className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
             >
-              <ArrowLeft size={18} />
-              <span className="font-mono text-sm uppercase tracking-wider">Back to Articles</span>
+              <ArrowLeft size={20} />
+              <span className="font-medium">Back to Blog</span>
             </button>
-
-            {/* Share Button */}
-            <button
-              onClick={copyLink}
-              className="flex items-center gap-2 px-3 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 hover:border-electric-teal/50 transition-all text-sm"
-            >
-              {copied ? (
-                <>
-                  <Check size={16} className="text-electric-teal" />
-                  <span className="text-electric-teal font-mono">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 size={16} />
-                  <span className="font-mono">Share</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Article Content */}
-        <article className="py-20 max-w-3xl mx-auto px-6">
-          <div className="mb-8">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
-              {selectedPost.category}
-            </span>
-          </div>
-          
-          <h1 className="font-serif text-5xl mb-6 text-white leading-tight">{selectedPost.title}</h1>
-          
-          <div className="flex items-center gap-4 mb-12 text-sm text-white/40">
-            <div className="flex items-center gap-1">
-              <Calendar size={14} />
-              <span>{selectedPost.date}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock size={14} />
-              <span>{selectedPost.readTime} read</span>
-            </div>
-          </div>
-
-          {/* Share Link Display */}
-          <div className="mb-8 p-4 bg-white/5 border border-white/10 rounded-sm">
-            <p className="text-xs text-white/40 mb-2 font-mono uppercase tracking-wider">Article Link:</p>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm text-electric-teal font-mono overflow-x-auto">
-                {articleUrl}
-              </code>
+            
+            <div className="flex items-center gap-3">
               <button
                 onClick={copyLink}
-                className="p-2 hover:bg-white/10 rounded transition-colors"
-                title="Copy link"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
               >
-                {copied ? <Check size={16} className="text-electric-teal" /> : <Copy size={16} />}
+                {copied ? (
+                  <>
+                    <Check size={16} className="text-electric-teal" />
+                    <span className="text-sm font-medium text-electric-teal">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 size={16} />
+                    <span className="text-sm font-medium">Share</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
+        </header>
 
-          {/* Improved Markdown Rendering */}
-          <div className="prose prose-invert prose-lg max-w-none">
+        {/* Article Container */}
+        <article className="max-w-4xl mx-auto px-6 py-16">
+          {/* Category Badge */}
+          <div className="mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-electric-teal/10 text-electric-teal font-medium text-sm">
+              {selectedPost.category}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="text-5xl font-bold mb-6 leading-tight text-gray-900">
+            {selectedPost.title}
+          </h1>
+
+          {/* Metadata */}
+          <div className="flex items-center gap-6 pb-8 mb-8 border-b border-gray-200">
+            <div className="flex items-center gap-2 text-gray-600">
+              <Calendar size={18} />
+              <span className="font-medium">{new Date(selectedPost.date).toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+              })}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600">
+              <Clock size={18} />
+              <span className="font-medium">{selectedPost.readTime}</span>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="prose prose-lg max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
-                // Headings
                 h1: ({ children }) => (
-                  <h1 className="font-serif text-4xl mb-6 mt-12 text-white leading-tight border-b border-white/10 pb-4">
+                  <h1 className="text-4xl font-bold mb-6 mt-12 text-gray-900 border-b border-gray-200 pb-4">
                     {children}
                   </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 className="font-serif text-3xl text-white mt-12 mb-4">
+                  <h2 className="text-3xl font-bold mb-4 mt-10 text-gray-900">
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 className="font-serif text-2xl text-white mt-8 mb-3">
+                  <h3 className="text-2xl font-semibold mb-3 mt-8 text-gray-800">
                     {children}
                   </h3>
                 ),
-                h4: ({ children }) => (
-                  <h4 className="text-lg font-bold text-electric-teal mt-6 mb-2">
-                    {children}
-                  </h4>
-                ),
-                
-                // Paragraphs
                 p: ({ children }) => (
-                  <p className="text-white/70 leading-relaxed mb-6 text-lg">
+                  <p className="text-gray-700 leading-relaxed mb-6 text-lg">
                     {children}
                   </p>
                 ),
-                
-                // Lists
                 ul: ({ children }) => (
-                  <ul className="list-disc pl-6 space-y-2 text-white/70 my-6">
+                  <ul className="space-y-3 my-6 ml-6">
                     {children}
                   </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="list-decimal pl-6 space-y-2 text-white/70 my-6">
+                  <ol className="space-y-3 my-6 ml-6 list-decimal">
                     {children}
                   </ol>
                 ),
                 li: ({ children }) => (
-                  <li className="text-white/70 leading-relaxed">
+                  <li className="text-gray-700 leading-relaxed">
                     {children}
                   </li>
                 ),
-                
-                // Emphasis
                 strong: ({ children }) => (
-                  <strong className="text-white font-semibold">
+                  <strong className="font-semibold text-gray-900">
                     {children}
                   </strong>
                 ),
                 em: ({ children }) => (
-                  <em className="text-electric-teal/80">
+                  <em className="italic text-gray-700">
                     {children}
                   </em>
                 ),
-                
-                // Code
                 code: ({ inline, children }) => 
                   inline ? (
-                    <code className="px-2 py-1 rounded bg-white/10 text-electric-teal text-sm font-mono">
+                    <code className="px-2 py-1 rounded bg-gray-100 text-electric-teal text-sm font-mono">
                       {children}
                     </code>
                   ) : (
-                    <code className="block px-6 py-4 rounded bg-black/50 border border-white/10 text-white/80 text-sm font-mono overflow-x-auto my-6">
+                    <code className="block px-6 py-4 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 text-sm font-mono overflow-x-auto my-6">
                       {children}
                     </code>
                   ),
-                
-                // Blockquotes
                 blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-electric-teal pl-6 py-2 my-6 italic text-white/60 bg-white/5">
+                  <blockquote className="border-l-4 border-electric-teal pl-6 py-2 my-6 italic text-gray-600 bg-gray-50 rounded-r">
                     {children}
                   </blockquote>
                 ),
-                
-                // Links
                 a: ({ href, children }) => (
                   <a 
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-electric-teal hover:text-white underline transition-colors"
+                    className="text-electric-teal hover:underline"
                   >
                     {children}
                   </a>
                 ),
-                
-                // Horizontal Rule
                 hr: () => (
-                  <hr className="my-12 border-none h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <hr className="my-12 border-gray-200" />
                 ),
-                
-                // Tables
                 table: ({ children }) => (
                   <div className="overflow-x-auto my-8">
-                    <table className="w-full border-collapse">
+                    <table className="w-full border-collapse border border-gray-200">
                       {children}
                     </table>
                   </div>
                 ),
                 th: ({ children }) => (
-                  <th className="px-4 py-3 text-left font-semibold border-b-2 border-electric-teal bg-white/5 text-white">
+                  <th className="px-4 py-3 text-left font-semibold bg-gray-50 border-b-2 border-gray-300 text-gray-900">
                     {children}
                   </th>
                 ),
                 td: ({ children }) => (
-                  <td className="px-4 py-3 border-b border-white/10 text-white/70">
+                  <td className="px-4 py-3 border-b border-gray-200 text-gray-700">
                     {children}
                   </td>
                 ),
@@ -265,110 +255,217 @@ export const BlogPage = () => {
               {selectedPost.content}
             </ReactMarkdown>
           </div>
+
+          {/* Tags */}
+          {selectedPost.tags && selectedPost.tags.length > 0 && (
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wider">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedPost.tags.map((tag, index) => (
+                  <span 
+                    key={index}
+                    className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
+
+        {/* Related Articles CTA */}
+        <div className="bg-gray-50 border-t border-gray-200 py-16">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">Explore More Insights</h2>
+            <p className="text-gray-600 mb-8">
+              Discover more forensic analysis and infrastructure research
+            </p>
+            <button 
+              onClick={goBack}
+              className="px-8 py-4 bg-electric-teal text-white font-semibold rounded-lg hover:bg-opacity-90 transition-all"
+            >
+              View All Articles
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // Blog List View
   return (
-    <div className="min-h-screen bg-matte-black text-white font-sans">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-black border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <button 
             onClick={() => {
               localStorage.setItem('tnb_entered', 'true');
               window.location.href = window.location.origin + window.location.pathname;
-            }} 
-            className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+            }}
+            className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
           >
-            <ArrowLeft size={18} />
-            <span className="font-mono text-sm uppercase tracking-wider">Back to Home</span>
+            <ArrowLeft size={20} />
+            <span className="font-medium">Home</span>
           </button>
           <div className="flex items-center gap-2">
-            <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
-            <span className="font-serif font-bold text-lg">The Neutral Bridge</span>
+            <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-8 h-8" />
+            <span className="font-bold text-xl">The Neutral Bridge</span>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Hero */}
-      <section className="py-20 border-b border-white/5 bg-circuit">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-electric-teal/10 border border-electric-teal/30 rounded-full mb-6">
-            <Terminal size={12} className="text-electric-teal" />
-            <span className="text-[10px] font-mono font-bold text-electric-teal uppercase tracking-widest">Engineering Analysis</span>
-          </div>
-          <h1 className="font-serif text-5xl md:text-6xl mb-6 text-white">The Bridge Journal</h1>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto">
-            Forensic analysis of the 2027 financial reset. Engineering-grade insights into XRP, Ripple, and global liquidity infrastructure.
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-gray-50 to-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-20">
+          <h1 className="text-6xl font-bold mb-6 text-gray-900">
+            Unlock Expert Analyses
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl">
+            Deep-dive forensic analysis on XRP infrastructure, global finance reset, and institutional adoption patterns.
           </p>
         </div>
       </section>
 
-      {/* Posts Grid */}
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          {posts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-white/40 text-lg">No analysis published yet. Check back soon.</p>
+      {/* Search and Categories */}
+      <section className="border-b border-gray-200 bg-white sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-electric-teal transition-colors"
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-8">
-              {posts.map((post) => (
-                <article 
-                  key={post.id}
-                  className="bg-charcoal border border-white/10 p-8 hover:border-electric-teal/50 transition-all group cursor-pointer"
-                  onClick={() => selectPost(post)}
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-electric-teal border border-electric-teal/30 px-2 py-1 rounded-sm">
-                      {post.category}
-                    </span>
-                    <div className="flex items-center gap-4 text-xs text-white/40">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={12} />
-                        <span>{post.date}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock size={12} />
-                        <span>{post.readTime} read</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <h2 className="font-serif text-2xl text-white mb-3 group-hover:text-electric-teal transition-colors">
-                    {post.title}
-                  </h2>
-                  
-                  <p className="text-white/60 leading-relaxed mb-4">
-                    {post.excerpt}
-                  </p>
-                  
-                  <button
-                    className="inline-flex items-center gap-2 text-electric-teal hover:text-white transition-colors"
-                  >
-                    Read Analysis →
-                  </button>
-                </article>
-              ))}
-            </div>
-          )}
-          
-          {/* Coming Soon Notice */}
-          <div className="mt-12 text-center p-8 border border-white/10 bg-white/5">
-            <p className="font-mono text-sm text-white/60 uppercase tracking-widest">
-              📡 New analysis published 3x weekly // Subscribe for updates
-            </p>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {categories.map(({ name, icon: Icon }) => (
+              <button
+                key={name}
+                onClick={() => setSelectedCategory(name)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium whitespace-nowrap transition-all ${
+                  selectedCategory === name
+                    ? 'bg-electric-teal text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Icon size={18} />
+                {name}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* Featured Post */}
+      {selectedCategory === 'All' && featuredPost && (
+        <section className="bg-gradient-to-br from-electric-teal/5 to-transparent border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-16">
+            <div 
+              onClick={() => selectPost(featuredPost)}
+              className="grid md:grid-cols-2 gap-12 items-center cursor-pointer group"
+            >
+              <div>
+                <span className="inline-block px-3 py-1 rounded-full bg-electric-teal text-white text-sm font-medium mb-4">
+                  Featured Article
+                </span>
+                <h2 className="text-4xl font-bold mb-4 text-gray-900 group-hover:text-electric-teal transition-colors">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  {featuredPost.excerpt}
+                </p>
+                <div className="flex items-center gap-6 text-gray-600 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={16} />
+                    <span className="text-sm">{featuredPost.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} />
+                    <span className="text-sm">{featuredPost.readTime}</span>
+                  </div>
+                </div>
+                <button className="flex items-center gap-2 px-6 py-3 bg-electric-teal text-white font-semibold rounded-lg hover:bg-opacity-90 transition-all">
+                  Read Article
+                  <ArrowRight size={18} />
+                </button>
+              </div>
+              <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl aspect-video flex items-center justify-center">
+                <BookOpen size={80} className="text-gray-400" />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Articles Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {regularPosts.map((post) => (
+              <article
+                key={post.id}
+                onClick={() => selectPost(post)}
+                className="group cursor-pointer bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-electric-teal/50 transition-all"
+              >
+                {/* Thumbnail */}
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 aspect-video flex items-center justify-center">
+                  <BookOpen size={48} className="text-gray-400 group-hover:text-electric-teal transition-colors" />
+                </div>
+
+                {/* Content */}
+                <div className="p-6">
+                  <span className="inline-block px-2 py-1 rounded bg-gray-100 text-gray-700 text-xs font-medium mb-3">
+                    {post.category}
+                  </span>
+                  
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-electric-teal transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      <span>{post.date}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} />
+                      <span>{post.readTime}</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {filteredPosts.length === 0 && (
+            <div className="text-center py-20">
+              <Search size={64} className="text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg">No articles found matching your criteria</p>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Newsletter CTA */}
-      <section className="py-20 bg-charcoal border-t border-white/10">
+      <section className="bg-gray-900 text-white py-20">
         <div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="font-serif text-3xl mb-4 text-white">Stay Ahead of the Reset</h2>
-          <p className="text-white/60 mb-8">Get weekly forensic analysis delivered to your inbox.</p>
+          <h2 className="text-4xl font-bold mb-4">Stay Informed</h2>
+          <p className="text-gray-400 mb-8 text-lg">
+            Get weekly forensic analysis and infrastructure insights delivered to your inbox
+          </p>
           <form 
             action="https://formspree.io/f/xqeqorqy" 
             method="POST"
@@ -379,11 +476,11 @@ export const BlogPage = () => {
               name="email"
               placeholder="Enter your email" 
               required
-              className="flex-1 bg-black border border-white/20 px-4 py-3 text-white focus:outline-none focus:border-electric-teal transition-colors rounded-sm"
+              className="flex-1 px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-electric-teal transition-colors rounded-lg"
             />
             <button 
               type="submit"
-              className="bg-electric-teal text-black font-bold px-8 py-3 rounded-sm hover:bg-white transition-all uppercase tracking-wider text-sm"
+              className="px-8 py-4 bg-electric-teal text-white font-bold rounded-lg hover:bg-opacity-90 transition-all whitespace-nowrap"
             >
               Subscribe
             </button>
@@ -392,12 +489,12 @@ export const BlogPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-white/10 py-12">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <p className="text-xs text-white/40">
+      <footer className="bg-white border-t border-gray-200 py-12">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-gray-600 text-sm">
             The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.
           </p>
-          <p className="text-xs text-white/20 mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
+          <p className="text-gray-400 text-sm mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
         </div>
       </footer>
     </div>
