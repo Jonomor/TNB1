@@ -395,11 +395,16 @@ const MarketAnalysisPage = () => {
           <div className="space-y-2 sm:space-y-3">
             {news.map((item, idx) => (
               <a
-                key={idx}
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block bg-gray-800/50 p-3 sm:p-4 rounded-lg hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
+               key={idx}
+  href={item.url || '#'}
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={(e) => {
+    if (!item.url || item.url === '#') {
+      e.preventDefault();
+    }
+  }}
+  className="block bg-gray-800/50 p-3 sm:p-4 rounded-lg hover:bg-gray-800 transition-all group border border-transparent hover:border-gray-700"
               >
                 <div className="flex items-start justify-between gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
