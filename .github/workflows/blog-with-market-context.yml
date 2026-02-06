@@ -241,15 +241,23 @@ jobs:
               
               // Update blog_posts.json
               const indexPath = './public/blog_posts.json';
-              let blogData = { posts: [] };
+              let posts = [];
               
               if (fs.existsSync(indexPath)) {
                 try {
-                  blogData = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+                  const data = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+                  // Handle both array format and object format
+                  posts = Array.isArray(data) ? data : (data.posts || []);
                 } catch (e) {
                   console.log('Creating new blog index');
-                  blogData = { posts: [] };
+                  posts = [];
                 }
+              }
+              
+              // Safety check to ensure posts is an array
+              if (!Array.isArray(posts)) {
+                console.warn('Posts data is not an array, resetting to empty array');
+                posts = [];
               }
               
               // Extract excerpt from content
@@ -278,19 +286,19 @@ jobs:
               };
               
               // Check if post with this ID already exists
-              const existingIndex = blogData.posts.findIndex(p => p.id === newPost.id);
+              const existingIndex = posts.findIndex(p => p.id === newPost.id);
               if (existingIndex >= 0) {
-                blogData.posts[existingIndex] = newPost;
+                posts[existingIndex] = newPost;
                 console.log('Updated existing post for today');
               } else {
-                blogData.posts.unshift(newPost);
+                posts.unshift(newPost);
                 console.log('Added new post');
               }
               
               // Keep only last 20 posts
-              blogData.posts = blogData.posts.slice(0, 20);
+              posts = posts.slice(0, 20);
               
-              fs.writeFileSync(indexPath, JSON.stringify(blogData, null, 2));
+              fs.writeFileSync(indexPath, JSON.stringify(posts, null, 2));
               console.log('Blog index updated successfully!');
               console.log('Analysis framework: ' + topicAngle);
               console.log('Style variant: ' + styleVariant);
