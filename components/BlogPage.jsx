@@ -15,10 +15,10 @@ export const BlogPage = () => {
   const [copied, setCopied] = useState(false);
 
   const categories = [
-    { name: 'All', icon: BookOpen },
-    { name: 'Market Analysis', icon: TrendingUp },
-    { name: 'Infrastructure Analysis', icon: Lightbulb },
-    { name: 'Research', icon: Search }
+    { name: 'All', shortName: 'All', icon: BookOpen },
+    { name: 'Market Analysis', shortName: 'Market', icon: TrendingUp },
+    { name: 'Infrastructure Analysis', shortName: 'Infrastructure', icon: Lightbulb },
+    { name: 'Research', shortName: 'Research', icon: Search }
   ];
 
   useEffect(() => {
@@ -328,13 +328,13 @@ export const BlogPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Mobile Optimized */}
       <section className="bg-gradient-to-br from-charcoal to-matte-black border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-electric-teal via-white to-electric-teal bg-clip-text text-transparent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-20">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 bg-gradient-to-r from-electric-teal via-white to-electric-teal bg-clip-text text-transparent leading-tight">
             Unlock Expert Analyses
           </h1>
-          <p className="text-base sm:text-xl text-white/60 max-w-2xl">
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/60 max-w-2xl leading-relaxed">
             Deep-dive forensic analysis on XRP infrastructure, global finance reset, and institutional adoption patterns.
           </p>
         </div>
@@ -357,20 +357,21 @@ export const BlogPage = () => {
             </div>
           </div>
 
-          {/* Category Tabs - Horizontal Scroll on Mobile */}
+          {/* Category Tabs - Mobile Optimized with Short Names */}
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
-            {categories.map(({ name, icon: Icon }) => (
+            {categories.map(({ name, shortName, icon: Icon }) => (
               <button
                 key={name}
                 onClick={() => setSelectedCategory(name)}
-                className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium whitespace-nowrap transition-all text-sm sm:text-base ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg font-medium whitespace-nowrap transition-all text-xs sm:text-sm md:text-base ${
                   selectedCategory === name
                     ? 'bg-electric-teal text-black'
                     : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
-                <Icon size={16} className="sm:w-[18px] sm:h-[18px]" />
-                {name}
+                <Icon size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px] flex-shrink-0" />
+                <span className="hidden sm:inline">{name}</span>
+                <span className="sm:hidden">{shortName}</span>
               </button>
             ))}
           </div>
