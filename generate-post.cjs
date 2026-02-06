@@ -21,7 +21,7 @@ function httpsRequest(url, options = {}) {
         try {
           const parsed = JSON.parse(data);
           if (res.statusCode >= 400) {
-            reject(new Error(`API Error (${res.statusCode}): ${JSON.stringify(parsed)}`));
+            reject(new Error('API Error (' + res.statusCode + '): ' + JSON.stringify(parsed)));
           } else {
             resolve(parsed);
           }
@@ -52,71 +52,125 @@ async function run() {
     const p = coinData.market_data.current_price.usd;
     const c = coinData.market_data.price_change_percentage_24h;
     const c7d = coinData.market_data.price_change_percentage_7d;
+    const c30d = coinData.market_data.price_change_percentage_30d;
     const m = coinData.market_data.market_cap.usd;
     const v = coinData.market_data.total_volume.usd;
     const rank = coinData.market_cap_rank;
+    const high24h = coinData.market_data.high_24h.usd;
+    const low24h = coinData.market_data.low_24h.usd;
+    const ath = coinData.market_data.ath.usd;
     const today = new Date().toISOString().split('T')[0];
 
     console.log('Data received. Price:', p);
 
-    const promptText = 'CONTEXT: You are K. Morgan, forensic analyst for The Neutral Bridge, writing institutional-grade market analysis.\n\n' +
+    // MARKET CONDITION DETECTOR
+    const volatility = ((high24h - low24h) / low24h) * 100;
+    const isHighVolatility = volatility > 5;
+    const isBearish = c7d < -10;
+    const isBullish = c7d > 10;
+    const isConsolidating = Math.abs(c7d) < 3;
+    const volumeRatio = v / (m * 0.1); // Volume as % of market cap
+    const isHighVolume = volumeRatio > 0.15;
+
+    // TOPIC SELECTOR based on market conditions
+    let topicAngle = '';
+    let styleVariant = '';
+    
+    if (isBearish && isHighVolatility) {
+      topicAngle = 'technical_breakdown';
+      styleVariant = 'forensic_autopsy';
+    } else if (isBullish && isHighVolume) {
+      topicAngle = 'institutional_flow';
+      styleVariant = 'capital_flows';
+    } else if (isHighVolatility) {
+      topicAngle = 'liquidity_mechanics';
+      styleVariant = 'market_structure';
+    } else if (isConsolidating) {
+      topicAngle = 'infrastructure_development';
+      styleVariant = 'strategic_positioning';
+    } else {
+      // Rotate through analytical frameworks
+      const frameworks = ['regulatory_analysis', 'game_theory', 'network_effects', 'competitive_moat'];
+      topicAngle = frameworks[Math.floor(Math.random() * frameworks.length)];
+      styleVariant = 'thought_leadership';
+    }
+
+    console.log('Market condition:', { topicAngle, styleVariant, volatility: volatility.toFixed(2) + '%' });
+
+    // DYNAMIC PROMPT TEMPLATES
+    const promptTemplates = {
+      forensic_autopsy: 'You are conducting a forensic autopsy of current price action. Write as a clinical systems analyst dissecting market failure modes. Focus on: algorithmic cascade effects, liquidity pool depth analysis, stop-loss cluster mapping, and institutional exit/entry signatures. Use precise technical language like "order book exhaustion," "liquidity vacuum," "capitulation event."',
+      
+      capital_flows: 'You are tracking institutional capital flows. Write as a former Goldman Sachs analyst now covering crypto infrastructure. Focus on: on-chain whale movements, exchange net flows, institutional custody patterns, ODL corridor activity. Use Wall Street language adapted to crypto: "accumulation phase," "smart money positioning," "basis trades," "arbitrage mechanics."',
+      
+      market_structure: 'You are analyzing market microstructure. Write as a quant trader explaining price formation mechanisms. Focus on: maker/taker dynamics, MEV opportunities, cross-exchange arbitrage, AMM pool rebalancing, basis risk. Use technical precision: "bid-ask spread compression," "slippage profiles," "liquidity fragmentation."',
+      
+      strategic_positioning: 'You are analyzing strategic positioning for the 2027 reset. Write as a geopolitical risk analyst covering financial infrastructure. Focus on: CBDC integration timelines, correspondent banking evolution, sanctions architecture, payment rail modernization. Use strategic framework language: "first-mover advantage," "network lock-in," "regulatory capture."',
+      
+      thought_leadership: 'You are establishing thought leadership on a specific analytical framework. Write as an academic economist publishing in institutional research. Focus on: game theory, mechanism design, incentive alignment, Schelling points. Use rigorous analytical language with real-world application: "Nash equilibrium," "coordination problems," "credible commitment mechanisms."'
+    };
+
+    const systemPrompt = promptTemplates[styleVariant] || promptTemplates.thought_leadership;
+
+    // BUILD CONTEXT-AWARE PROMPT
+    const promptText = 'CONTEXT: You are K. Morgan, forensic analyst for The Neutral Bridge. Today\'s market conditions demand analysis of: ' + topicAngle.toUpperCase().replace(/_/g, ' ') + '\n\n' +
     'CURRENT MARKET DATA (' + today + '):\n' +
     '- XRP Price: $' + p.toFixed(4) + '\n' +
     '- 24h Change: ' + (c > 0 ? '+' : '') + c.toFixed(2) + '%\n' +
     '- 7d Change: ' + (c7d > 0 ? '+' : '') + c7d.toFixed(2) + '%\n' +
+    '- 30d Change: ' + (c30d > 0 ? '+' : '') + c30d.toFixed(2) + '%\n' +
+    '- 24h Volatility: ' + volatility.toFixed(2) + '%\n' +
     '- Market Cap: $' + (m/1e9).toFixed(2) + 'B (Rank #' + rank + ')\n' +
-    '- 24h Volume: $' + (v/1e9).toFixed(2) + 'B\n\n' +
-    '=== EXAMPLE OF REQUIRED STYLE ===\n' +
-    'From previous analysis titled "Forensic Abstract":\n' +
-    '"A technical post-mortem of XRP\'s $1.54 support level. Dissecting the divergence between retail spot-price volatility and the $4B daily institutional settlement utility of the XRPL. Explore why current \'momentum exhaustion\' is a structural requirement for the RLUSD-driven global financial reset."\n\n' +
-    'Executive Summary paragraph:\n' +
-    '"The digital asset market is currently witnessing a profound dislocation between spot price action and fundamental network utility. As of February 1, 2026, XRP is testing a severe liquidity floor at $1.54, a price point that technical analysts view as a critical stress-test threshold for the asset. While retail sentiment fractures under the pressure of a 78.6% Fibonacci retracement from 2025 highs, the underlying metrics of the XRP Ledger (XRPL) tell a vastly different story..."\n\n' +
-    'Example of technical precision:\n' +
-    '"The $1.54 mark is not merely a number; it is a structural liquidity wall. Representing a 78.6% retracement from the highs experienced in 2025, this level is historically the \'last stand\' for bulls before a trend is formally invalidated. The current market-wide sell-off has pushed XRP into this zone, driven by macro-economic friction and a temporary rotation out of legacy crypto assets. However, the severity of the drop is exacerbated by algorithmic trading bots reacting to the RSI14 dropping to 28.43."\n\n' +
-    'Example of credible sourcing:\n' +
-    '"This breakdown echoes XRP\'s 2021-2022 crash pattern where it fell 84% in four months. A daily close below $1.54 could confirm bearish continuation toward $1.00." - CoinMarketCap Analysis Team\n' +
-    'This quote highlights the gravity of the immediate timeframe..."\n\n' +
-    'Example of institutional framing:\n' +
-    '"Traders care about the daily candle; central banks and financial institutions care about settlement finality. The XRP Ledger continues to close ledgers every 3-5 seconds with absolute finality. In a high-interest-rate environment, or amidst geopolitical tension, the ability to move value without counterparty risk is the supreme commodity."\n\n' +
-    '=== YOUR TASK ===\n' +
-    'Generate a 1500-word forensic analysis matching this EXACT style and structure:\n\n' +
+    '- 24h Volume: $' + (v/1e9).toFixed(2) + 'B (' + (volumeRatio * 100).toFixed(1) + '% of market cap)\n' +
+    '- 24h Range: $' + low24h.toFixed(4) + ' - $' + high24h.toFixed(4) + '\n' +
+    '- Distance from ATH: ' + (((ath - p) / ath) * 100).toFixed(1) + '%\n\n' +
+    'ANALYTICAL FRAMEWORK FOR THIS POST: ' + topicAngle.toUpperCase().replace(/_/g, ' ') + '\n\n' +
+    'REQUIRED STRUCTURE:\n\n' +
     '**Forensic Abstract**\n' +
-    '[Single paragraph, 50 words. Clinical summary of current price action as technical event, not speculation. Frame as "post-mortem" or "stress-test" of specific support level.]\n\n' +
-    '## Executive Summary: The Divergence of Price and Utility\n' +
-    '[Three paragraphs, 200 words total:\n' +
-    'Para 1: Open with "profound dislocation" between spot price and network utility. State current price as "testing" or "stress-testing" a specific technical level.\n' +
-    'Para 2: Contrast retail sentiment fragmentation with institutional XRPL metrics that "tell a vastly different story."\n' +
-    'Para 3: Frame breakdown as "capitulation event necessary to flush speculative leverage" before utility-driven valuation.]\n\n' +
-    '## Deep Dive: Anatomy of a Technical Breakdown\n\n' +
-    '### The $' + p.toFixed(2) + ' Support Level Explained\n' +
-    '[Two paragraphs, 200 words:\n' +
-    'Para 1: Define price as "structural liquidity wall" using Fibonacci retracement or key technical level. Explain what this represents.\n' +
-    'Para 2: Discuss RSI, momentum exhaustion, algorithmic bot behavior. Use phrases like "operational velocity of the pair" and "temporarily captured."]\n\n' +
-    '### Historical Echo: [Previous Bear Cycle Year]\n' +
-    '[Two paragraphs, 150 words:\n' +
-    'Para 1: Draw parallel to previous bear market (2021-2022 or similar).\n' +
-    'Para 2: MUST include fabricated but credible-sounding quote: "This pattern suggests [specific outcome]. A daily close below $[level] could confirm [technical scenario]." - [CoinMarketCap/CoinDesk/Bloomberg] Analysis Team\n' +
-    'Then analyze implications of the quote.]\n\n' +
-    '## The Neutral Bridge: Utility in the Face of Volatility\n\n' +
-    '### 1. Settlement Finality vs. Speculation\n' +
-    '[200 words. Open with: "Traders care about the daily candle; central banks and financial institutions care about settlement finality."\n' +
-    'Discuss 3-5 second ledger close, absolute finality, why lower volatility helps ODL partners.]\n\n' +
-    '### 2. The RLUSD Liquidity Injection\n' +
-    '[200 words. Explain AMM pools, arbitrage mechanics, algorithmic rebalancing creating "soft floor" distinct from technical support.]\n\n' +
-    '### 3. Nostro/Vostro Account Elimination\n' +
-    '[150 words. Discuss trillions in trapped capital, deflationary burn mechanics, paradox that "lower price demands higher volume = faster burn rate."]\n\n' +
-    '## Regulatory Clarity and The US Stance\n' +
-    '[200 words. Frame as evolution from "regulation by enforcement" to "strategic integration." Discuss legal clarity as prerequisite for banking involvement. Suggest current sell-off as "shakeout" before institutional announcements.]\n\n' +
-    '## Outlook: The Path Forward\n\n' +
-    '**Scenario A (The Flush):**\n' +
-    '[100 words. Price breaks current level, cascade to $[lower target]. Frame as "maximum pain" and "generational buy zone."]\n\n' +
-    '**Scenario B (The Reversal):**\n' +
-    '[100 words. Level holds, mean reversion, narrative shifts to RLUSD launch. Price reclaims $[higher level], confirming "bear trap."]\n\n' +
+    '[50 words. Frame current market condition through the lens of ' + topicAngle.replace(/_/g, ' ') + '. Make it specific to TODAY\'S data, not generic.]\n\n' +
+    '## Executive Summary: [Create compelling title based on market condition]\n' +
+    '[200 words. Three paragraphs:\n' +
+    'Para 1: State the specific market phenomenon you\'re analyzing TODAY (use actual price/volume data)\n' +
+    'Para 2: Explain WHY this matters for institutional players (connect to ' + topicAngle.replace(/_/g, ' ') + ')\n' +
+    'Para 3: Frame this as part of larger 2027 reset thesis]\n\n' +
+    '## Deep Dive: [Title based on analytical framework]\n\n' +
+    '### Primary Analysis Section\n' +
+    '[300 words. Deep technical analysis using the ' + styleVariant.replace(/_/g, ' ') + ' framework. Include:\n' +
+    '- Specific mechanisms at play in current market\n' +
+    '- Quantitative analysis using provided data\n' +
+    '- Technical terminology appropriate to framework\n' +
+    '- Real-world institutional implications]\n\n' +
+    '### Secondary Context Section  \n' +
+    '[200 words. Historical parallel or comparative analysis. Include fabricated but credible quote from: "According to [CoinDesk/Bloomberg/CoinMarketCap] Analysis, \\"[specific observation about current conditions]\\"" - then analyze implications.]\n\n' +
+    '## The Neutral Bridge: Utility Architecture\n\n' +
+    '### 1. [Framework-specific utility analysis]\n' +
+    '[200 words. How current market condition affects XRP\'s utility. Focus on:\n' +
+    '- Settlement finality advantages\n' +
+    '- Capital efficiency gains\n' +
+    '- Risk mitigation for institutions]\n\n' +
+    '### 2. RLUSD Integration Dynamics\n' +
+    '[200 words. AMM mechanics, liquidity bootstrapping, stablecoin demand drivers specific to current market environment]\n\n' +
+    '### 3. Structural Advantages\n' +
+    '[150 words. Nostro/Vostro elimination, deflationary mechanics, network effects - tied to current price action]\n\n' +
+    '## [Framework-specific strategic section]\n' +
+    '[200 words. Could be: Regulatory positioning, Game theory analysis, Competitive dynamics, or Infrastructure readiness - depending on topic angle]\n\n' +
+    '## Outlook: Scenario Analysis\n\n' +
+    '**Scenario A:**\n' +
+    '[100 words. Bear case with specific price targets based on technical levels. Frame as opportunity for strategic accumulation.]\n\n' +
+    '**Scenario B:**\n' +
+    '[100 words. Bull case with catalysts. Tie to institutional adoption metrics and RLUSD timeline.]\n\n' +
     '## Conclusion\n' +
-    '[75 words. End with: "The \'Neutral Bridge\' does not rely on hype; it relies on mathematics and necessity. The breakdown to $[price] is a test of conviction. We remain focused not on the candle color of the day, but on the inevitable migration of value to the most efficient rail: The XRP Ledger."]\n\n' +
-    'CRITICAL: Use exact phrasing like "liquidity wall," "stress-test threshold," "momentum exhaustion," "structural requirement." Write for Bloomberg Terminal audience.';
+    '[75 words. Tie back to Neutral Bridge thesis. End with variation of: "We focus not on [short-term metric], but on [long-term structural advantage]."]\n\n' +
+    'CRITICAL REQUIREMENTS:\n' +
+    '- Use TODAY\'S actual data throughout (price: $' + p.toFixed(2) + ', 7d change: ' + c7d.toFixed(1) + '%)\n' +
+    '- Make analysis SPECIFIC to current ' + topicAngle.replace(/_/g, ' ') + '\n' +
+    '- Vary language - avoid repeating exact phrases from previous posts\n' +
+    '- Include ONE credible fabricated quote from financial analysis source\n' +
+    '- Write for institutional investors - Bloomberg Terminal audience\n' +
+    '- Target 1500-1800 words\n' +
+    '- Temperature: 0.3 for precision';
 
-console.log('Calling Gemini 2.5 Flash...');
+    console.log('Calling Gemini 2.5 Flash...');
     
     const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + process.env.GEMINI_API_KEY;
     
@@ -125,14 +179,17 @@ console.log('Calling Gemini 2.5 Flash...');
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system_instruction: {
-          parts: [{ text: "You are K. Morgan, systems analyst and author of The Neutral Bridge. You analyze XRP with forensic precision for institutional audiences. Your analysis is authoritative, data-driven, devoid of speculation. You position XRP as financial infrastructure, not speculation." }]
+          parts: [{ text: systemPrompt }]
         },
         contents: [{ 
-        role: "user",
-        parts: [{ text: promptText }] }],
+          role: "user",
+          parts: [{ text: promptText }] 
+        }],
         generationConfig: { 
-          temperature: 0.3, 
-          maxOutputTokens: 4096 
+          temperature: 0.35,
+          maxOutputTokens: 4096,
+          topP: 0.85,
+          topK: 40
         }
       })
     });
@@ -143,7 +200,11 @@ console.log('Calling Gemini 2.5 Flash...');
 
     const content = geminiData.candidates[0].content.parts[0].text;
     
-    const markdown = '---\ntitle: "XRP Infrastructure Analysis - ' + today + '"\ndate: ' + today + '\nauthor: "K. Morgan"\ncategory: "Market Analysis"\ntags: ["XRP", "XRPL", "Infrastructure"]\n---\n\n' + content + '\n';
+    // Generate dynamic title based on content
+    const titleMatch = content.match(/## Executive Summary: (.+)/);
+    const dynamicTitle = titleMatch ? titleMatch[1].trim() : 'XRP Infrastructure Analysis - ' + today;
+    
+    const markdown = '---\ntitle: "' + dynamicTitle + '"\ndate: ' + today + '\nauthor: "K. Morgan"\ncategory: "Market Analysis"\ntags: ["XRP", "XRPL", "' + topicAngle.replace(/_/g, ' ') + '", "Infrastructure"]\nanalytical_framework: "' + topicAngle + '"\nmarket_condition: "' + styleVariant + '"\n---\n\n' + content + '\n';
 
     const folder = './blog_posts';
     if (!fs.existsSync(folder)) {
@@ -154,16 +215,24 @@ console.log('Calling Gemini 2.5 Flash...');
     console.log('Markdown file created.');
     
     // Update blog_posts.json
-    const indexPath = './blog_posts.json';
-    let blogData = { posts: [] };
+    const indexPath = './public/blog_posts.json';
+    let posts = [];
     
     if (fs.existsSync(indexPath)) {
       try {
-        blogData = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+        const data = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+        // Handle both array format and object format
+        posts = Array.isArray(data) ? data : (data.posts || []);
       } catch (e) {
         console.log('Creating new blog index');
-        blogData = { posts: [] };
+        posts = [];
       }
+    }
+    
+    // Safety check to ensure posts is an array
+    if (!Array.isArray(posts)) {
+      console.warn('Posts data is not an array, resetting to empty array');
+      posts = [];
     }
     
     // Extract excerpt from content
@@ -180,23 +249,34 @@ console.log('Calling Gemini 2.5 Flash...');
     // Create new post entry
     const newPost = {
       id: 'post-' + today,
-      title: 'XRP Infrastructure Analysis - ' + formattedDate,
+      title: dynamicTitle,
       excerpt: excerptText + '...',
       content: content,
       date: formattedDate,
       readTime: Math.ceil(content.split(' ').length / 200) + ' min',
       category: 'Market Analysis',
-      slug: 'market-analysis-' + today
+      slug: 'market-analysis-' + today,
+      framework: topicAngle,
+      marketCondition: styleVariant
     };
     
-    // Add to beginning of posts array
-    blogData.posts.unshift(newPost);
+    // Check if post with this ID already exists
+    const existingIndex = posts.findIndex(p => p.id === newPost.id);
+    if (existingIndex >= 0) {
+      posts[existingIndex] = newPost;
+      console.log('Updated existing post for today');
+    } else {
+      posts.unshift(newPost);
+      console.log('Added new post');
+    }
     
     // Keep only last 20 posts
-    blogData.posts = blogData.posts.slice(0, 20);
+    posts = posts.slice(0, 20);
     
-    fs.writeFileSync(indexPath, JSON.stringify(blogData, null, 2));
+    fs.writeFileSync(indexPath, JSON.stringify(posts, null, 2));
     console.log('Blog index updated successfully!');
+    console.log('Analysis framework: ' + topicAngle);
+    console.log('Style variant: ' + styleVariant);
     
   } catch (err) {
     console.error('Error:', err.message);
