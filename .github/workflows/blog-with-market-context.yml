@@ -271,7 +271,12 @@ jobs:
               const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
               const formattedDate = months[dateObj.getMonth()] + ' ' + dateObj.getDate() + ', ' + dateObj.getFullYear();
               
-              // Create new post entry
+             // Create new post entry
+              const existingPost = (function() {
+                const idx = posts.findIndex(function(p) { return p.id === 'post-' + today; });
+                return idx >= 0 ? posts[idx] : null;
+              })();
+
               const newPost = {
                 id: 'post-' + today,
                 title: dynamicTitle,
@@ -280,15 +285,20 @@ jobs:
                 date: formattedDate,
                 readTime: Math.ceil(content.split(' ').length / 200) + ' min',
                 category: 'Market Analysis',
+                image: existingPost ? existingPost.image : '',
+                tags: ['XRP', 'XRPL', topicAngle.replace(/_/g, ' '), 'Infrastructure'],
+                author: 'K. Morgan',
                 slug: 'market-analysis-' + today,
                 framework: topicAngle,
                 marketCondition: styleVariant
               };
               
               // Check if post with this ID already exists
-              const existingIndex = posts.findIndex(p => p.id === newPost.id);
+              const existingIndex = posts.findIndex(function(p) { return p.id === newPost.id; });
               if (existingIndex >= 0) {
-                posts[existingIndex] = newPost;
+                var preserved = posts[existingIndex];
+                Object.keys(newPost).forEach(function(key) { preserved[key] = newPost[key]; });
+                posts[existingIndex] = preserved;
                 console.log('Updated existing post for today');
               } else {
                 posts.unshift(newPost);
