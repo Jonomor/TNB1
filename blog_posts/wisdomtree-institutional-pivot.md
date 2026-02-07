@@ -27,7 +27,7 @@ To understand the gravity of this announcement, we must analyze the specific lan
 
 ### 1. "Core Strategic Focus" vs. "Experimental Phase"
 
-For the past five years, traditional finance (TradFi) treated blockchain as an R&D expense. It was an experiment—a sandbox to test tokenization without risking the balance sheet. Steinberg's declaration marks the crossing of the Rubicon. When a firm managing over **$100 billion in AUM** labels crypto as "core," it means:
+For the past five years, traditional finance (TradFi) treated blockchain as an R&D expense. It was an experiment, a sandbox to test tokenization without risking the balance sheet. Steinberg's declaration marks the crossing of the Rubicon. When a firm managing over **$100 billion in AUM** labels crypto as "core," it means:
 
 - **Resource Allocation:** IT, compliance, and legal budgets are now heavily weighted toward blockchain infrastructure.
 - **Integration:** Digital assets are no longer siloed; they are being integrated into the firm's primary portfolio management systems.
