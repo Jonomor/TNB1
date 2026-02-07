@@ -464,28 +464,115 @@
   }
 }
 
-/* ===== COMPARISON SECTION MOBILE FIX =====
-   Add this to the END of mobile-optimizations.css
-   (or replace the existing COMPARISON TABLE section)
-   ============================================ */
+/* =============================================
+   MOBILE FIXES PATCH - Add to END of mobile-optimizations.css
+   
+   IMPORTANT: Find and REMOVE or COMMENT OUT the existing 
+   "COMPARISON TABLE" section in your mobile-optimizations.css 
+   (the one with overflow-x: auto). Replace with this.
+   ============================================= */
 
-/* Remove the old comparison table overrides and replace with: */
+/* ===== COMPARISON SECTION (REPLACES OLD COMPARISON TABLE RULES) ===== */
 @media (max-width: 768px) {
-  /* Comparison section container */
+  /* Remove old horizontal scroll - card layout doesn't need it */
   #editions .border-t.border-white\/10.pt-12 {
-    padding-top: 1.5rem !important;
-    overflow-x: visible !important; /* Remove horizontal scroll - no longer needed */
+    padding-top: 1rem !important;
+    overflow-x: visible !important;
   }
 
-  /* Add a header above the comparison cards on mobile */
-  #editions .border-t.border-white\/10.pt-12::before {
-    content: 'Edition Comparison';
-    display: block;
-    font-family: ui-serif, Georgia, serif;
-    font-size: 1.25rem;
-    color: white;
-    margin-bottom: 1rem;
-    text-align: center;
+  /* Let the new card component handle its own spacing */
+  #editions .border-t.border-white\/10.pt-12 .py-4 {
+    padding-top: unset;
+    padding-bottom: unset;
+  }
+
+  #editions .border-t.border-white\/10.pt-12 .text-sm {
+    font-size: unset;
+  }
+}
+
+/* ===== PRICE JUSTIFICATION TABLE FIX ===== */
+@media (max-width: 768px) {
+  /* Make the table more readable on small screens */
+  #pricing table,
+  section table {
+    font-size: 0.8125rem !important;
+  }
+
+  #pricing table td,
+  #pricing table th,
+  section table td,
+  section table th {
+    padding: 0.625rem 0.5rem !important;
+    vertical-align: top !important;
+  }
+
+  /* Prevent Investment column from getting too narrow */
+  #pricing table td:first-child,
+  #pricing table th:first-child,
+  section table td:first-child,
+  section table th:first-child {
+    min-width: 100px !important;
+    white-space: normal !important;
+  }
+
+  /* Let Value Received column breathe */
+  #pricing table td:last-child,
+  #pricing table th:last-child,
+  section table td:last-child,
+  section table th:last-child {
+    max-width: 140px !important;
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+  }
+}
+
+/* ===== FOOTER FIX - Email icon alignment & spacing ===== */
+@media (max-width: 768px) {
+  /* Fix email row icon alignment */
+  footer .flex.items-center.gap-2 svg {
+    flex-shrink: 0 !important;
+    align-self: center !important;
+  }
+
+  /* Ensure email icon sits inline, not below */
+  footer a[href^="mailto"] {
+    word-break: break-all !important;
+  }
+
+  /* Reduce excessive empty space above footer content */
+  footer.py-24 {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  footer .mb-16 {
+    margin-bottom: 2rem !important;
+  }
+
+  /* Tighten up footer sections */
+  footer .gap-12 {
+    gap: 1.5rem !important;
+  }
+
+  /* Social link spacing */
+  footer .gap-4 {
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Footer columns - keep side by side */
+  footer .flex.gap-16 {
+    gap: 3rem !important;
+  }
+
+  /* Footer disclaimer tighter */
+  footer .mt-16 {
+    margin-top: 1.5rem !important;
+  }
+
+  footer .pt-8 {
+    padding-top: 1rem !important;
   }
 }
 
