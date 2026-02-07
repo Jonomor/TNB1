@@ -464,13 +464,30 @@
   }
 }
 
-/* ===== COMPARISON TABLE ===== */
+/* ===== COMPARISON SECTION MOBILE FIX =====
+   Add this to the END of mobile-optimizations.css
+   (or replace the existing COMPARISON TABLE section)
+   ============================================ */
+
+/* Remove the old comparison table overrides and replace with: */
 @media (max-width: 768px) {
-  /* Make table scrollable */
-  .border-t.border-white\/10.pt-12 {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+  /* Comparison section container */
+  #editions .border-t.border-white\/10.pt-12 {
+    padding-top: 1.5rem !important;
+    overflow-x: visible !important; /* Remove horizontal scroll - no longer needed */
   }
+
+  /* Add a header above the comparison cards on mobile */
+  #editions .border-t.border-white\/10.pt-12::before {
+    content: 'Edition Comparison';
+    display: block;
+    font-family: ui-serif, Georgia, serif;
+    font-size: 1.25rem;
+    color: white;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+}
 
   /* Smaller table text */
   .border-t.border-white\/10.pt-12 .text-sm {
