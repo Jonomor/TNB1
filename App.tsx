@@ -253,8 +253,8 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
       features: ['Serialized Raw Data Appendix', 'Excel-Based Liquidity Model', 'Quarterly Strategy Briefings', 'Priority Analyst Support', 'Snypre System AI Whitelist'],
       requiresAcknowledgement: true,
       variants: [
-        { id: 'ebook-inst', label: 'E-Book', price: '$99.99', ctaText: 'Buy Institutional', externalUrl: 'https://www.amazon.com/dp/B0GHRYD6BJ' },
-        { id: 'hardcover', label: 'Hardcover', price: '$159.99', ctaText: 'Buy Institutional' }
+        { id: 'ebook-inst', label: 'E-Book', price: '$69.99', ctaText: 'Buy Institutional', externalUrl: 'https://www.amazon.com/dp/B0GHRYD6BJ' },
+        { id: 'hardcover', label: 'Hardcover', price: '$49.99', ctaText: 'Buy Institutional' }
       ]
     }
   ];
