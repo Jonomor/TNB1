@@ -151,7 +151,7 @@ export const PreOrderBridge: React.FC = () => {
                          {redirectingType === 'institutional' ? (
                            <><Loader2 size={12} className="animate-spin"/> REDIRECTING...</>
                          ) : (
-                           "ORDER INSTITUTIONAL ON AMAZON ($99.99)"
+                           "ORDER INSTITUTIONAL ON AMAZON ($69.99)"
                          )}
                       </button>
                    </div>
