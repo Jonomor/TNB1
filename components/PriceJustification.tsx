@@ -36,7 +36,7 @@ export const PriceJustification: React.FC = () => {
                   Optimal
                 </span>
               </td>
-              <td className="p-6 text-sm text-electric-teal font-mono font-bold">$159.99</td>
+              <td className="p-6 text-sm text-electric-teal font-mono font-bold">$69.99</td>
               <td className="p-6 text-sm text-white">
                 A 2-year technical roadmap, years of engineering research, and 24/7 preparation for the 2027 Reset.
               </td>
