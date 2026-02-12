@@ -38,7 +38,7 @@ export const InstitutionalBundle: React.FC<InstitutionalBundleProps> = ({ onOpen
             <tbody className="divide-y divide-white/5">
               <tr>
                 <td className="py-4 text-sm text-white font-medium">System Analysis Manuscript (Institutional)</td>
-                <td className="py-4 text-sm text-white/60 font-mono text-right">$159.99</td>
+                <td className="py-4 text-sm text-white/60 font-mono text-right">$69.99</td>
                 <td className="py-4 text-center"><Check size={16} className="mx-auto text-electric-teal" /></td>
               </tr>
               <tr>
@@ -74,7 +74,7 @@ export const InstitutionalBundle: React.FC<InstitutionalBundleProps> = ({ onOpen
                 <td className="py-6 font-serif text-xl text-white pl-4">Total Asset Value: $800.00+</td>
                 <td colSpan={2} className="py-6 text-right pr-4">
                   <span className="font-mono text-sm text-electric-teal font-bold uppercase tracking-widest">
-                    Bundle Price: $159.99
+                    Bundle Price: $69.99
                   </span>
                 </td>
               </tr>
