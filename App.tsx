@@ -493,7 +493,7 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
 <PreLaunchUrgency 
         retailLink="https://www.amazon.com/dp/B0GHP8PGCL"
         institutionalLink="https://www.amazon.com/dp/B0GHRYD6BJ"
-        launchDate={new Date('2026-02-18T00:00:00')}
+        launchDate={new Date('2026-02-18T09:00:00 EST')}
       />
       
       <PreOrderBridge />
@@ -624,7 +624,7 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
   <PreLaunchUrgency 
     retailLink="https://www.amazon.com/dp/B0GHP8PGCL"
     institutionalLink="https://www.amazon.com/dp/B0GHRYD6BJ"
-    launchDate={new Date('2026-02-18T00:00:00')}
+    launchDate={new Date('2026-02-18T09:00:00 EST')}
   />
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto text-left">
     {pricingTiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
