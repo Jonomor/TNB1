@@ -28,6 +28,7 @@ import { VaultPage } from './components/VaultPage';
 import { BlogPage } from './components/BlogPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import XRPMarketWidget from './components/XRPMarketWidget';
+import { PreLaunchUrgency } from './components/PreLaunchUrgency';
 import MarketAnalysisPage from './pages/MarketAnalysisPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
@@ -614,6 +615,14 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
       <BridgeCalculator />
 
       <Section id="pricing" label="Secure Your Intelligence">
+        <PreLaunchUrgency 
+    retailLink="https://www.amazon.com/dp/B0GHP8PGCL"
+    institutionalLink="https://www.amazon.com/dp/B0GHRYD6BJ"
+    launchDate={new Date('2026-02-18T00:00:00')}
+  />
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto text-left">
+    {pricingTiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
+  </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center max-w-5xl mx-auto text-left">
           {pricingTiers.map((tier) => <PricingCard key={tier.id} tier={tier} />)}
         </div>
