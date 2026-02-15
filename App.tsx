@@ -489,7 +489,13 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
           </div>
         </div>
       </header>
-
+      
+<PreLaunchUrgency 
+        retailLink="https://www.amazon.com/dp/B0GHP8PGCL"
+        institutionalLink="https://www.amazon.com/dp/B0GHRYD6BJ"
+        launchDate={new Date('2026-02-18T00:00:00')}
+      />
+      
       <PreOrderBridge />
 
       {/* XRP Market Analysis Widget */}
