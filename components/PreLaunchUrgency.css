@@ -1,18 +1,15 @@
-/* DELETE THIS ENTIRE FILE AFTER LAUNCH */
-
 .pre-launch-urgency-wrapper {
-  margin: 2rem auto;
+  margin: 3rem auto;
   max-width: 800px;
   padding: 0 1rem;
 }
 
-/* Top Urgency Banner */
 .urgency-banner {
   background: linear-gradient(135deg, #1a2332 0%, #0a0f1a 100%);
   border: 2px solid #00d9ff;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
   animation: border-glow 2s ease-in-out infinite;
 }
@@ -54,7 +51,6 @@
   font-size: 0.85rem;
 }
 
-/* Order Buttons Container */
 .order-buttons-container {
   display: flex;
   gap: 1.5rem;
@@ -62,7 +58,6 @@
   justify-content: center;
 }
 
-/* Amazon Button Base Styling */
 .amazon-btn {
   position: relative;
   flex: 1;
@@ -71,7 +66,7 @@
   padding: 1.5rem 2rem;
   background: linear-gradient(135deg, #1a2332 0%, #0f1923 100%);
   border: 2px solid #00d9ff;
-  border-radius: 8px;
+  border-radius: 4px;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -88,7 +83,6 @@
   border-color: #ffd700;
 }
 
-/* Pulsing Animation on Buttons */
 .pulse-urgency {
   animation: pulse-border 2s ease-in-out infinite;
 }
@@ -102,7 +96,6 @@
   }
 }
 
-/* Urgency Overlay Badge */
 .btn-urgency-overlay {
   position: absolute;
   top: -8px;
@@ -133,7 +126,6 @@
   }
 }
 
-/* Button Text */
 .btn-text {
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
@@ -151,7 +143,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Different button variants */
 .institutional-btn {
   border-color: #ffd700;
 }
@@ -160,7 +151,6 @@
   border-color: #00d9ff;
 }
 
-/* Animations */
 @keyframes pulse-icon {
   0%, 100% {
     transform: scale(1);
@@ -181,7 +171,6 @@
   }
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .urgency-banner-content {
     font-size: 0.8rem;
