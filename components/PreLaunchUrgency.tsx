@@ -33,7 +33,7 @@ const PreLaunchUrgency: React.FC<PreLaunchUrgencyProps> = ({
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 60000); // Update every minute
+    const interval = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(interval);
   }, [launchDate]);
@@ -42,7 +42,6 @@ const PreLaunchUrgency: React.FC<PreLaunchUrgencyProps> = ({
 
   return (
     <div className="pre-launch-urgency-wrapper">
-      {/* Top Banner */}
       <div className="urgency-banner">
         <div className="urgency-banner-content">
           <span className="urgency-icon">⚡</span>
@@ -52,9 +51,7 @@ const PreLaunchUrgency: React.FC<PreLaunchUrgencyProps> = ({
         </div>
       </div>
 
-      {/* Order Buttons */}
       <div className="order-buttons-container">
-        {/* Retail Edition */}
         <a 
           href={retailLink} 
           className="amazon-btn retail-btn pulse-urgency" 
@@ -68,7 +65,6 @@ const PreLaunchUrgency: React.FC<PreLaunchUrgencyProps> = ({
           <span className="btn-price">Launch Price Locked</span>
         </a>
 
-        {/* Institutional Edition */}
         <a 
           href={institutionalLink} 
           className="amazon-btn institutional-btn pulse-urgency" 
