@@ -29,6 +29,7 @@ import { BlogPage } from './components/BlogPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import XRPMarketWidget from './components/XRPMarketWidget';
 import PreLaunchUrgency from './components/PreLaunchUrgency';
+import CanonicalEntities from './components/CanonicalEntities';
 import MarketAnalysisPage from './pages/MarketAnalysisPage';
 import { PricingTier, ComparisonPoint, Testimonial } from './types';
 import { getAssetBase } from './utils/assets';
