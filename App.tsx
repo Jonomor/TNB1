@@ -278,7 +278,7 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
 
   return (
     <div className="min-h-screen font-sans bg-matte-black text-off-white selection:bg-electric-teal selection:text-black pt-12">
-      
+      <CanonicalEntities />
       {/* GLOBAL FORENSIC STYLES */}
       <style>{`
         @keyframes osc-pulse {
