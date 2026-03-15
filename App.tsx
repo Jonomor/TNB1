@@ -686,38 +686,63 @@ if (currentPath.includes('#/retail') || currentPath.includes('#/institutional'))
       <div id="legal"><Disclaimer /></div>
 
       <footer className="bg-black border-t border-white/10 py-24 mb-16 text-left" id="footer">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
-          <div>
-            <div className="flex items-center gap-2 mb-6">
-              <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
-              <span className="font-serif font-bold tracking-tight text-white text-xl">The Neutral Bridge</span>
-            </div>
-            <div className="flex flex-col gap-2 text-sm text-white/50">
-              <div className="flex items-center gap-2"><span>Location: United States (Remote)</span></div>
-              <div className="flex items-center gap-2"><Mail size={14} className="text-electric-teal/60" /><a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a></div>
-            </div>
-          </div>
-          <div className="flex gap-4 text-white/40">
-              <a href="https://x.com/NeutralBridge" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">X (Twitter)</a>
-          </div>
-          <div className="flex gap-16 text-sm text-white/60">
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Resources</span>
-              <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
-              <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
-            </div>
-            <div className="flex flex-col gap-3">
-              <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Legal</span>
-              <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
-              <button onClick={() => { window.location.hash = '#/privacy'; window.location.reload(); }} className="hover:text-white text-left">Privacy Policy</button>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 leading-relaxed">
-          <p>The Neutral Bridge is an analytical publication. It does not constitute financial or investment advice.</p>
-          <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
-        </div>
-      </footer>
+  <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
+    <div>
+      <div className="flex items-center gap-2 mb-6">
+        <img src="/bridge_LOGO_3.png" alt="The Neutral Bridge" className="w-6 h-6" />
+        <span className="font-serif font-bold tracking-tight text-white text-xl">The Neutral Bridge</span>
+      </div>
+      <div className="flex flex-col gap-2 text-sm text-white/50 mb-6">
+        <div className="flex items-center gap-2"><span>Financial Infrastructure Research</span></div>
+        <div className="flex items-center gap-2"><Mail size={14} className="text-electric-teal/60" /><a href="mailto:inquiries@theneutralbridge.com" className="hover:text-white">inquiries@theneutralbridge.com</a></div>
+      </div>
+      
+      {/* Canonical Entity Authority Loop */}
+      <div className="border-t border-white/10 pt-6 mt-6 space-y-2">
+        <div className="text-xs text-white/40 uppercase tracking-widest mb-3">Network</div>
+        <a 
+          href="https://jonomor.com/ali-morgan" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm text-white/60 hover:text-electric-teal transition-colors group"
+        >
+          <span className="w-1 h-1 rounded-full bg-electric-teal group-hover:bg-white"></span>
+          Built by Ali Morgan
+        </a>
+        <a 
+          href="https://jonomor.com/ecosystem" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-sm text-white/60 hover:text-electric-teal transition-colors group"
+        >
+          <span className="w-1 h-1 rounded-full bg-electric-teal group-hover:bg-white"></span>
+          Part of the Jonomor Ecosystem
+        </a>
+      </div>
+    </div>
+    
+    <div className="flex gap-4 text-white/40">
+        <a href="https://x.com/NeutralBridge" target="_blank" rel="noopener noreferrer" className="hover:text-electric-teal transition-colors">X (Twitter)</a>
+    </div>
+    
+    <div className="flex gap-16 text-sm text-white/60">
+      <div className="flex flex-col gap-3">
+        <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Resources</span>
+        <button onClick={() => scrollToSection('pricing')} className="hover:text-white text-left">Shop</button>
+        <button onClick={() => scrollToSection('editions')} className="hover:text-white text-left">Analysis</button>
+      </div>
+      <div className="flex flex-col gap-3">
+        <span className="font-bold text-white mb-2 uppercase tracking-widest text-xs">Legal</span>
+        <button onClick={() => openLegal('terms')} className="hover:text-white text-left">Terms of Service</button>
+        <button onClick={() => { window.location.hash = '#/privacy'; window.location.reload(); }} className="hover:text-white text-left">Privacy Policy</button>
+      </div>
+    </div>
+  </div>
+  <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-white/5 text-[10px] text-white/20 leading-relaxed">
+    <p>The Neutral Bridge is a financial infrastructure research and analysis publication. It does not constitute financial or investment advice.</p>
+    <p className="mt-2">© 2026 K. Morgan. All Rights Reserved.</p>
+  </div>
+</footer>
     </div>
   );
 };
